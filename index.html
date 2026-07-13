@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>آینده نگر</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', Tahoma, sans-serif; -webkit-tap-highlight-color: transparent; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
+
+.app-container { width: 100%; height: 100%; max-width: 480px; margin: 0 auto; position: relative; overflow: hidden; background: #000; }
+
+.screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; animation: fadeIn 0.4s ease; }
+.screen.active { display: flex; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+#loading-screen { background: url('b6cf661e-bf25-4eef-9494-0a4e08e27f1a.png') center/cover no-repeat; justify-content: center; align-items: center; }
+
+.loading-spinner { position: absolute; bottom: 30px; left: 20px; width: 50px; height: 50px; animation: spin 1.5s linear infinite; }
+.spinner-line { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 4px solid transparent; }
+.spinner-line:nth-child(1) { border-top-color: #22c55e; transform: rotate(0deg); }
+.spinner-line:nth-child(2) { border-top-color: #ffffff; transform: rotate(120deg); }
+.spinner-line:nth-child(3) { border-top-color: #ef4444; transform: rotate(240deg); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-bottom-right { position: absolute; bottom: 30px; right: 20px; color: #fff; font-size: 11px; text-align: center; background: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 20px; backdrop-filter: blur(10px); }
+
+#phone-screen { background: url('191a055a-3a77-4739-ae96-50cc8ff26189.png') center/cover no-repeat; padding: 40px 25px; justify-content: center; }
+.phone-logo { width: 120px; height: 120px; margin: 0 auto 25px; background: url('InShot_20260712_161951935.png') center/cover no-repeat; }
+.phone-title { text-align: center; color: #fff; font-size: 22px; font-weight: 700; margin-bottom: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+.phone-subtitle { text-align: center; color: rgba(255,255,255,0.9); font-size: 13px; margin-bottom: 30px; font-weight: 500; }
+.input-group { background: rgba(255,255,255,0.97); border-radius: 16px; padding: 14px 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+.input-group .icon { font-size: 20px; color: #666; }
+.input-group input { flex: 1; border: none; outline: none; background: transparent; font-size: 16px; font-family: inherit; color: #000; font-weight: 600; direction: ltr; text-align: right; }
+.input-group input::placeholder { color: #555; font-weight: 400; }
+
+.btn-primary { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #fff; border: none; padding: 16px; border-radius: 16px; font-size: 17px; font-weight: 700; font-family: inherit; cursor: pointer; box-shadow: 0 8px 25px rgba(239,68,68,0.4); transition: all 0.2s; margin-top: 10px; }
+.btn-primary:active { transform: scale(0.97); }
+
+#video-screen { background: #000; justify-content: center; align-items: center; }
+.video-container { width: 100%; height: 100%; position: relative; }
+.video-container video { width: 100%; height: 100%; object-fit: cover; }
+.skip-btn { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.6); color: #fff; border: none; padding: 10px 18px; border-radius: 25px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; backdrop-filter: blur(10px); opacity: 0.4; pointer-events: none; transition: all 0.3s; }
+.skip-btn.active { opacity: 1; pointer-events: auto; }
+.video-timer { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 13px; background: rgba(0,0,0,0.5); padding: 8px 16px; border-radius: 20px; }
+
+#otp-screen { background: url('191a055a-3a77-4739-ae96-50cc8ff26189.png') center/cover no-repeat; padding: 40px 25px; justify-content: center; }
+.otp-title { text-align: center; color: #fff; font-size: 20px; font-weight: 700; margin-bottom: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }.otp-subtitle { text-align: center; color: rgba(255,255,255,0.9); font-size: 13px; margin-bottom: 30px; font-weight: 500; }
+.otp-inputs { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; direction: ltr; }
+.otp-inputs input { width: 50px; height: 60px; text-align: center; border: 2px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.97); border-radius: 12px; font-size: 22px; font-weight: 700; outline: none; color: #000; }
+.otp-inputs input:focus { border-color: #ef4444; }
+.resend-btn { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.5); padding: 12px; border-radius: 12px; font-family: inherit; font-size: 14px; cursor: pointer; margin-top: 10px; transition: all 0.2s; font-weight: 500; }
+.resend-btn:active { background: rgba(255,255,255,0.1); }
+
+#info-screen { background: url('191a055a-3a77-4739-ae96-50cc8ff26189.png') center/cover no-repeat; padding: 30px 25px; overflow-y: auto; }
+.info-title { text-align: center; color: #fff; font-size: 20px; font-weight: 700; margin-bottom: 25px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+.info-input { background: rgba(255,255,255,0.97); border-radius: 14px; padding: 14px 18px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+.info-input input, .info-input select { flex: 1; border: none; outline: none; background: transparent; font-size: 15px; font-family: inherit; color: #000; font-weight: 600; }
+.info-input input::placeholder { color: #555; font-weight: 400; }
+.info-input select { cursor: pointer; }
+
+#profile-screen { background: url('191a055a-3a77-4739-ae96-50cc8ff26189.png') center/cover no-repeat; padding: 30px 25px; justify-content: center; align-items: center; }
+.profile-circle { width: 140px; height: 140px; border-radius: 50%; border: 4px solid #22c55e; background: rgba(255,255,255,0.2); display: flex; justify-content: center; align-items: center; cursor: pointer; overflow: hidden; box-shadow: 0 8px 30px rgba(34,197,94,0.3); margin-bottom: 25px; }
+.profile-circle img { width: 100%; height: 100%; object-fit: cover; }
+.profile-circle .plus-icon { font-size: 50px; color: #fff; font-weight: 300; }
+.profile-circle-label { color: #fff; font-size: 12px; margin-top: -15px; margin-bottom: 20px; text-shadow: 0 2px 8px rgba(0,0,0,0.5); font-weight: 500; }
+.profile-fields { width: 100%; }
+.profile-field { background: rgba(255,255,255,0.97); border-radius: 14px; padding: 14px 18px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+.profile-field input, .profile-field select { flex: 1; border: none; outline: none; background: transparent; font-size: 15px; font-family: inherit; color: #000; font-weight: 600; }
+.profile-field input::placeholder { color: #555; font-weight: 400; }
+
+#password-screen, #forgot-screen, #verify-forgot-screen, #reset-screen { background: url('191a055a-3a77-4739-ae96-50cc8ff26189.png') center/cover no-repeat; padding: 40px 25px; justify-content: center; }
+.pwd-title { text-align: center; color: #fff; font-size: 20px; font-weight: 700; margin-bottom: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+.pwd-subtitle { text-align: center; color: rgba(255,255,255,0.9); font-size: 13px; margin-bottom: 30px; font-weight: 500; }
+.forgot-link { text-align: center; color: #fff; font-size: 13px; margin-top: 15px; cursor: pointer; text-decoration: underline; font-weight: 500; }
+
+.toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); color: #fff; padding: 12px 24px; border-radius: 25px; font-size: 14px; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <div id="loading-screen" class="screen active">
+    <div class="loading-spinner">
+      <div class="spinner-line"></div>
+      <div class="spinner-line"></div>
+      <div class="spinner-line"></div>
+    </div>
+    <div class="loading-bottom-right"><div>1.0.0</div></div>
+  </div>
+
+  <div id="phone-screen" class="screen">
+    <div class="phone-logo"></div>
+    <div class="phone-title">به آینده نگر خوش آمدید</div>
+    <div class="phone-subtitle">برای ادامه شماره موبایل خود را وارد کنید</div>
+    <div class="input-group">      <span class="icon">📱</span>
+      <input type="tel" id="phone-input" placeholder="09123456789" maxlength="11">
+    </div>
+    <button class="btn-primary" onclick="submitPhone()">تایید و ادامه</button>
+  </div>
+
+  <div id="video-screen" class="screen">
+    <div class="video-container">
+      <video id="intro-video" autoplay muted playsinline>
+        <source src="intro.mp4" type="video/mp4">
+      </video>
+      <button class="skip-btn" id="skip-btn" onclick="skipVideo()">رد کردن</button>
+      <div class="video-timer" id="video-timer">02:00</div>
+    </div>
+  </div>
+
+  <div id="otp-screen" class="screen">
+    <div class="phone-logo"></div>
+    <div class="otp-title">کد تایید را وارد کنید</div>
+    <div class="otp-subtitle">کد 5 رقمی به شماره <span id="otp-phone"></span> ارسال شد</div>
+    <div class="otp-inputs">
+      <input type="tel" maxlength="1" class="otp-digit">
+      <input type="tel" maxlength="1" class="otp-digit">
+      <input type="tel" maxlength="1" class="otp-digit">
+      <input type="tel" maxlength="1" class="otp-digit">
+      <input type="tel" maxlength="1" class="otp-digit">
+    </div>
+    <button class="btn-primary" onclick="verifyOTP()">تایید کد</button>
+    <button class="resend-btn" onclick="resendOTP()"> ارسال مجدد کد</button>
+  </div>
+
+  <div id="info-screen" class="screen">
+    <div class="phone-logo"></div>
+    <div class="info-title">اطلاعات شخصی</div>
+    <div class="info-input">
+      <span class="icon"></span>
+      <input type="text" id="info-firstname" placeholder="نام">
+    </div>
+    <div class="info-input">
+      <span class="icon">👤</span>
+      <input type="text" id="info-lastname" placeholder="نام خانوادگی">
+    </div>
+    <div class="info-input">
+      <span class="icon">🏫</span>
+      <input type="text" id="info-school" placeholder="نام مدرسه">
+    </div>
+    <div class="info-input">
+      <span class="icon">📍</span>
+      <select id="info-province">
+        <option value="">انتخاب استان</option>        <option>آذربایجان شرقی</option><option>آذربایجان غربی</option>
+        <option>اردبیل</option><option>اصفهان</option><option>البرز</option>
+        <option>ایلام</option><option>بوشهر</option><option>تهران</option>
+        <option>چهارمحال و بختیاری</option><option>خراسان جنوبی</option>
+        <option>خراسان رضوی</option><option>خراسان شمالی</option>
+        <option>خوزستان</option><option>زنجان</option><option>سمنان</option>
+        <option>سیستان و بلوچستان</option><option>فارس</option>
+        <option>قزوین</option><option>قم</option><option>کردستان</option>
+        <option>کرمان</option><option>کرمانشاه</option>
+        <option>کهگیلویه و بویراحمد</option><option>گلستان</option>
+        <option>گیلان</option><option>لرستان</option><option>مازندران</option>
+        <option>مرکزی</option><option>هرمزگان</option><option>همدان</option>
+        <option>یزد</option>
+      </select>
+    </div>
+    <div class="info-input">
+      <span class="icon"></span>
+      <input type="tel" id="info-contact" placeholder="شماره تماس">
+    </div>
+    <button class="btn-primary" onclick="submitInfo()">تایید و ادامه</button>
+  </div>
+
+  <div id="profile-screen" class="screen">
+    <div class="profile-circle" onclick="document.getElementById('avatar-input').click()">
+      <span class="plus-icon" id="avatar-placeholder">+</span>
+      <img id="avatar-preview" style="display:none;">
+    </div>
+    <div class="profile-circle-label">انتخاب عکس پروفایل</div>
+    <input type="file" id="avatar-input" accept="image/*" style="display:none;" onchange="handleAvatar(event)">
+    <div class="profile-fields">
+      <div class="profile-field">
+        <span class="icon">🎂</span>
+        <input type="number" id="profile-age" placeholder="سن" min="5" max="99">
+      </div>
+      <div class="profile-field">
+        <span class="icon">📚</span>
+        <select id="profile-grade">
+          <option value="">پایه تحصیلی</option>
+          <option>هفتم</option><option>هشتم</option><option>نهم</option>
+        </select>
+      </div>
+      <div class="profile-field">
+        <span class="icon">🔒</span>
+        <input type="password" id="profile-password" placeholder="رمز عبور (حداقل 6 کاراکتر)">
+      </div>
+    </div>
+    <button class="btn-primary" onclick="submitProfile()">ورود به برنامه</button>
+  </div>
+
+  <div id="password-screen" class="screen">    <div class="phone-logo"></div>
+    <div class="pwd-title">خوش برگشتی! 👋</div>
+    <div class="pwd-subtitle">رمز عبور خود را وارد کنید</div>
+    <div class="input-group">
+      <span class="icon">🔒</span>
+      <input type="password" id="pwd-input" placeholder="رمز عبور">
+    </div>
+    <button class="btn-primary" onclick="verifyPassword()">ورود به حساب</button>
+    <div class="forgot-link" onclick="showScreen('forgot-screen')">رمز عبور را فراموش کرده‌ام</div>
+  </div>
+
+  <div id="forgot-screen" class="screen">
+    <div class="phone-logo"></div>
+    <div class="pwd-title">بازیابی رمز عبور</div>
+    <div class="pwd-subtitle">برای دریافت کد یکبار مصرف دکمه زیر را بزنید</div>
+    <button class="btn-primary" onclick="sendForgotOTP()">📨 ارسال کد یکبار مصرف</button>
+    <div class="forgot-link" onclick="showScreen('password-screen')">بازگشت به صفحه ورود</div>
+  </div>
+
+  <div id="verify-forgot-screen" class="screen">
+    <div class="phone-logo"></div>
+    <div class="pwd-title">تایید کد یکبار مصرف</div>
+    <div class="pwd-subtitle">کد ارسال شده به شماره <span id="forgot-phone-display"></span> را وارد کنید</div>
+    <div class="input-group">
+      <span class="icon">🔑</span>
+      <input type="tel" id="verify-forgot-otp" placeholder="کد 5 رقمی" maxlength="5">
+    </div>
+    <button class="btn-primary" onclick="verifyForgotOTP()">تایید کد</button>
+    <button class="resend-btn" onclick="sendForgotOTP()">🔄 ارسال مجدد کد</button>
+  </div>
+
+  <div id="reset-screen" class="screen">
+    <div class="phone-logo"></div>
+    <div class="pwd-title">رمز عبور جدید</div>
+    <div class="pwd-subtitle">رمز عبور جدید خود را وارد کنید</div>
+    <div class="input-group">
+      <span class="icon">🔒</span>
+      <input type="password" id="new-pwd" placeholder="رمز عبور جدید">
+    </div>
+    <div class="input-group">
+      <span class="icon">🔒</span>
+      <input type="password" id="confirm-pwd" placeholder="تکرار رمز عبور">
+    </div>
+    <button class="btn-primary" onclick="resetPassword()">تایید و ورود</button>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+// ============================================
+// JSONBin Configuration
+// ============================================
+const JSONBIN_CONFIG = {
+  MASTER_KEY: '$2a$10$G8pgSWnFz4w/.voj3lfBPuJL7luRXAXiR/fIufC3YIB4.qRkZSjSS',
+  BIN_ID: '6a53f4c8f5f4af5e298541fe',
+  BASE_URL: 'https://api.jsonbin.io/v3/b'
+};
+
+// ============================================
+// TEACHER & SUPPORT ACCOUNTS
+// ============================================
+const TEACHER_ACCOUNT = {
+  phone: '09904844001',
+  password: 'Par1617230',
+  firstname: 'احسان',
+  lastname: 'بهشتی کیا',
+  isTeacher: true,
+  isSupport: true,
+  avatar: 'IMG_20260712_192216_220.jpg',
+  grade: 'همه',
+  age: '30',
+  school: 'آموزشگاه آینده نگر',
+  province: 'تهران',
+  contact: '09904844001',
+  vipView: 'unlimited',
+  vipDownload: 'unlimited',
+  vipClass: 'unlimited',
+  vipChat: 'unlimited'
+};
+
+const SUPPORT_ACCOUNTS = {
+  '09904844031': {
+    firstname: 'پشتیبان', lastname: 'اصلی',
+    password: 'Par1617230', isSupport: true,
+    grade: 'نهم', age: '15', school: 'تیم پشتیبانی',
+    province: 'تهران', contact: '09904844031',
+    vipView: 'unlimited', vipDownload: 'unlimited',
+    vipClass: 'unlimited', vipChat: 'unlimited'
+  },
+  '09904845012': {
+    firstname: 'پشتیبان', lastname: 'دوم',
+    password: '123456789', isSupport: true,
+    grade: 'نهم', age: '15', school: 'تیم پشتیبانی',
+    province: 'تهران', contact: '09904845012',
+    vipView: 'unlimited', vipDownload: 'unlimited',
+    vipClass: 'unlimited', vipChat: 'unlimited'
+  },
+  '09190882182': {    firstname: 'پشتیبان', lastname: 'سوم',
+    password: '123456789', isSupport: true,
+    grade: 'نهم', age: '15', school: 'تیم پشتیبانی',
+    province: 'تهران', contact: '09190882182',
+    vipView: 'unlimited', vipDownload: 'unlimited',
+    vipClass: 'unlimited', vipChat: 'unlimited'
+  }
+};
+
+// ============================================
+// STATE
+// ============================================
+let currentPhone = '';
+let generatedOTP = '';
+let forgotOTP = '';
+let videoTimer = 120;
+let videoInterval = null;
+let userData = {};
+let appData = { users: {}, videos: [], messages: {}, activity_logs: [] };
+
+// ============================================
+// LOCAL STORAGE HELPERS
+// ============================================
+function getLocalStorageData() {
+  return {
+    users: JSON.parse(localStorage.getItem('riazi_users') || '{}'),
+    videos: JSON.parse(localStorage.getItem('riazi_videos') || '[]'),
+    messages: JSON.parse(localStorage.getItem('riazi_messages') || '{}'),
+    activity_logs: JSON.parse(localStorage.getItem('riazi_activity_logs') || '[]')
+  };
+}
+
+function saveToLocalStorage(data) {
+  localStorage.setItem('riazi_users', JSON.stringify(data.users || {}));
+  localStorage.setItem('riazi_videos', JSON.stringify(data.videos || []));
+  localStorage.setItem('riazi_messages', JSON.stringify(data.messages || {}));
+  localStorage.setItem('riazi_activity_logs', JSON.stringify(data.activity_logs || []));
+}
+
+// ============================================
+// JSONBin API
+// ============================================
+async function fetchFromJSONBin() {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    const response = await fetch(JSONBIN_CONFIG.BASE_URL + '/' + JSONBIN_CONFIG.BIN_ID + '/latest', {
+      method: 'GET',
+      headers: { 'X-Master-Key': JSONBIN_CONFIG.MASTER_KEY },
+      signal: controller.signal    });
+    clearTimeout(timeoutId);
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    const data = await response.json();
+    const record = data.record || {};
+    if (!record.users) record.users = {};
+    if (!record.videos) record.videos = [];
+    if (!record.messages) record.messages = {};
+    if (!record.activity_logs) record.activity_logs = [];
+    return record;
+  } catch (error) {
+    return getLocalStorageData();
+  }
+}
+
+async function saveToJSONBin(data) {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const response = await fetch(JSONBIN_CONFIG.BASE_URL + '/' + JSONBIN_CONFIG.BIN_ID, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_CONFIG.MASTER_KEY },
+      body: JSON.stringify(data),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function loadData() {
+  appData = await fetchFromJSONBin();
+  saveToLocalStorage(appData);
+  return appData;
+}
+
+async function saveData() {
+  saveToLocalStorage(appData);
+  await saveToJSONBin(appData);
+}
+
+// ============================================
+// ثبت اکانت‌های پیش‌فرض
+// ============================================
+function registerDefaultAccounts() {
+  let changed = false;
+    if (!appData.users[TEACHER_ACCOUNT.phone]) {
+    appData.users[TEACHER_ACCOUNT.phone] = { ...TEACHER_ACCOUNT, registeredAt: new Date().toISOString() };
+    changed = true;
+  } else {
+    appData.users[TEACHER_ACCOUNT.phone].isTeacher = true;
+    appData.users[TEACHER_ACCOUNT.phone].isSupport = true;
+    appData.users[TEACHER_ACCOUNT.phone].password = TEACHER_ACCOUNT.password;
+    appData.users[TEACHER_ACCOUNT.phone].vipView = 'unlimited';
+    appData.users[TEACHER_ACCOUNT.phone].vipDownload = 'unlimited';
+    appData.users[TEACHER_ACCOUNT.phone].vipClass = 'unlimited';
+    appData.users[TEACHER_ACCOUNT.phone].vipChat = 'unlimited';
+    changed = true;
+  }
+  
+  for (const phone in SUPPORT_ACCOUNTS) {
+    if (!appData.users[phone]) {
+      appData.users[phone] = { ...SUPPORT_ACCOUNTS[phone], registeredAt: new Date().toISOString() };
+      changed = true;
+    } else {
+      appData.users[phone].isSupport = true;
+      appData.users[phone].password = SUPPORT_ACCOUNTS[phone].password;
+      appData.users[phone].vipView = 'unlimited';
+      appData.users[phone].vipDownload = 'unlimited';
+      appData.users[phone].vipClass = 'unlimited';
+      appData.users[phone].vipChat = 'unlimited';
+      changed = true;
+    }
+  }
+  
+  if (changed) {
+    saveToLocalStorage(appData);
+  }
+  
+  return appData;
+}
+
+// ============================================
+// SHOW SCREEN
+// ============================================
+function showScreen(id) {
+  const screens = document.querySelectorAll('.screen');
+  for (let i = 0; i < screens.length; i++) {
+    screens[i].classList.remove('active');
+  }
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
+}
+
+// ============================================
+// TOAST// ============================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============================================
+// GO TO SAFE BARNAME.HTML
+// ============================================
+function goToSafeBarname() {
+  window.location.href = 'Safe Barname.html';
+}
+
+// ============================================
+// START APP
+// ============================================
+const initialData = getLocalStorageData();
+appData = initialData;
+registerDefaultAccounts();
+
+setTimeout(function() {
+  const current = localStorage.getItem('riazi_current');
+  
+  if (current && appData.users[current]) {
+    currentPhone = current;
+    goToSafeBarname();
+    return;
+  }
+  
+  showScreen('phone-screen');
+  
+  loadData().then(function() {
+    registerDefaultAccounts();
+  }).catch(function() {});
+}, 3000);
+
+// ============================================
+// PHONE SUBMIT
+// ============================================
+async function submitPhone() {
+  const phone = document.getElementById('phone-input').value.trim();
+  if (phone.length !== 11 || !phone.startsWith('09')) {
+    showToast('❌ شماره موبایل معتبر نیست');
+    return;
+  }
+  currentPhone = phone;
+  
+  await loadData();  appData = registerDefaultAccounts();
+  
+  if (appData.users[phone]) {
+    showScreen('password-screen');
+  } else {
+    startVideo();
+  }
+}
+
+// ============================================
+// VIDEO
+// ============================================
+function startVideo() {
+  showScreen('video-screen');
+  videoTimer = 120;
+  updateVideoTimer();
+  
+  const skipBtn = document.getElementById('skip-btn');
+  skipBtn.classList.remove('active');
+  
+  if (videoInterval) {
+    clearInterval(videoInterval);
+    videoInterval = null;
+  }
+  
+  videoInterval = setInterval(function() {
+    videoTimer--;
+    updateVideoTimer();
+    if (videoTimer <= 0) {
+      clearInterval(videoInterval);
+      videoInterval = null;
+      skipBtn.classList.add('active');
+    }
+  }, 1000);
+}
+
+function updateVideoTimer() {
+  if (videoTimer < 0) videoTimer = 0;
+  const m = Math.floor(videoTimer / 60);
+  const s = videoTimer % 60;
+  document.getElementById('video-timer').textContent = 
+    m.toString().padStart(2,'0') + ':' + s.toString().padStart(2,'0');
+}
+
+function skipVideo() {
+  const skipBtn = document.getElementById('skip-btn');
+  if (!skipBtn.classList.contains('active')) {
+    showToast('️ لطفاً صبر کنید تا زمان ویدیو تمام شود');
+    return;
+  }  if (videoInterval) {
+    clearInterval(videoInterval);
+    videoInterval = null;
+  }
+  generatedOTP = Math.floor(10000 + Math.random() * 90000).toString();
+  document.getElementById('otp-phone').textContent = currentPhone;
+  showScreen('otp-screen');
+  showToast('کد تایید: ' + generatedOTP);
+}
+
+// ============================================
+// OTP
+// ============================================
+document.querySelectorAll('.otp-digit').forEach(function(input, idx, arr) {
+  input.addEventListener('input', function(e) {
+    if (e.target.value && idx < arr.length - 1) arr[idx + 1].focus();
+  });
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Backspace' && !e.target.value && idx > 0) arr[idx - 1].focus();
+  });
+});
+
+function verifyOTP() {
+  const digits = Array.from(document.querySelectorAll('.otp-digit')).map(function(i) { return i.value; }).join('');
+  if (digits.length !== 5) { showToast('❌ کد 5 رقمی را کامل وارد کنید'); return; }
+  if (digits === generatedOTP) {
+    showScreen('info-screen');
+  } else {
+    showToast('❌ کد وارد شده اشتباه است');
+  }
+}
+
+function resendOTP() {
+  generatedOTP = Math.floor(10000 + Math.random() * 90000).toString();
+  showToast('کد جدید ارسال شد: ' + generatedOTP);
+  document.querySelectorAll('.otp-digit').forEach(function(i) { i.value = ''; });
+  document.querySelector('.otp-digit').focus();
+}
+
+// ============================================
+// INFO
+// ============================================
+function submitInfo() {
+  const firstname = document.getElementById('info-firstname').value.trim();
+  const lastname = document.getElementById('info-lastname').value.trim();
+  const school = document.getElementById('info-school').value.trim();
+  const province = document.getElementById('info-province').value;
+  const contact = document.getElementById('info-contact').value.trim();
+  if (!firstname || !lastname || !school || !province || !contact) {
+    showToast('❌ همه فیلدها را پر کنید'); return;  }
+  userData = { firstname: firstname, lastname: lastname, school: school, province: province, contact: contact, phone: currentPhone, isSupport: false };
+  showScreen('profile-screen');
+}
+
+// ============================================
+// PROFILE
+// ============================================
+function handleAvatar(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const img = document.getElementById('avatar-preview');
+    img.src = ev.target.result;
+    img.style.display = 'block';
+    document.getElementById('avatar-placeholder').style.display = 'none';
+    userData.avatar = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function submitProfile() {
+  const age = document.getElementById('profile-age').value;
+  const grade = document.getElementById('profile-grade').value;
+  const password = document.getElementById('profile-password').value;
+  if (!age || !grade || !password) { showToast(' همه فیلدها را پر کنید'); return; }
+  if (password.length < 6) { showToast('❌ رمز عبور باید حداقل 6 کاراکتر باشد'); return; }
+  userData.age = age;
+  userData.grade = grade;
+  userData.password = password;
+  userData.registeredAt = new Date().toISOString();
+  userData.isSupport = false;
+  appData.users[currentPhone] = userData;
+  localStorage.setItem('riazi_current', currentPhone);
+  await saveData();
+  goToSafeBarname();
+}
+
+// ============================================
+// PASSWORD
+// ============================================
+async function verifyPassword() {
+  const pwd = document.getElementById('pwd-input').value;
+  await loadData();
+  appData = registerDefaultAccounts();
+  const user = appData.users[currentPhone];
+  if (user && user.password === pwd) {
+    localStorage.setItem('riazi_current', currentPhone);
+    goToSafeBarname();  } else {
+    showToast('❌ رمز عبور اشتباه است');
+  }
+}
+
+// ============================================
+// FORGOT PASSWORD
+// ============================================
+function sendForgotOTP() {
+  forgotOTP = Math.floor(10000 + Math.random() * 90000).toString();
+  document.getElementById('forgot-phone-display').textContent = currentPhone;
+  showScreen('verify-forgot-screen');
+  showToast('کد یکبار مصرف: ' + forgotOTP);
+  document.getElementById('verify-forgot-otp').value = '';
+  setTimeout(function() { document.getElementById('verify-forgot-otp').focus(); }, 100);
+}
+
+function verifyForgotOTP() {
+  const otp = document.getElementById('verify-forgot-otp').value.trim();
+  if (!otp || otp.length !== 5) { showToast('❌ کد 5 رقمی را وارد کنید'); return; }
+  if (otp === forgotOTP) {
+    showScreen('reset-screen');
+  } else {
+    showToast('❌ کد یکبار مصرف اشتباه است');
+  }
+}
+
+async function resetPassword() {
+  const newPwd = document.getElementById('new-pwd').value;
+  const confirmPwd = document.getElementById('confirm-pwd').value;
+  if (!newPwd || !confirmPwd) { showToast('❌ همه فیلدها را پر کنید'); return; }
+  if (newPwd !== confirmPwd) { showToast('❌ رمز عبور و تکرار آن یکسان نیستند'); return; }
+  if (newPwd.length < 6) { showToast('❌ رمز عبور باید حداقل 6 کاراکتر باشد'); return; }
+  await loadData();
+  appData = registerDefaultAccounts();
+  if (appData.users[currentPhone]) {
+    appData.users[currentPhone].password = newPwd;
+    await saveData();
+  }
+  localStorage.setItem('riazi_current', currentPhone);
+  showToast('✅ رمز عبور با موفقیت تغییر کرد');
+  setTimeout(function() { goToSafeBarname(); }, 1000);
+}
+</script>
+
+</body>
+</html>
