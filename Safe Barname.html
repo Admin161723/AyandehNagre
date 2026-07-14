@@ -58,6 +58,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .chat-item .chat-info{flex:1;min-width:0}
 .chat-item .chat-name{color:#1e293b;font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:4px}
 .chat-item .chat-last{color:#64748b;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-item .chat-unread{background:#ef4444;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-right:6px}
 .private-chat{position:fixed;top:0;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:#f1f5f9;z-index:2000;display:none;flex-direction:column}
 .private-chat.active{display:flex}
 .chat-header{background:linear-gradient(135deg,#3b82f6 0%,#1d4ed8 100%);padding:16px;display:flex;align-items:center;gap:12px;color:#fff;box-shadow:0 4px 20px rgba(0,0,0,0.15)}
@@ -95,8 +96,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .chat-input-area .attach-btn,.chat-input-area .voice-btn{background:#f1f5f9;border:none;width:46px;height:46px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0}
 .chat-input-area .attach-btn svg,.chat-input-area .voice-btn svg{width:20px;height:20px;color:#3b82f6}
 .chat-input-area .voice-btn.recording{background:#ef4444;animation:pulse 1s ease infinite}
-.chat-input-area .voice-btn.recording svg{color:#fff}
-.chat-input-area .send-btn{background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);color:#fff;border:none;width:46px;height:46px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(59,130,246,0.4);flex-shrink:0}.chat-input-area .send-btn svg{width:20px;height:20px;color:#fff}
+.chat-input-area .voice-btn.recording svg{color:#fff}.chat-input-area .send-btn{background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);color:#fff;border:none;width:46px;height:46px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(59,130,246,0.4);flex-shrink:0}
+.chat-input-area .send-btn svg{width:20px;height:20px;color:#fff}
 .voice-preview{background:#fff;padding:10px 14px;border-top:1px solid #e2e8f0;display:none;align-items:center;gap:10px}
 .voice-preview.active{display:flex}
 .voice-preview .play-preview{width:38px;height:38px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;border:none}
@@ -144,8 +145,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .sessions-header{background:linear-gradient(135deg,rgba(30,41,59,0.95) 0%,rgba(15,23,42,0.98) 100%);backdrop-filter:blur(20px);padding:16px 20px;display:flex;align-items:center;gap:12px;color:#fff;position:sticky;top:0;z-index:10;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
 .sessions-header .back-btn{background:rgba(255,255,255,0.1);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .sessions-list{padding:20px}
-.admin-page{position:fixed;top:0;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:#f1f5f9;z-index:3500;display:none;flex-direction:column;overflow-y:auto}
-.admin-page.active{display:flex}.admin-header{background:linear-gradient(135deg,#3b82f6 0%,#1d4ed8 100%);padding:16px 20px;display:flex;align-items:center;gap:12px;color:#fff;position:sticky;top:0;z-index:10;box-shadow:0 4px 20px rgba(0,0,0,0.15)}
+.admin-page{position:fixed;top:0;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:#f1f5f9;z-index:3500;display:none;flex-direction:column;overflow-y:auto}.admin-page.active{display:flex}
+.admin-header{background:linear-gradient(135deg,#3b82f6 0%,#1d4ed8 100%);padding:16px 20px;display:flex;align-items:center;gap:12px;color:#fff;position:sticky;top:0;z-index:10;box-shadow:0 4px 20px rgba(0,0,0,0.15)}
 .admin-header .back-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .admin-header h2{font-size:18px;flex:1;font-weight:800}
 .admin-content{padding:20px}
@@ -193,9 +194,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .toast.show{opacity:1}
 .logout-btn{background:rgba(239,68,68,0.2);color:#ef4444;border:1px solid rgba(239,68,68,0.3);padding:8px 14px;border-radius:12px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
-
-/* ===== صفحه پخش زنده ===== */.live-stream-page{position:fixed;top:0;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:#000;z-index:6000;display:none;flex-direction:column}
-.live-stream-page.active{display:flex}
+.live-stream-page{position:fixed;top:0;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:#000;z-index:6000;display:none;flex-direction:column}.live-stream-page.active{display:flex}
 .live-stream-page.landscape{max-width:100%;width:100%}
 .live-top-bar{background:linear-gradient(135deg,rgba(30,41,59,0.95) 0%,rgba(15,23,42,0.98) 100%);padding:12px 16px;display:flex;align-items:center;gap:10px;color:#fff}
 .live-top-bar .back-btn{background:rgba(255,255,255,0.1);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -221,11 +220,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .live-ctrl-btn.start-live{background:linear-gradient(135deg,#ef4444 0%,#dc2626 100%);width:auto;padding:0 18px;border-radius:22px;font-family:inherit;font-size:13px;font-weight:700;gap:6px}
 .live-ctrl-btn.stop-live{background:linear-gradient(135deg,#6b7280 0%,#4b5563 100%);width:auto;padding:0 18px;border-radius:22px;font-family:inherit;font-size:13px;font-weight:700;gap:6px}
 .live-stream-page.landscape{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(90deg);width:100vh;height:100vw;max-width:none}
-
 .live-stream-card{background:linear-gradient(135deg,rgba(239,68,68,0.2) 0%,rgba(220,38,38,0.1) 100%);border:2px solid #ef4444;border-radius:16px;padding:18px;margin-bottom:14px;cursor:pointer;transition:all 0.25s;display:flex;align-items:center;gap:14px;position:relative}
 .live-stream-card:active{transform:scale(0.98)}
 .live-stream-card .delete-live-btn{position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.6);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px}
 .live-stream-card .delete-live-btn:active{background:rgba(239,68,68,0.8)}
+.sync-indicator{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(34,197,94,0.9);color:#fff;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;z-index:9998;opacity:0;transition:opacity 0.3s;pointer-events:none}
+.sync-indicator.show{opacity:1}
 </style>
 </head>
 <body>
@@ -333,7 +333,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
     <div class="video-info"><h3 id="video-info-title"></h3><p id="video-info-desc"></p></div>
   </div>
 
-  <!-- ===== صفحه پخش زنده ===== -->
   <div id="live-stream-page" class="live-stream-page">
     <div class="live-top-bar">
       <button class="back-btn" onclick="closeLiveStream()">‹</button>
@@ -341,8 +340,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
         <div class="live-title" id="live-stream-title">پخش زنده</div>
         <div class="live-subtitle" id="live-stream-subtitle"></div>
       </div>
-      <div class="live-badge-live" id="live-badge-indicator">زنده</div>    </div>
-    <div class="live-video-area" id="live-video-area">
+      <div class="live-badge-live" id="live-badge-indicator">زنده</div>
+    </div>    <div class="live-video-area" id="live-video-area">
       <video id="live-video" autoplay playsinline muted style="display:none;"></video>
       <div class="no-stream" id="no-stream-msg">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
@@ -390,8 +389,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
           <label>پایه تحصیلی</label>
           <select id="live-grade"><option value="هفتم">هفتم</option><option value="هشتم">هشتم</option><option value="نهم">نهم</option></select>
           <label>درس</label>
-          <select id="live-subject"><option value="math">ریاضی</option><option value="science">علوم</option><option value="english">انگلیسی</option><option value="farsi">فارسی</option></select>          <label>موضوع</label>
-          <input type="text" id="live-title" placeholder="موضوع پخش زنده">
+          <select id="live-subject"><option value="math">ریاضی</option><option value="science">علوم</option><option value="english">انگلیسی</option><option value="farsi">فارسی</option></select>
+          <label>موضوع</label>          <input type="text" id="live-title" placeholder="موضوع پخش زنده">
           <label>توضیحات</label>
           <textarea id="live-description" placeholder="توضیحات پخش زنده"></textarea>
           <button class="btn-admin" onclick="createLiveStream()">ایجاد و شروع پخش زنده</button>
@@ -439,8 +438,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
     <div class="modal-content">
       <div class="modal-header"><h3>مسدود کردن کاربر</h3><button class="close-btn" onclick="closeBanModal()">×</button></div>
       <div class="form-group"><label>مدت زمان مسدودی</label><select id="ban-duration"><option value="1">1 روز</option><option value="3">3 روز</option><option value="7">7 روز</option><option value="30">30 روز</option><option value="90">90 روز</option><option value="365">1 سال</option><option value="permanent">دائمی</option></select></div>
-      <div class="form-group"><label>دلیل مسدودی</label><textarea id="ban-reason" placeholder="دلیل مسدود کردن کاربر را بنویسید..."></textarea></div>      <button class="btn-save" style="background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%); box-shadow:0 6px 20px rgba(239,68,68,0.35);" onclick="confirmBan()">تایید مسدودی</button>
-    </div>
+      <div class="form-group"><label>دلیل مسدودی</label><textarea id="ban-reason" placeholder="دلیل مسدود کردن کاربر را بنویسید..."></textarea></div>
+      <button class="btn-save" style="background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%); box-shadow:0 6px 20px rgba(239,68,68,0.35);" onclick="confirmBan()">تایید مسدودی</button>    </div>
   </div>
 
   <div id="vip-modal" class="modal-overlay">
@@ -454,6 +453,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="sync-indicator" id="sync-indicator">🔄 همگام‌سازی...</div>
 
 <script>
 const JSONBIN_CONFIG={MASTER_KEY:'$2a$10$G8pgSWnFz4w/.voj3lfBPuJL7luRXAXiR/fIufC3YIB4.qRkZSjSS',BIN_ID:'6a53f4c8f5f4af5e298541fe',BASE_URL:'https://api.jsonbin.io/v3/b'};
@@ -470,39 +470,176 @@ let currentUser=null,currentChat=null,currentReply=null,mediaRecorder=null,audio
 let appData={users:{},videos:[],messages:{},activity_logs:[],liveStreams:[]};
 let isSaving=false,pendingSave=false,syncInterval=null,currentLiveStream=null,currentCameraMode='front',isLandscape=false,isCreator=false,lastLiveGrade=null,lastLiveSubject=null;
 let localStream=null;
+let lastSyncDataHash='';
 
-function startSync(){if(syncInterval)clearInterval(syncInterval);syncInterval=setInterval(async()=>{await loadData();if(currentChat)loadMessages();loadChatList();},5000);}
+// ===== سیستم همگام‌سازی هوشمند =====
+async function syncWithServer(){
+  try{
+    const res=await fetch(JSONBIN_CONFIG.BASE_URL+'/'+JSONBIN_CONFIG.BIN_ID+'/latest',{headers:{'X-Master-Key':JSONBIN_CONFIG.MASTER_KEY}});
+    if(!res.ok)throw new Error();
+    const data=await res.json();
+    const r=data.record||{};
+    if(!r.users)r.users={};
+    if(!r.videos)r.videos=[];
+    if(!r.messages)r.messages={};
+    if(!r.activity_logs)r.activity_logs=[];
+    if(!r.liveStreams)r.liveStreams=[];
+    
+    // بررسی تغییرات
+    const newHash=JSON.stringify({
+      usersCount:Object.keys(r.users).length,
+      videosCount:r.videos.length,      messagesCount:Object.keys(r.messages).reduce((s,k)=>s+(r.messages[k]||[]).length,0),
+      liveStreamsCount:r.liveStreams.length
+    });
+    
+    if(newHash!==lastSyncDataHash){
+      lastSyncDataHash=newHash;
+      appData=r;
+      saveToLocalStorage(appData);
+      
+      // به‌روزرسانی currentUser
+      if(currentUser&&appData.users[currentUser.phone]){
+        currentUser=appData.users[currentUser.phone];
+      }
+      
+      // نشان دادن sync indicator
+      const indicator=document.getElementById('sync-indicator');
+      indicator.classList.add('show');
+      setTimeout(()=>indicator.classList.remove('show'),800);
+      
+      // refresh UI
+      refreshAllUI();
+    }
+  }catch(e){
+    console.log('Sync error:',e.message);
+  }
+}
 
-async function fetchFromJSONBin(){try{const res=await fetch(JSONBIN_CONFIG.BASE_URL+'/'+JSONBIN_CONFIG.BIN_ID+'/latest',{headers:{'X-Master-Key':JSONBIN_CONFIG.MASTER_KEY}});if(!res.ok)throw new Error();const data=await res.json();const r=data.record||{};if(!r.users)r.users={};if(!r.videos)r.videos=[];if(!r.messages)r.messages={};if(!r.activity_logs)r.activity_logs=[];if(!r.liveStreams)r.liveStreams=[];return r;}catch(e){return getLocalStorageData();}}
+function refreshAllUI(){
+  // Refresh chat list if on chat section
+  if(document.getElementById('chat-section').classList.contains('active')){
+    loadChatList();
+  }
+  
+  // Refresh messages if in private chat
+  if(currentChat&&document.getElementById('private-chat-modal').classList.contains('active')){
+    loadMessages();
+    markReceivedMessagesAsRead();
+  }
+  
+  // Refresh admin panel if open
+  if(document.getElementById('admin-page').classList.contains('active')){
+    loadUsersList();
+    loadActivityLogs();
+  }
+  
+  // Refresh sessions page if showing live streams
+  if(document.getElementById('sessions-page').classList.contains('active')){
+    const title=document.getElementById('sessions-page-title').textContent;
+    if(title==='پخش زنده'&&lastLiveGrade&&lastLiveSubject){
+      showLiveNow(lastLiveGrade,lastLiveSubject);    }else if(title==='پخش زنده قبلی'&&lastLiveGrade&&lastLiveSubject){
+      showPreviousLives(lastLiveGrade,lastLiveSubject);
+    }
+  }
+  
+  // Check if current live stream was stopped by admin
+  if(currentLiveStream){
+    const live=appData.liveStreams.find(ls=>ls.id===currentLiveStream.id);
+    if(!live||!live.isActive){
+      if(isCreator&&localStream){
+        localStream.getTracks().forEach(t=>t.stop());
+        localStream=null;
+      }
+      showToast('پخش زنده توسط ادمین متوقف شد');
+      closeLiveStream();
+    }
+  }
+}
 
-async function saveToJSONBin(data){try{const res=await fetch(JSONBIN_CONFIG.BASE_URL+'/'+JSONBIN_CONFIG.BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_CONFIG.MASTER_KEY},body:JSON.stringify(data)});return res.ok;}catch(e){saveToLocalStorage(data);return false;}}
+function markReceivedMessagesAsRead(){
+  if(!currentChat)return;
+  const k1=currentChat.id+'-'+currentUser.phone;
+  let changed=false;
+  if(appData.messages[k1]){
+    appData.messages[k1].forEach(m=>{
+      if(m.sender===currentChat.id&&!m.read){
+        m.read=true;
+        changed=true;
+      }
+    });
+  }
+  if(changed){
+    saveData();
+  }
+}
+
+function startSync(){
+  if(syncInterval)clearInterval(syncInterval);
+  // Sync هر 3 ثانیه
+  syncInterval=setInterval(syncWithServer,3000);
+  // اولین sync فوری
+  syncWithServer();
+}
+
+// ===== ذخیره‌سازی =====
+async function saveToJSONBin(data){
+  try{
+    const res=await fetch(JSONBIN_CONFIG.BASE_URL+'/'+JSONBIN_CONFIG.BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_CONFIG.MASTER_KEY},body:JSON.stringify(data)});
+    return res.ok;
+  }catch(e){saveToLocalStorage(data);return false;}}
 
 function getLocalStorageData(){return{users:JSON.parse(localStorage.getItem('riazi_users')||'{}'),videos:JSON.parse(localStorage.getItem('riazi_videos')||'[]'),messages:JSON.parse(localStorage.getItem('riazi_messages')||'{}'),activity_logs:JSON.parse(localStorage.getItem('riazi_activity_logs')||'[]'),liveStreams:JSON.parse(localStorage.getItem('riazi_liveStreams')||'[]')};}
 
 function saveToLocalStorage(data){localStorage.setItem('riazi_users',JSON.stringify(data.users||{}));localStorage.setItem('riazi_videos',JSON.stringify(data.videos||[]));localStorage.setItem('riazi_messages',JSON.stringify(data.messages||{}));localStorage.setItem('riazi_activity_logs',JSON.stringify(data.activity_logs||[]));localStorage.setItem('riazi_liveStreams',JSON.stringify(data.liveStreams||[]));}
 
-async function loadData(){const d=await fetchFromJSONBin();appData=d;saveToLocalStorage(appData);return appData;}
-async function saveData(){saveToLocalStorage(appData);if(isSaving){pendingSave=true;return;}isSaving=true;await saveToJSONBin(appData);isSaving=false;if(pendingSave){pendingSave=false;await saveData();}}
+async function saveData(){
+  saveToLocalStorage(appData);
+  if(isSaving){pendingSave=true;return;}
+  isSaving=true;
+  await saveToJSONBin(appData);
+  isSaving=false;
+  if(pendingSave){pendingSave=false;await saveData();}
+  // به‌روزرسانی hash بعد از save
+  lastSyncDataHash=JSON.stringify({
+    usersCount:Object.keys(appData.users).length,
+    videosCount:appData.videos.length,
+    messagesCount:Object.keys(appData.messages).reduce((s,k)=>s+(appData.messages[k]||[]).length,0),
+    liveStreamsCount:appData.liveStreams.length
+  });
+}
 
 function getVipRemaining(v){if(!v||v==='none')return null;if(v==='unlimited')return 'دائمی';const d=new Date(v),n=new Date();if(d<=n)return 'منقضی';const diff=d-n;const days=Math.floor(diff/86400000);const hrs=Math.floor((diff%86400000)/3600000);return days>0?days+' روز و '+hrs+' ساعت':hrs+' ساعت';}
 function isVipActive(v){return v&&(v==='unlimited'||new Date(v)>new Date());}
 function formatPrice(p){return p.toLocaleString('fa-IR');}
 function formatTime(iso){const d=new Date(iso);return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');}
-function escapeHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}function formatFileSize(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB';}
+function escapeHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+function formatFileSize(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB';}
 function logUserActivity(phone,action){appData.activity_logs.push({phone,action,time:new Date().toISOString()});saveData();}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+// شمارنده پیام‌های خوانده نشده
+function getUnreadCount(chatId){
+  const k=chatId+'-'+currentUser.phone;
+  const msgs=appData.messages[k]||[];
+  return msgs.filter(m=>m.sender===chatId&&!m.read).length;
+}
 
 async function init(){
   const phone=localStorage.getItem('riazi_current');
   if(!phone){window.location.href='index.html';return;}
   appData=getLocalStorageData();currentUser=appData.users[phone];
-  if(!currentUser){await loadData();currentUser=appData.users[phone];if(!currentUser){localStorage.removeItem('riazi_current');window.location.href='index.html';return;}}
+  if(!currentUser){
+    // تلاش برای sync از سرور
+    await syncWithServer();
+    currentUser=appData.users[phone];
+    if(!currentUser){localStorage.removeItem('riazi_current');window.location.href='index.html';return;}
+  }
   if(currentUser.banned){if(currentUser.banUntil==='permanent'||(currentUser.banUntil&&new Date(currentUser.banUntil)>new Date())){showToast('حساب مسدود شده: '+(currentUser.banReason||''));localStorage.removeItem('riazi_current');setTimeout(()=>window.location.href='index.html',2000);return;}else{delete appData.users[phone].banned;delete appData.users[phone].banUntil;delete appData.users[phone].banReason;saveData();currentUser=appData.users[phone];}}
-  if(!appData.users[TEACHER_ACCOUNT.phone])appData.users[TEACHER_ACCOUNT.phone]={...TEACHER_ACCOUNT,grade:'همه',age:'30',school:'آموزشگاه',province:'تهران',contact:TEACHER_ACCOUNT.phone,isTeacher:true,isSupport:true,vipDownload:'unlimited',vipChat:'unlimited',vipClass:'unlimited',registeredAt:new Date().toISOString()};
-  for(const p in SUPPORT_ACCOUNTS){if(!appData.users[p])appData.users[p]={...SUPPORT_ACCOUNTS[p],grade:'همه',age:'25',school:'پشتیبانی',province:'تهران',contact:p,password:'123456789',isSupport:true,vipDownload:'unlimited',vipChat:'unlimited',vipClass:'unlimited',registeredAt:new Date().toISOString()};else{appData.users[p].isSupport=true;appData.users[p].vipDownload='unlimited';appData.users[p].vipChat='unlimited';appData.users[p].vipClass='unlimited';}}
+  if(!appData.users[TEACHER_ACCOUNT.phone])appData.users[TEACHER_ACCOUNT.phone]={...TEACHER_ACCOUNT,grade:'همه',age:'30',school:'آموزشگاه',province:'تهران',contact:TEACHER_ACCOUNT.phone,isTeacher:true,isSupport:true,vipDownload:'unlimited',vipChat:'unlimited',vipClass:'unlimited',registeredAt:new Date().toISOString()};  for(const p in SUPPORT_ACCOUNTS){if(!appData.users[p])appData.users[p]={...SUPPORT_ACCOUNTS[p],grade:'همه',age:'25',school:'پشتیبانی',province:'تهران',contact:p,password:'123456789',isSupport:true,vipDownload:'unlimited',vipChat:'unlimited',vipClass:'unlimited',registeredAt:new Date().toISOString()};else{appData.users[p].isSupport=true;appData.users[p].vipDownload='unlimited';appData.users[p].vipChat='unlimited';appData.users[p].vipClass='unlimited';}}
   if(!currentUser.vipDownloadGiven){const d=new Date();d.setDate(d.getDate()+3);appData.users[phone].vipDownload=d.toISOString();appData.users[phone].vipDownloadGiven=true;}
   if(!currentUser.vipChatGiven){const d=new Date();d.setDate(d.getDate()+3);appData.users[phone].vipChat=d.toISOString();appData.users[phone].vipChatGiven=true;}
-  loadUserData();loadChatList();loadStore();saveData();startSync();
+  loadUserData();loadChatList();loadStore();saveData();
+  startSync();
 }
 
 function loadUserData(){
@@ -537,7 +674,8 @@ function selectHomeGrade(g){
 }
 
 function selectVirtualGrade(g){
-  document.getElementById('sessions-page-title').textContent='کلاس مجازی - پایه '+g;  document.getElementById('sessions-page-subtitle').textContent='درس را انتخاب کنید';
+  document.getElementById('sessions-page-title').textContent='کلاس مجازی - پایه '+g;
+  document.getElementById('sessions-page-subtitle').textContent='درس را انتخاب کنید';
   const l=document.getElementById('sessions-list');l.innerHTML='';
   Object.keys(SUBJECTS).forEach(k=>{
     const s=SUBJECTS[k];
@@ -547,7 +685,6 @@ function selectVirtualGrade(g){
   });
   document.getElementById('sessions-page').classList.add('active');
 }
-
 function showLessons(g,k){
   const s=SUBJECTS[k];
   document.getElementById('sessions-page-title').textContent=s.name+' - پایه '+g;
@@ -586,7 +723,8 @@ function showLiveOptions(g,k){
   document.getElementById('sessions-page-title').textContent=s.name+' - پایه '+g;
   document.getElementById('sessions-page-subtitle').textContent='';
   const l=document.getElementById('sessions-list');l.innerHTML='';
-  const live=document.createElement('div');live.className='live-option-btn';  live.innerHTML=`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2zm0-8h2v6h-2z"/></svg><h3>پخش زنده</h3>`;
+  const live=document.createElement('div');live.className='live-option-btn';
+  live.innerHTML=`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2zm0-8h2v6h-2z"/></svg><h3>پخش زنده</h3>`;
   live.onclick=()=>showLiveNow(g,k);l.appendChild(live);
   const prev=document.createElement('div');prev.className='live-option-btn';
   prev.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><h3>پخش زنده قبلی</h3>`;
@@ -594,7 +732,8 @@ function showLiveOptions(g,k){
 }
 
 function showLiveNow(g,k){
-  document.getElementById('sessions-page-title').textContent='پخش زنده';
+  lastLiveGrade=g;
+  lastLiveSubject=k;  document.getElementById('sessions-page-title').textContent='پخش زنده';
   document.getElementById('sessions-page-subtitle').textContent='';
   const l=document.getElementById('sessions-list');l.innerHTML='';
   const liveStreams=appData.liveStreams.filter(ls=>ls.grade===g&&ls.subject===k&&ls.isActive);
@@ -610,6 +749,8 @@ function showLiveNow(g,k){
 }
 
 function showPreviousLives(g,k){
+  lastLiveGrade=g;
+  lastLiveSubject=k;
   document.getElementById('sessions-page-title').textContent='پخش زنده قبلی';
   document.getElementById('sessions-page-subtitle').textContent='';
   const l=document.getElementById('sessions-list');l.innerHTML='';
@@ -635,14 +776,13 @@ function openTeachersPage(){
   document.getElementById('sessions-page').classList.add('active');
 }
 
-function closeSessionsPage(){document.getElementById('sessions-page').classList.remove('active');}function playIntroVideo(t){playVideo({title:'معرفی برنامه',link:'intro.mp4',grade:'',chapter:0,session:0});}
+function closeSessionsPage(){document.getElementById('sessions-page').classList.remove('active');}
+function playIntroVideo(t){playVideo({title:'معرفی برنامه',link:'intro.mp4',grade:'',chapter:0,session:0});}
 
-// ===== پخش زنده - getUserMedia =====
 async function createLiveStream(){
   const grade=document.getElementById('live-grade').value;
   const subject=document.getElementById('live-subject').value;
-  const title=document.getElementById('live-title').value;
-  const description=document.getElementById('live-description').value;
+  const title=document.getElementById('live-title').value;  const description=document.getElementById('live-description').value;
   if(!title){showToast('موضوع را وارد کنید');return;}
   const streamId='riazi_'+Date.now();
   const newStream={id:streamId,grade:grade,subject:subject,title:title,description:description,createdBy:currentUser.phone,creatorName:currentUser.firstname+' '+(currentUser.lastname||''),createdAt:new Date().toISOString(),isActive:true,roomName:streamId};
@@ -650,7 +790,7 @@ async function createLiveStream(){
   await saveData();
   document.getElementById('live-title').value='';
   document.getElementById('live-description').value='';
-  showToast('پخش زنده ایجاد شد');
+  showToast('پخش زنده ایجاد شد - در همه دستگاه‌ها فعال می‌شود');
   setTimeout(()=>{openLiveStreamPage(newStream,true);},300);
 }
 
@@ -676,7 +816,7 @@ function openLiveStreamPage(stream,creator){
       document.getElementById('no-stream-msg').style.display='block';
       document.getElementById('live-badge-indicator').style.display='flex';
       document.getElementById('live-video').style.display='none';
-      document.getElementById('no-stream-msg').innerHTML='<div style="font-size:18px;font-weight:700;">🔴 در حال تماشای پخش زنده</div><div style="margin-top:15px;font-size:14px;opacity:0.8;">پخش زنده توسط <b>'+stream.creatorName+'</b> در حال انجام است</div><div style="margin-top:20px;padding:15px;background:rgba(255,255,255,0.1);border-radius:12px;font-size:13px;">برای مشاهده تصویر، منتظر بمانید یا از دستگاه ادمین استفاده کنید</div>';
+      document.getElementById('no-stream-msg').innerHTML='<div style="font-size:18px;font-weight:700;">🔴 در حال تماشای پخش زنده</div><div style="margin-top:15px;font-size:14px;opacity:0.8;">پخش زنده توسط <b>'+stream.creatorName+'</b> در حال انجام است</div>';
     }else{
       document.getElementById('no-stream-msg').style.display='block';
       document.getElementById('live-badge-indicator').style.display='none';
@@ -684,25 +824,19 @@ function openLiveStreamPage(stream,creator){
   }
 }
 
-function joinLiveStream(stream){  if(!isVipActive(currentUser.vipClass)){showToast('برای تماشای پخش زنده باید ویژه کلاس مجازی داشته باشید');return;}
+function joinLiveStream(stream){
+  if(!isVipActive(currentUser.vipClass)){showToast('برای تماشای پخش زنده باید ویژه کلاس مجازی داشته باشید');return;}
   openLiveStreamPage(stream,false);
 }
 
 async function startLiveStream(){
   if(!currentLiveStream)return;
-  try{
-    if(currentCameraMode==='screen'){
-      if(!navigator.mediaDevices.getDisplayMedia){
-        showToast('ضبط صفحه در این مرورگر پشتیبانی نمی‌شود');
-        return;
-      }
+  try{    if(currentCameraMode==='screen'){
+      if(!navigator.mediaDevices.getDisplayMedia){showToast('ضبط صفحه در این مرورگر پشتیبانی نمی‌شود');return;}
       localStream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});
     }else{
       const facingMode=currentCameraMode==='front'?'user':'environment';
-      localStream=await navigator.mediaDevices.getUserMedia({
-        video:{facingMode:facingMode,width:{ideal:1280},height:{ideal:720}},
-        audio:true
-      });
+      localStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facingMode,width:{ideal:1280},height:{ideal:720}},audio:true});
     }
     const video=document.getElementById('live-video');
     video.srcObject=localStream;
@@ -713,7 +847,7 @@ async function startLiveStream(){
     await saveData();
     document.getElementById('start-live-btn').style.display='none';
     document.getElementById('stop-live-btn').style.display='flex';
-    showToast('پخش زنده شروع شد - دوربین فعال است');
+    showToast('پخش زنده شروع شد - در همه دستگاه‌ها فعال است');
   }catch(err){
     console.error('Camera error:',err);
     showToast('خطا در دسترسی به دوربین: '+err.message);
@@ -722,10 +856,7 @@ async function startLiveStream(){
 
 async function stopLiveStream(){
   if(!currentLiveStream)return;
-  if(localStream){
-    localStream.getTracks().forEach(track=>track.stop());
-    localStream=null;
-  }
+  if(localStream){localStream.getTracks().forEach(track=>track.stop());localStream=null;}
   const video=document.getElementById('live-video');
   video.srcObject=null;
   video.style.display='none';
@@ -733,7 +864,8 @@ async function stopLiveStream(){
   await saveData();
   document.getElementById('start-live-btn').style.display='flex';
   document.getElementById('stop-live-btn').style.display='none';
-  document.getElementById('live-badge-indicator').style.display='none';  document.getElementById('no-stream-msg').style.display='block';
+  document.getElementById('live-badge-indicator').style.display='none';
+  document.getElementById('no-stream-msg').style.display='block';
   document.getElementById('no-stream-msg').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:60px;height:60px;color:#64748b;margin-bottom:12px;"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><div>پخش زنده متوقف شد</div>';
   showToast('پخش زنده متوقف شد');
   setTimeout(()=>{
@@ -746,13 +878,9 @@ async function stopLiveStream(){
 }
 
 function closeLiveStream(){
-  if(localStream){
-    localStream.getTracks().forEach(track=>track.stop());
-    localStream=null;
-  }
+  if(localStream){localStream.getTracks().forEach(track=>track.stop());localStream=null;}
   if(currentLiveStream&&currentLiveStream.isActive&&currentLiveStream.createdBy===currentUser.phone){
-    currentLiveStream.isActive=false;
-    saveData();
+    currentLiveStream.isActive=false;    saveData();
   }
   currentLiveStream=null;
   isCreator=false;
@@ -767,42 +895,28 @@ async function switchCameraMode(mode){
   if(localStream&&isCreator){
     try{
       localStream.getTracks().forEach(track=>track.stop());
-      if(mode==='screen'){
-        localStream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});
-      }else{
-        const facingMode=mode==='front'?'user':'environment';
-        localStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facingMode},audio:true});
-      }
+      if(mode==='screen'){localStream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});}
+      else{const facingMode=mode==='front'?'user':'environment';localStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facingMode},audio:true});}
       const video=document.getElementById('live-video');
       video.srcObject=localStream;
       showToast(mode==='front'?'دوربین جلو فعال شد':(mode==='back'?'دوربین عقب فعال شد':'ضبط صفحه فعال شد'));
-    }catch(err){
-      console.error('Camera switch error:',err);
-      showToast('خطا در تغییر دوربین');
-    }
+    }catch(err){console.error('Camera switch error:',err);showToast('خطا در تغییر دوربین');}
   }
 }
+
 async function deleteLiveStream(streamId){
   if(!confirm('آیا مطمئن هستید که می‌خواهید این پخش زنده را حذف کنید؟'))return;
   const idx=appData.liveStreams.findIndex(ls=>ls.id===streamId);
   if(idx!==-1){
     appData.liveStreams.splice(idx,1);
     await saveData();
-    showToast('پخش زنده حذف شد');
-    if(lastLiveGrade&&lastLiveSubject){
-      showLiveNow(lastLiveGrade,lastLiveSubject);
-    }
-    if(currentLiveStream&&currentLiveStream.id===streamId){
-      closeLiveStream();
-    }
+    showToast('پخش زنده حذف شد - در همه دستگاه‌ها');
+    if(lastLiveGrade&&lastLiveSubject){showLiveNow(lastLiveGrade,lastLiveSubject);}
+    if(currentLiveStream&&currentLiveStream.id===streamId){closeLiveStream();}
   }
 }
 
-function toggleOrientation(){
-  isLandscape=!isLandscape;
-  document.getElementById('live-stream-page').classList.toggle('landscape',isLandscape);
-  showToast(isLandscape?'حالت افقی':'حالت عمودی');
-}
+function toggleOrientation(){isLandscape=!isLandscape;document.getElementById('live-stream-page').classList.toggle('landscape',isLandscape);showToast(isLandscape?'حالت افقی':'حالت عمودی');}
 
 function toggleFullscreen(){
   const page=document.getElementById('live-stream-page');
@@ -813,11 +927,12 @@ function toggleFullscreen(){
 function loadChatList(){
   const c=document.getElementById('chat-list-container');c.innerHTML='';
   const td=document.createElement('div');td.className='chat-item';
-  td.innerHTML=`<div class="chat-avatar"><img src="${TEACHER_ACCOUNT.avatar}" onerror="this.src='IMG_20260712_192216_220.jpg'"></div><div class="chat-info"><div class="chat-name">استاد احسان بهشتی کیا <span class="verified-badge" style="width:18px;height:18px;"></span></div><div class="chat-last">${getLastMessage(TEACHER_ACCOUNT.phone)||'برای گفتگو کلیک کنید'}</div></div>`;
-  td.onclick=()=>openPrivateChat(TEACHER_ACCOUNT.phone,'استاد احسان بهشتی کیا',TEACHER_ACCOUNT.avatar,true);c.appendChild(td);
-  Object.keys(SUPPORT_ACCOUNTS).forEach(p=>{
+  const unreadTeacher=getUnreadCount(TEACHER_ACCOUNT.phone);
+  td.innerHTML=`<div class="chat-avatar"><img src="${TEACHER_ACCOUNT.avatar}" onerror="this.src='IMG_20260712_192216_220.jpg'"></div><div class="chat-info"><div class="chat-name">استاد احسان بهشتی کیا <span class="verified-badge" style="width:18px;height:18px;"></span>${unreadTeacher>0?`<span class="chat-unread">${unreadTeacher}</span>`:''}</div><div class="chat-last">${getLastMessage(TEACHER_ACCOUNT.phone)||'برای گفتگو کلیک کنید'}</div></div>`;
+  td.onclick=()=>openPrivateChat(TEACHER_ACCOUNT.phone,'استاد احسان بهشتی کیا',TEACHER_ACCOUNT.avatar,true);c.appendChild(td);  Object.keys(SUPPORT_ACCOUNTS).forEach(p=>{
     const s=SUPPORT_ACCOUNTS[p];const d=document.createElement('div');d.className='chat-item';
-    d.innerHTML=`<div class="chat-avatar"><img src="${s.avatar}" onerror="this.src='316b4205-1a5b-491e-81f7-2fc93d4fbc0f.png'"></div><div class="chat-info"><div class="chat-name">${s.firstname} ${s.lastname} <span class="verified-badge" style="width:18px;height:18px;"></span></div><div class="chat-last">${getLastMessage(p)||'پشتیبانی برنامه'}</div></div>`;
+    const unread=getUnreadCount(p);
+    d.innerHTML=`<div class="chat-avatar"><img src="${s.avatar}" onerror="this.src='316b4205-1a5b-491e-81f7-2fc93d4fbc0f.png'"></div><div class="chat-info"><div class="chat-name">${s.firstname} ${s.lastname} <span class="verified-badge" style="width:18px;height:18px;"></span>${unread>0?`<span class="chat-unread">${unread}</span>`:''}</div><div class="chat-last">${getLastMessage(p)||'پشتیبانی برنامه'}</div></div>`;
     d.onclick=()=>openPrivateChat(p,s.firstname+' '+s.lastname,s.avatar,true);c.appendChild(d);
   });
 }
@@ -831,7 +946,8 @@ function getLastMessage(chatId){
 
 function openPrivateChat(id,name,av,isVIP){
   if(!isVIP&&!isVipActive(currentUser.vipChat)){showToast('ویژه چت نیاز دارید. با پشتیبانی تماس بگیرید.');return;}
-  currentChat={id,name,avatar:av};  document.getElementById('chat-header-name').innerHTML=name+(id===TEACHER_ACCOUNT.phone||SUPPORT_ACCOUNTS[id]?' <span class="verified-badge" style="width:18px;height:18px;"></span>':'');
+  currentChat={id,name,avatar:av};
+  document.getElementById('chat-header-name').innerHTML=name+(id===TEACHER_ACCOUNT.phone||SUPPORT_ACCOUNTS[id]?' <span class="verified-badge" style="width:18px;height:18px;"></span>':'');
   document.getElementById('chat-header-img').src=av;
   document.getElementById('private-chat-modal').classList.add('active');
   cancelReply();deleteVoicePreview();
@@ -843,11 +959,13 @@ function openPrivateChat(id,name,av,isVIP){
     }
   }
   loadMessages();
+  markReceivedMessagesAsRead();
 }
 
 function closePrivateChat(){document.getElementById('private-chat-modal').classList.remove('active');currentChat=null;cancelReply();deleteVoicePreview();}
 
 function loadMessages(){
+  if(!currentChat)return;
   const k1=currentUser.phone+'-'+currentChat.id,k2=currentChat.id+'-'+currentUser.phone;
   const all=(appData.messages[k1]||[]).concat(appData.messages[k2]||[]).sort((a,b)=>new Date(a.time)-new Date(b.time));
   const c=document.getElementById('chat-messages');c.innerHTML='';
@@ -860,8 +978,7 @@ function loadMessages(){
     if(m.type==='text')h+=`<div>${escapeHtml(m.text)}</div>`;
     else if(m.type==='voice'){h+=`<div class="message-voice"><div class="play-btn" onclick="playVoice('${m.audioData}',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div><div class="voice-info"><div class="voice-wave">`;for(let i=0;i<15;i++)h+=`<span style="height:${Math.random()*10+6}px"></span>`;h+=`</div><div class="voice-duration">${m.duration||''}</div></div></div>`;}
     else if(m.type==='image')h+=`<img class="message-image" src="${m.fileData}">`;
-    else if(m.type==='file'){const ic=m.fileName&&m.fileName.endsWith('.mp4')?'🎬':'📎';h+=`<div class="message-file"><div class="file-icon">${ic}</div><div class="file-info"><div class="file-name">${escapeHtml(m.fileName||'فایل')}</div><div class="file-size">${m.fileSize||''}</div></div></div>`;}
-    h+=`<span class="message-time">${formatTime(m.time)}${m.sender===currentUser.phone?` <span class="message-status">${m.read?'✓✓':'✓'}</span>`:''}</span>`;
+    else if(m.type==='file'){const ic=m.fileName&&m.fileName.endsWith('.mp4')?'🎬':'📎';h+=`<div class="message-file"><div class="file-icon">${ic}</div><div class="file-info"><div class="file-name">${escapeHtml(m.fileName||'فایل')}</div><div class="file-size">${m.fileSize||''}</div></div></div>`;}    h+=`<span class="message-time">${formatTime(m.time)}${m.sender===currentUser.phone?` <span class="message-status">${m.read?'✓✓':'✓'}</span>`:''}</span>`;
     d.innerHTML=h;
     d.addEventListener('contextmenu',e=>{e.preventDefault();if(m.sender===currentUser.phone&&confirm('حذف شود؟'))delMsg(k1,k2,m);});
     c.appendChild(d);
@@ -871,7 +988,7 @@ function loadMessages(){
 
 async function delMsg(k1,k2,m){if(appData.messages[k1])appData.messages[k1]=appData.messages[k1].filter(x=>x.time!==m.time);if(appData.messages[k2])appData.messages[k2]=appData.messages[k2].filter(x=>x.time!==m.time);await saveData();loadMessages();loadChatList();}
 
-async function sendMessage(){const i=document.getElementById('chat-message-input');const t=i.value.trim();if(!t)return;const k=currentUser.phone+'-'+currentChat.id;if(!appData.messages[k])appData.messages[k]=[];appData.messages[k].push({sender:currentUser.phone,type:'text',text:t,replyTo:currentReply?currentReply.text:null,time:new Date().toISOString(),read:false});await saveData();i.value='';cancelReply();loadMessages();loadChatList();}
+async function sendMessage(){const i=document.getElementById('chat-message-input');const t=i.value.trim();if(!t||!currentChat)return;const k=currentUser.phone+'-'+currentChat.id;if(!appData.messages[k])appData.messages[k]=[];appData.messages[k].push({sender:currentUser.phone,type:'text',text:t,replyTo:currentReply?currentReply.text:null,time:new Date().toISOString(),read:false});await saveData();i.value='';cancelReply();loadMessages();loadChatList();}
 
 async function sendFile(ev){const f=ev.target.files[0];if(!f||!currentChat)return;const r=new FileReader();r.onload=async e=>{const k=currentUser.phone+'-'+currentChat.id;if(!appData.messages[k])appData.messages[k]=[];const m={sender:currentUser.phone,replyTo:currentReply?currentReply.text:null,time:new Date().toISOString(),read:false};if(f.type.startsWith('image/')){m.type='image';m.fileData=e.target.result;m.fileName=f.name;}else{m.type='file';m.fileData=e.target.result;m.fileName=f.name;m.fileSize=formatFileSize(f.size);}appData.messages[k].push(m);await saveData();showToast('ارسال شد');loadMessages();loadChatList();};r.readAsDataURL(f);ev.target.value='';}
 
@@ -880,7 +997,8 @@ function startRecording(){
   navigator.mediaDevices.getUserMedia({audio:true}).then(s=>{
     mediaRecorder=new MediaRecorder(s);audioChunks=[];recordedBlob=null;
     mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
-    mediaRecorder.onstop=()=>{      recordedBlob=new Blob(audioChunks,{type:'audio/webm'});
+    mediaRecorder.onstop=()=>{
+      recordedBlob=new Blob(audioChunks,{type:'audio/webm'});
       document.getElementById('voice-timer').textContent=((Date.now()-recordingStartTime)/1000).toFixed(1)+' ثانیه';
       document.getElementById('voice-preview').classList.add('active');
       s.getTracks().forEach(t=>t.stop());
@@ -909,8 +1027,7 @@ function playVoice(d,btn){const a=new Audio(d);a.play();const h=btn.innerHTML;bt
 function cancelReply(){currentReply=null;}
 function openSupportFromProfile(){openPrivateChat('09904844031','پشتیبان اصلی','316b4205-1a5b-491e-81f7-2fc93d4fbc0f.png',true);}
 
-function openEditProfile(){document.getElementById('edit-firstname').value=currentUser.firstname||'';document.getElementById('edit-lastname').value=currentUser.lastname||'';document.getElementById('edit-school').value=currentUser.school||'';document.getElementById('edit-province').value=currentUser.province||'تهران';document.getElementById('edit-grade').value=currentUser.grade||'هفتم';document.getElementById('edit-age').value=currentUser.age||'';document.getElementById('edit-profile-modal').classList.add('active');}
-function closeEditProfile(){document.getElementById('edit-profile-modal').classList.remove('active');}
+function openEditProfile(){document.getElementById('edit-firstname').value=currentUser.firstname||'';document.getElementById('edit-lastname').value=currentUser.lastname||'';document.getElementById('edit-school').value=currentUser.school||'';document.getElementById('edit-province').value=currentUser.province||'تهران';document.getElementById('edit-grade').value=currentUser.grade||'هفتم';document.getElementById('edit-age').value=currentUser.age||'';document.getElementById('edit-profile-modal').classList.add('active');}function closeEditProfile(){document.getElementById('edit-profile-modal').classList.remove('active');}
 async function saveProfile(){appData.users[currentUser.phone].firstname=document.getElementById('edit-firstname').value;appData.users[currentUser.phone].lastname=document.getElementById('edit-lastname').value;appData.users[currentUser.phone].school=document.getElementById('edit-school').value;appData.users[currentUser.phone].province=document.getElementById('edit-province').value;appData.users[currentUser.phone].grade=document.getElementById('edit-grade').value;appData.users[currentUser.phone].age=document.getElementById('edit-age').value;currentUser=appData.users[currentUser.phone];await saveData();loadUserData();closeEditProfile();showToast('پروفایل ذخیره شد');}
 
 function changeAvatar(){const i=document.createElement('input');i.type='file';i.accept='image/*';i.onchange=async e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async ev=>{appData.users[currentUser.phone].avatar=ev.target.result;currentUser=appData.users[currentUser.phone];await saveData();loadUserData();showToast('عکس تغییر کرد');};r.readAsDataURL(f);};i.click();}
@@ -922,14 +1039,15 @@ async function addVideo(){
   const t=document.getElementById('admin-video-type').value,g=document.getElementById('admin-grade').value,s=document.getElementById('admin-subject').value,c=parseInt(document.getElementById('admin-chapter-num').value)||1,sn=parseInt(document.getElementById('admin-session-num').value)||0,ti=document.getElementById('admin-video-title').value,l=document.getElementById('admin-video-link').value,d=document.getElementById('admin-video-desc').value;
   if(!ti||!l)return showToast('عنوان و لینک الزامی است');
   appData.videos.push({type:t,grade:g,subject:s,chapter:c,session:sn,title:ti,link:l,description:d,isLive:t==='live',addedBy:currentUser.phone,addedAt:new Date().toISOString()});
-  await saveData();showToast('اضافه شد');document.getElementById('admin-video-title').value='';document.getElementById('admin-video-link').value='';document.getElementById('admin-video-desc').value='';
+  await saveData();showToast('ویدیو اضافه شد - در همه دستگاه‌ها اعمال می‌شود');document.getElementById('admin-video-title').value='';document.getElementById('admin-video-link').value='';document.getElementById('admin-video-desc').value='';
 }
 
 function loadUsersList(){
   const c=document.getElementById('users-list-container');c.innerHTML='';
   const u=Object.values(appData.users).filter(x=>!x.isTeacher&&!x.isSupport);
-  if(u.length===0){c.innerHTML='<div style="text-align:center;color:#64748b;padding:30px;">کاربری نیست</div>';return;}
-  u.forEach(user=>{    const d=document.createElement('div');d.className='user-list-item';
+  if(u.length===0){c.innerHTML='<div style="text-align:center;color:#64748b;padding:30px;">کاربری ثبت‌نام نکرده</div>';return;}
+  u.forEach(user=>{
+    const d=document.createElement('div');d.className='user-list-item';
     let b='';if(user.banned)b=user.banUntil==='permanent'?'<div class="ban-status">دائمی</div>':(user.banUntil&&new Date(user.banUntil)>new Date()?'<div class="ban-status">مسدود</div>':'');
     d.innerHTML=`<div class="user-info-admin"><div class="user-avatar-admin">${(user.firstname||'?')[0]}</div><div class="user-details"><h4>${user.firstname||''} ${user.lastname||''}</h4><p>${user.phone} | ${user.grade||'-'}</p>${b}</div></div><div class="user-actions"><button class="vip" onclick="openVipModal('${user.phone}')">ویژه</button><button class="msg" onclick="openAdminChat('${user.phone}','${user.firstname||''}','${user.avatar||''}')">پیام</button><button class="ban" onclick="openBanModal('${user.phone}')">${user.banned?'رفع بن':'بن'}</button></div>`;
     c.appendChild(d);
@@ -958,8 +1076,7 @@ async function confirmVip(){
     let e=d==='unlimited'?'unlimited':new Date(Date.now()+parseInt(d)*86400000).toISOString();
     appData.users[vipTargetPhone][t]=e;
     await saveData();showToast('ویژه اعمال شد');
-  }closeVipModal();
-}
+  }closeVipModal();}
 
 function openAdminChat(p,n,a){adminChatTarget={phone:p,name:n,avatar:a};document.getElementById('admin-chat-name').textContent=n;document.getElementById('admin-chat-img').src=a||'default.png';document.getElementById('admin-chat-modal').classList.add('active');loadAdminMessages();}
 function closeAdminChat(){document.getElementById('admin-chat-modal').classList.remove('active');adminChatTarget=null;}
@@ -978,7 +1095,8 @@ function loadAdminMessages(){
     else if(m.type==='file')h+=`<div class="message-file"><div class="file-icon">📎</div><div class="file-info"><div class="file-name">${escapeHtml(m.fileName||'')}</div></div></div>`;
     h+=`<span class="message-time">${formatTime(m.time)}</span>`;
     d.innerHTML=h;c.appendChild(d);
-  });c.scrollTop=c.scrollHeight;}
+  });c.scrollTop=c.scrollHeight;
+}
 async function sendAdminMessage(){const i=document.getElementById('admin-chat-input');const t=i.value.trim();if(!t||!adminChatTarget)return;const k=currentUser.phone+'-'+adminChatTarget.phone;if(!appData.messages[k])appData.messages[k]=[];appData.messages[k].push({sender:currentUser.phone,type:'text',text:t,time:new Date().toISOString(),read:false});await saveData();i.value='';loadAdminMessages();}
 async function sendAdminFile(ev){const f=ev.target.files[0];if(!f||!adminChatTarget)return;const r=new FileReader();r.onload=async e=>{const k=currentUser.phone+'-'+adminChatTarget.phone;if(!appData.messages[k])appData.messages[k]=[];const m={sender:currentUser.phone,time:new Date().toISOString(),read:false};if(f.type.startsWith('image/')){m.type='image';m.fileData=e.target.result;m.fileName=f.name;}else{m.type='file';m.fileData=e.target.result;m.fileName=f.name;m.fileSize=formatFileSize(f.size);}appData.messages[k].push(m);await saveData();loadAdminMessages();};r.readAsDataURL(f);ev.target.value='';}
 
