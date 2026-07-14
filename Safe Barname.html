@@ -470,31 +470,38 @@ let currentUser=null,currentChat=null,currentReply=null,mediaRecorder=null,audio
 let appData={users:{},videos:[],messages:{},activity_logs:[],liveStreams:[]};
 let isSaving=false,pendingSave=false,syncInterval=null,currentLiveStream=null,currentCameraMode='front',isLandscape=false,isCreator=false,lastLiveGrade=null,lastLiveSubject=null;
 let localStream=null;
-let lastSyncDataHash='';
+let lastSyncHash='';
+let isSyncing=false;
 
-// ===== سیستم همگام‌سازی هوشمند =====
-async function syncWithServer(){
+// ===== سیستم همگام‌سازی پیشرفته =====
+async function syncWithServer(forceRefresh=false){
+  if(isSyncing)return;
+  isSyncing=true;
+  
   try{
-    const res=await fetch(JSONBIN_CONFIG.BASE_URL+'/'+JSONBIN_CONFIG.BIN_ID+'/latest',{headers:{'X-Master-Key':JSONBIN_CONFIG.MASTER_KEY}});
-    if(!res.ok)throw new Error();
-    const data=await res.json();
-    const r=data.record||{};
-    if(!r.users)r.users={};
-    if(!r.videos)r.videos=[];
-    if(!r.messages)r.messages={};
-    if(!r.activity_logs)r.activity_logs=[];
-    if(!r.liveStreams)r.liveStreams=[];
-    
-    // بررسی تغییرات
-    const newHash=JSON.stringify({
-      usersCount:Object.keys(r.users).length,
-      videosCount:r.videos.length,      messagesCount:Object.keys(r.messages).reduce((s,k)=>s+(r.messages[k]||[]).length,0),
-      liveStreamsCount:r.liveStreams.length
+    const res=await fetch(JSONBIN_CONFIG.BASE_URL+'/'+JSONBIN_CONFIG.BIN_ID+'/latest',{
+      headers:{'X-Master-Key':JSONBIN_CONFIG.MASTER_KEY},
+      cache:'no-store'
     });
     
-    if(newHash!==lastSyncDataHash){
-      lastSyncDataHash=newHash;
-      appData=r;
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    
+    const data=await res.json();
+    const serverData=data.record||{};
+        if(!serverData.users)serverData.users={};
+    if(!serverData.videos)serverData.videos=[];
+    if(!serverData.messages)serverData.messages={};
+    if(!serverData.activity_logs)serverData.activity_logs=[];
+    if(!serverData.liveStreams)serverData.liveStreams=[];
+    
+    // محاسبه hash دقیق
+    const newHash=JSON.stringify(serverData);
+    
+    if(newHash!==lastSyncHash||forceRefresh){
+      lastSyncHash=newHash;
+      
+      // merge داده‌ها
+      appData=serverData;
       saveToLocalStorage(appData);
       
       // به‌روزرسانی currentUser
@@ -507,16 +514,18 @@ async function syncWithServer(){
       indicator.classList.add('show');
       setTimeout(()=>indicator.classList.remove('show'),800);
       
-      // refresh UI
+      // refresh کامل UI
       refreshAllUI();
     }
   }catch(e){
     console.log('Sync error:',e.message);
+  }finally{
+    isSyncing=false;
   }
 }
 
 function refreshAllUI(){
-  // Refresh chat list if on chat section
+  // Refresh chat list
   if(document.getElementById('chat-section').classList.contains('active')){
     loadChatList();
   }
@@ -527,22 +536,22 @@ function refreshAllUI(){
     markReceivedMessagesAsRead();
   }
   
-  // Refresh admin panel if open
-  if(document.getElementById('admin-page').classList.contains('active')){
-    loadUsersList();
+  // Refresh admin panel
+  if(document.getElementById('admin-page').classList.contains('active')){    loadUsersList();
     loadActivityLogs();
   }
   
-  // Refresh sessions page if showing live streams
+  // Refresh sessions page
   if(document.getElementById('sessions-page').classList.contains('active')){
     const title=document.getElementById('sessions-page-title').textContent;
     if(title==='پخش زنده'&&lastLiveGrade&&lastLiveSubject){
-      showLiveNow(lastLiveGrade,lastLiveSubject);    }else if(title==='پخش زنده قبلی'&&lastLiveGrade&&lastLiveSubject){
+      showLiveNow(lastLiveGrade,lastLiveSubject);
+    }else if(title==='پخش زنده قبلی'&&lastLiveGrade&&lastLiveSubject){
       showPreviousLives(lastLiveGrade,lastLiveSubject);
     }
   }
   
-  // Check if current live stream was stopped by admin
+  // Check if current live stream was stopped
   if(currentLiveStream){
     const live=appData.liveStreams.find(ls=>ls.id===currentLiveStream.id);
     if(!live||!live.isActive){
@@ -575,39 +584,57 @@ function markReceivedMessagesAsRead(){
 
 function startSync(){
   if(syncInterval)clearInterval(syncInterval);
-  // Sync هر 3 ثانیه
-  syncInterval=setInterval(syncWithServer,3000);
-  // اولین sync فوری
-  syncWithServer();
+  syncInterval=setInterval(()=>syncWithServer(),2000);
+  syncWithServer(true);
 }
-
 // ===== ذخیره‌سازی =====
 async function saveToJSONBin(data){
   try{
-    const res=await fetch(JSONBIN_CONFIG.BASE_URL+'/'+JSONBIN_CONFIG.BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_CONFIG.MASTER_KEY},body:JSON.stringify(data)});
+    const res=await fetch(JSONBIN_CONFIG.BASE_URL+'/'+JSONBIN_CONFIG.BIN_ID,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_CONFIG.MASTER_KEY},
+      body:JSON.stringify(data)
+    });
     return res.ok;
-  }catch(e){saveToLocalStorage(data);return false;}}
+  }catch(e){
+    saveToLocalStorage(data);
+    return false;
+  }
+}
 
-function getLocalStorageData(){return{users:JSON.parse(localStorage.getItem('riazi_users')||'{}'),videos:JSON.parse(localStorage.getItem('riazi_videos')||'[]'),messages:JSON.parse(localStorage.getItem('riazi_messages')||'{}'),activity_logs:JSON.parse(localStorage.getItem('riazi_activity_logs')||'[]'),liveStreams:JSON.parse(localStorage.getItem('riazi_liveStreams')||'[]')};}
+function getLocalStorageData(){
+  return{
+    users:JSON.parse(localStorage.getItem('riazi_users')||'{}'),
+    videos:JSON.parse(localStorage.getItem('riazi_videos')||'[]'),
+    messages:JSON.parse(localStorage.getItem('riazi_messages')||'{}'),
+    activity_logs:JSON.parse(localStorage.getItem('riazi_activity_logs')||'[]'),
+    liveStreams:JSON.parse(localStorage.getItem('riazi_liveStreams')||'[]')
+  };
+}
 
-function saveToLocalStorage(data){localStorage.setItem('riazi_users',JSON.stringify(data.users||{}));localStorage.setItem('riazi_videos',JSON.stringify(data.videos||[]));localStorage.setItem('riazi_messages',JSON.stringify(data.messages||{}));localStorage.setItem('riazi_activity_logs',JSON.stringify(data.activity_logs||[]));localStorage.setItem('riazi_liveStreams',JSON.stringify(data.liveStreams||[]));}
+function saveToLocalStorage(data){
+  localStorage.setItem('riazi_users',JSON.stringify(data.users||{}));
+  localStorage.setItem('riazi_videos',JSON.stringify(data.videos||[]));
+  localStorage.setItem('riazi_messages',JSON.stringify(data.messages||{}));
+  localStorage.setItem('riazi_activity_logs',JSON.stringify(data.activity_logs||[]));
+  localStorage.setItem('riazi_liveStreams',JSON.stringify(data.liveStreams||[]));
+}
 
 async function saveData(){
   saveToLocalStorage(appData);
-  if(isSaving){pendingSave=true;return;}
+  if(isSaving){
+    pendingSave=true;
+    return;
+  }
   isSaving=true;
   await saveToJSONBin(appData);
   isSaving=false;
-  if(pendingSave){pendingSave=false;await saveData();}
-  // به‌روزرسانی hash بعد از save
-  lastSyncDataHash=JSON.stringify({
-    usersCount:Object.keys(appData.users).length,
-    videosCount:appData.videos.length,
-    messagesCount:Object.keys(appData.messages).reduce((s,k)=>s+(appData.messages[k]||[]).length,0),
-    liveStreamsCount:appData.liveStreams.length
-  });
+  if(pendingSave){
+    pendingSave=false;
+    await saveData();
+  }
+  lastSyncHash=JSON.stringify(appData);
 }
-
 function getVipRemaining(v){if(!v||v==='none')return null;if(v==='unlimited')return 'دائمی';const d=new Date(v),n=new Date();if(d<=n)return 'منقضی';const diff=d-n;const days=Math.floor(diff/86400000);const hrs=Math.floor((diff%86400000)/3600000);return days>0?days+' روز و '+hrs+' ساعت':hrs+' ساعت';}
 function isVipActive(v){return v&&(v==='unlimited'||new Date(v)>new Date());}
 function formatPrice(p){return p.toLocaleString('fa-IR');}
@@ -617,7 +644,6 @@ function formatFileSize(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).t
 function logUserActivity(phone,action){appData.activity_logs.push({phone,action,time:new Date().toISOString()});saveData();}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
-// شمارنده پیام‌های خوانده نشده
 function getUnreadCount(chatId){
   const k=chatId+'-'+currentUser.phone;
   const msgs=appData.messages[k]||[];
@@ -627,18 +653,67 @@ function getUnreadCount(chatId){
 async function init(){
   const phone=localStorage.getItem('riazi_current');
   if(!phone){window.location.href='index.html';return;}
-  appData=getLocalStorageData();currentUser=appData.users[phone];
+  
+  appData=getLocalStorageData();
+  currentUser=appData.users[phone];
+  
   if(!currentUser){
-    // تلاش برای sync از سرور
-    await syncWithServer();
+    await syncWithServer(true);
     currentUser=appData.users[phone];
-    if(!currentUser){localStorage.removeItem('riazi_current');window.location.href='index.html';return;}
+    if(!currentUser){
+      localStorage.removeItem('riazi_current');
+      window.location.href='index.html';
+      return;
+    }
   }
-  if(currentUser.banned){if(currentUser.banUntil==='permanent'||(currentUser.banUntil&&new Date(currentUser.banUntil)>new Date())){showToast('حساب مسدود شده: '+(currentUser.banReason||''));localStorage.removeItem('riazi_current');setTimeout(()=>window.location.href='index.html',2000);return;}else{delete appData.users[phone].banned;delete appData.users[phone].banUntil;delete appData.users[phone].banReason;saveData();currentUser=appData.users[phone];}}
-  if(!appData.users[TEACHER_ACCOUNT.phone])appData.users[TEACHER_ACCOUNT.phone]={...TEACHER_ACCOUNT,grade:'همه',age:'30',school:'آموزشگاه',province:'تهران',contact:TEACHER_ACCOUNT.phone,isTeacher:true,isSupport:true,vipDownload:'unlimited',vipChat:'unlimited',vipClass:'unlimited',registeredAt:new Date().toISOString()};  for(const p in SUPPORT_ACCOUNTS){if(!appData.users[p])appData.users[p]={...SUPPORT_ACCOUNTS[p],grade:'همه',age:'25',school:'پشتیبانی',province:'تهران',contact:p,password:'123456789',isSupport:true,vipDownload:'unlimited',vipChat:'unlimited',vipClass:'unlimited',registeredAt:new Date().toISOString()};else{appData.users[p].isSupport=true;appData.users[p].vipDownload='unlimited';appData.users[p].vipChat='unlimited';appData.users[p].vipClass='unlimited';}}
-  if(!currentUser.vipDownloadGiven){const d=new Date();d.setDate(d.getDate()+3);appData.users[phone].vipDownload=d.toISOString();appData.users[phone].vipDownloadGiven=true;}
-  if(!currentUser.vipChatGiven){const d=new Date();d.setDate(d.getDate()+3);appData.users[phone].vipChat=d.toISOString();appData.users[phone].vipChatGiven=true;}
-  loadUserData();loadChatList();loadStore();saveData();
+  
+  if(currentUser.banned){
+    if(currentUser.banUntil==='permanent'||(currentUser.banUntil&&new Date(currentUser.banUntil)>new Date())){
+      showToast('حساب مسدود شده: '+(currentUser.banReason||''));
+      localStorage.removeItem('riazi_current');
+      setTimeout(()=>window.location.href='index.html',2000);
+      return;
+    }else{
+      delete appData.users[phone].banned;
+      delete appData.users[phone].banUntil;
+      delete appData.users[phone].banReason;
+      saveData();
+      currentUser=appData.users[phone];
+    }
+  }
+  
+  if(!appData.users[TEACHER_ACCOUNT.phone]){
+    appData.users[TEACHER_ACCOUNT.phone]={...TEACHER_ACCOUNT,grade:'همه',age:'30',school:'آموزشگاه',province:'تهران',contact:TEACHER_ACCOUNT.phone,isTeacher:true,isSupport:true,vipDownload:'unlimited',vipChat:'unlimited',vipClass:'unlimited',registeredAt:new Date().toISOString()};
+  }  
+  for(const p in SUPPORT_ACCOUNTS){
+    if(!appData.users[p]){
+      appData.users[p]={...SUPPORT_ACCOUNTS[p],grade:'همه',age:'25',school:'پشتیبانی',province:'تهران',contact:p,password:'123456789',isSupport:true,vipDownload:'unlimited',vipChat:'unlimited',vipClass:'unlimited',registeredAt:new Date().toISOString()};
+    }else{
+      appData.users[p].isSupport=true;
+      appData.users[p].vipDownload='unlimited';
+      appData.users[p].vipChat='unlimited';
+      appData.users[p].vipClass='unlimited';
+    }
+  }
+  
+  if(!currentUser.vipDownloadGiven){
+    const d=new Date();
+    d.setDate(d.getDate()+3);
+    appData.users[phone].vipDownload=d.toISOString();
+    appData.users[phone].vipDownloadGiven=true;
+  }
+  
+  if(!currentUser.vipChatGiven){
+    const d=new Date();
+    d.setDate(d.getDate()+3);
+    appData.users[phone].vipChat=d.toISOString();
+    appData.users[phone].vipChatGiven=true;
+  }
+  
+  loadUserData();
+  loadChatList();
+  loadStore();
+  saveData();
   startSync();
 }
 
@@ -647,7 +722,8 @@ function loadUserData(){
   document.getElementById('header-user-name').textContent=currentUser.firstname;
   document.getElementById('header-user-grade').textContent='پایه '+(currentUser.grade||'')+(currentUser.school?' | '+currentUser.school:'');
   const av=currentUser.avatar||'InShot_20260712_161951935.png';
-  document.getElementById('header-profile-img').src=av;document.getElementById('profile-large-img').src=av;
+  document.getElementById('header-profile-img').src=av;
+  document.getElementById('profile-large-img').src=av;
   if(currentUser.isSupport||currentUser.isTeacher)document.getElementById('header-verified-badge').style.display='inline-flex';
   document.getElementById('header-vip-badge').style.display=(isVipActive(currentUser.vipDownload)||isVipActive(currentUser.vipChat)||isVipActive(currentUser.vipClass))?'inline-block':'none';
   document.getElementById('profile-name-large').innerHTML=name+((currentUser.isSupport||currentUser.isTeacher)?'<span class="verified-badge" style="width:22px;height:22px;"></span>':'');
@@ -657,18 +733,20 @@ function loadUserData(){
   if(isVipActive(currentUser.vipChat))b+='<span class="vip-badge">ویژه چت</span><span class="vip-timer">'+getVipRemaining(currentUser.vipChat)+'</span>';
   if(isVipActive(currentUser.vipClass))b+='<span class="vip-badge">ویژه کلاس</span><span class="vip-timer">'+getVipRemaining(currentUser.vipClass)+'</span>';
   document.getElementById('profile-vip-badges').innerHTML=b;
-  document.getElementById('admin-menu-item').style.display=(currentUser.isTeacher||currentUser.isSupport)?'flex':'none';
-}
+  document.getElementById('admin-menu-item').style.display=(currentUser.isTeacher||currentUser.isSupport)?'flex':'none';}
 
 function selectHomeGrade(g){
   document.getElementById('sessions-page-title').textContent='پایه '+g;
   document.getElementById('sessions-page-subtitle').textContent='درس مورد نظر را انتخاب کنید';
-  const l=document.getElementById('sessions-list');l.innerHTML='';
+  const l=document.getElementById('sessions-list');
+  l.innerHTML='';
   Object.keys(SUBJECTS).forEach(k=>{
     const s=SUBJECTS[k];
-    const d=document.createElement('div');d.className='lesson-card';
+    const d=document.createElement('div');
+    d.className='lesson-card';
     d.innerHTML=`<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></div><div class="card-info"><div class="card-title">${s.name}</div><div class="card-desc">${s.lessons} درس</div></div>`;
-    d.onclick=()=>showLessons(g,k);l.appendChild(d);
+    d.onclick=()=>showLessons(g,k);
+    l.appendChild(d);
   });
   document.getElementById('sessions-page').classList.add('active');
 }
@@ -676,36 +754,44 @@ function selectHomeGrade(g){
 function selectVirtualGrade(g){
   document.getElementById('sessions-page-title').textContent='کلاس مجازی - پایه '+g;
   document.getElementById('sessions-page-subtitle').textContent='درس را انتخاب کنید';
-  const l=document.getElementById('sessions-list');l.innerHTML='';
+  const l=document.getElementById('sessions-list');
+  l.innerHTML='';
   Object.keys(SUBJECTS).forEach(k=>{
     const s=SUBJECTS[k];
-    const d=document.createElement('div');d.className='lesson-card';
+    const d=document.createElement('div');
+    d.className='lesson-card';
     d.innerHTML=`<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253"/></svg></div><div class="card-info"><div class="card-title">${s.name}</div><div class="card-desc">کلاس‌های زنده و ضبط شده</div></div>`;
-    d.onclick=()=>showLiveOptions(g,k);l.appendChild(d);
+    d.onclick=()=>showLiveOptions(g,k);
+    l.appendChild(d);
   });
   document.getElementById('sessions-page').classList.add('active');
 }
+
 function showLessons(g,k){
   const s=SUBJECTS[k];
   document.getElementById('sessions-page-title').textContent=s.name+' - پایه '+g;
   document.getElementById('sessions-page-subtitle').textContent=s.lessons+' درس';
-  const l=document.getElementById('sessions-list');l.innerHTML='';
+  const l=document.getElementById('sessions-list');
+  l.innerHTML='';
   for(let i=1;i<=s.lessons;i++){
-    const d=document.createElement('div');d.className='lesson-card';
+    const d=document.createElement('div');
+    d.className='lesson-card';
     d.innerHTML=`<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13"/></svg></div><div class="card-info"><div class="card-title">درس ${i}</div><div class="card-desc">10 جلسه آموزشی</div></div>`;
-    d.onclick=()=>showSessions(g,k,i);l.appendChild(d);
+    d.onclick=()=>showSessions(g,k,i);
+    l.appendChild(d);
   }
 }
 
-function showSessions(g,k,lessonNum){
-  const s=SUBJECTS[k];
+function showSessions(g,k,lessonNum){  const s=SUBJECTS[k];
   document.getElementById('sessions-page-title').textContent=s.name+' - درس '+lessonNum;
   document.getElementById('sessions-page-subtitle').textContent='10 جلسه';
-  const l=document.getElementById('sessions-list');l.innerHTML='';
+  const l=document.getElementById('sessions-list');
+  l.innerHTML='';
   const vids=appData.videos.filter(v=>v.grade===g&&v.subject===k&&v.chapter==lessonNum&&v.type==='lesson');
   for(let i=1;i<=10;i++){
     const vid=vids.find(x=>x.session==i);
-    const d=document.createElement('div');d.className='session-card';
+    const d=document.createElement('div');
+    d.className='session-card';
     if(vid){
       d.innerHTML=`<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="card-info"><div class="card-title">${vid.title}</div><div class="card-desc">جلسه ${i}</div></div>`;
       d.onclick=()=>playVideo(vid);
@@ -722,25 +808,33 @@ function showLiveOptions(g,k){
   const s=SUBJECTS[k];
   document.getElementById('sessions-page-title').textContent=s.name+' - پایه '+g;
   document.getElementById('sessions-page-subtitle').textContent='';
-  const l=document.getElementById('sessions-list');l.innerHTML='';
-  const live=document.createElement('div');live.className='live-option-btn';
+  const l=document.getElementById('sessions-list');
+  l.innerHTML='';
+  const live=document.createElement('div');
+  live.className='live-option-btn';
   live.innerHTML=`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2zm0-8h2v6h-2z"/></svg><h3>پخش زنده</h3>`;
-  live.onclick=()=>showLiveNow(g,k);l.appendChild(live);
-  const prev=document.createElement('div');prev.className='live-option-btn';
+  live.onclick=()=>showLiveNow(g,k);
+  l.appendChild(live);
+  const prev=document.createElement('div');
+  prev.className='live-option-btn';
   prev.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><h3>پخش زنده قبلی</h3>`;
-  prev.onclick=()=>showPreviousLives(g,k);l.appendChild(prev);
+  prev.onclick=()=>showPreviousLives(g,k);
+  l.appendChild(prev);
 }
 
 function showLiveNow(g,k){
   lastLiveGrade=g;
-  lastLiveSubject=k;  document.getElementById('sessions-page-title').textContent='پخش زنده';
+  lastLiveSubject=k;
+  document.getElementById('sessions-page-title').textContent='پخش زنده';
   document.getElementById('sessions-page-subtitle').textContent='';
-  const l=document.getElementById('sessions-list');l.innerHTML='';
+  const l=document.getElementById('sessions-list');
+  l.innerHTML='';
   const liveStreams=appData.liveStreams.filter(ls=>ls.grade===g&&ls.subject===k&&ls.isActive);
-  if(liveStreams.length===0){l.innerHTML='<div style="text-align:center;color:#fff;padding:40px;">پخش زنده‌ای در حال انجام نیست</div>';}
-  else{
+  if(liveStreams.length===0){
+    l.innerHTML='<div style="text-align:center;color:#fff;padding:40px;">پخش زنده‌ای در حال انجام نیست</div>';  }else{
     liveStreams.forEach(ls=>{
-      const d=document.createElement('div');d.className='live-stream-card';
+      const d=document.createElement('div');
+      d.className='live-stream-card';
       d.innerHTML=`<button class="delete-live-btn" onclick="event.stopPropagation();deleteLiveStream('${ls.id}')">×</button><div class="card-icon" style="background:linear-gradient(135deg,#ef4444,#dc2626)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2zm0-8h2v6h-2z"/></svg></div><div class="card-info"><div class="card-title">🔴 ${ls.title}</div><div class="card-desc">${ls.description||'در حال پخش'} | ${ls.creatorName||''}</div></div>`;
       d.onclick=()=>joinLiveStream(ls);
       l.appendChild(d);
@@ -753,45 +847,80 @@ function showPreviousLives(g,k){
   lastLiveSubject=k;
   document.getElementById('sessions-page-title').textContent='پخش زنده قبلی';
   document.getElementById('sessions-page-subtitle').textContent='';
-  const l=document.getElementById('sessions-list');l.innerHTML='';
+  const l=document.getElementById('sessions-list');
+  l.innerHTML='';
   const vids=appData.videos.filter(v=>v.grade===g&&v.subject===k&&v.type==='live'&&!v.isLive);
-  if(vids.length===0)l.innerHTML='<div style="text-align:center;color:#fff;padding:40px;">ویدیویی وجود ندارد</div>';
-  else vids.forEach(v=>{
-    const d=document.createElement('div');d.className='session-card';
-    d.innerHTML=`<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="card-info"><div class="card-title">${v.title}</div><div class="card-desc">${v.description||''}</div></div>`;
-    d.onclick=()=>playVideo(v);l.appendChild(d);
-  });
+  if(vids.length===0){
+    l.innerHTML='<div style="text-align:center;color:#fff;padding:40px;">ویدیویی وجود ندارد</div>';
+  }else{
+    vids.forEach(v=>{
+      const d=document.createElement('div');
+      d.className='session-card';
+      d.innerHTML=`<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="card-info"><div class="card-title">${v.title}</div><div class="card-desc">${v.description||''}</div></div>`;
+      d.onclick=()=>playVideo(v);
+      l.appendChild(d);
+    });
+  }
 }
 
 function openTeachersPage(){
   document.getElementById('sessions-page-title').textContent='معرفی اساتید';
   document.getElementById('sessions-page-subtitle').textContent='';
-  const l=document.getElementById('sessions-list');l.innerHTML='';
+  const l=document.getElementById('sessions-list');
+  l.innerHTML='';
   const t=[{n:'استاد ریاضی',d:'احسان بهشتی کیا',v:'teacher_math.mp4'},{n:'استاد علوم',d:'به زودی',v:'teacher_science.mp4'},{n:'استاد فارسی',d:'به زودی',v:'teacher_farsi.mp4'},{n:'استاد انگلیسی',d:'به زودی',v:'teacher_english.mp4'}];
   t.forEach(x=>{
-    const d=document.createElement('div');d.className='session-card';
+    const d=document.createElement('div');
+    d.className='session-card';
     d.innerHTML=`<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg></div><div class="card-info"><div class="card-title">${x.n}</div><div class="card-desc">${x.d}</div></div>`;
-    d.onclick=()=>playVideo({title:x.n,link:x.v,grade:'',chapter:0,session:0});l.appendChild(d);
+    d.onclick=()=>playVideo({title:x.n,link:x.v,grade:'',chapter:0,session:0});
+    l.appendChild(d);
   });
   document.getElementById('sessions-page').classList.add('active');
 }
 
-function closeSessionsPage(){document.getElementById('sessions-page').classList.remove('active');}
-function playIntroVideo(t){playVideo({title:'معرفی برنامه',link:'intro.mp4',grade:'',chapter:0,session:0});}
+function closeSessionsPage(){
+  document.getElementById('sessions-page').classList.remove('active');}
+
+function playIntroVideo(t){
+  playVideo({title:'معرفی برنامه',link:'intro.mp4',grade:'',chapter:0,session:0});
+}
 
 async function createLiveStream(){
   const grade=document.getElementById('live-grade').value;
   const subject=document.getElementById('live-subject').value;
-  const title=document.getElementById('live-title').value;  const description=document.getElementById('live-description').value;
-  if(!title){showToast('موضوع را وارد کنید');return;}
+  const title=document.getElementById('live-title').value;
+  const description=document.getElementById('live-description').value;
+  
+  if(!title){
+    showToast('موضوع را وارد کنید');
+    return;
+  }
+  
   const streamId='riazi_'+Date.now();
-  const newStream={id:streamId,grade:grade,subject:subject,title:title,description:description,createdBy:currentUser.phone,creatorName:currentUser.firstname+' '+(currentUser.lastname||''),createdAt:new Date().toISOString(),isActive:true,roomName:streamId};
+  const newStream={
+    id:streamId,
+    grade:grade,
+    subject:subject,
+    title:title,
+    description:description,
+    createdBy:currentUser.phone,
+    creatorName:currentUser.firstname+' '+(currentUser.lastname||''),
+    createdAt:new Date().toISOString(),
+    isActive:true,
+    roomName:streamId
+  };
+  
   appData.liveStreams.push(newStream);
   await saveData();
+  
   document.getElementById('live-title').value='';
   document.getElementById('live-description').value='';
+  
   showToast('پخش زنده ایجاد شد - در همه دستگاه‌ها فعال می‌شود');
-  setTimeout(()=>{openLiveStreamPage(newStream,true);},300);
+  setTimeout(()=>{
+    openLiveStreamPage(newStream,true);
+  },300);
 }
 
 function openLiveStreamPage(stream,creator){
@@ -800,7 +929,8 @@ function openLiveStreamPage(stream,creator){
   document.getElementById('live-stream-page').classList.add('active');
   document.getElementById('live-stream-title').textContent=stream.title;
   document.getElementById('live-stream-subtitle').textContent=(SUBJECTS[stream.subject]?.name||stream.subject)+' - پایه '+stream.grade;
-  const camSelector=document.getElementById('camera-selector');
+    const camSelector=document.getElementById('camera-selector');
+  
   if(creator){
     camSelector.classList.add('active');
     document.getElementById('start-live-btn').style.display='flex';
@@ -812,6 +942,7 @@ function openLiveStreamPage(stream,creator){
     camSelector.classList.remove('active');
     document.getElementById('start-live-btn').style.display='none';
     document.getElementById('stop-live-btn').style.display='none';
+    
     if(stream.isActive){
       document.getElementById('no-stream-msg').style.display='block';
       document.getElementById('live-badge-indicator').style.display='flex';
@@ -825,28 +956,42 @@ function openLiveStreamPage(stream,creator){
 }
 
 function joinLiveStream(stream){
-  if(!isVipActive(currentUser.vipClass)){showToast('برای تماشای پخش زنده باید ویژه کلاس مجازی داشته باشید');return;}
+  if(!isVipActive(currentUser.vipClass)){
+    showToast('برای تماشای پخش زنده باید ویژه کلاس مجازی داشته باشید');
+    return;
+  }
   openLiveStreamPage(stream,false);
 }
 
 async function startLiveStream(){
   if(!currentLiveStream)return;
-  try{    if(currentCameraMode==='screen'){
-      if(!navigator.mediaDevices.getDisplayMedia){showToast('ضبط صفحه در این مرورگر پشتیبانی نمی‌شود');return;}
+  
+  try{
+    if(currentCameraMode==='screen'){
+      if(!navigator.mediaDevices.getDisplayMedia){
+        showToast('ضبط صفحه در این مرورگر پشتیبانی نمی‌شود');
+        return;
+      }
       localStream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});
     }else{
       const facingMode=currentCameraMode==='front'?'user':'environment';
-      localStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facingMode,width:{ideal:1280},height:{ideal:720}},audio:true});
-    }
+      localStream=await navigator.mediaDevices.getUserMedia({
+        video:{facingMode:facingMode,width:{ideal:1280},height:{ideal:720}},
+        audio:true
+      });    }
+    
     const video=document.getElementById('live-video');
     video.srcObject=localStream;
     video.style.display='block';
     document.getElementById('no-stream-msg').style.display='none';
     document.getElementById('live-badge-indicator').style.display='flex';
+    
     currentLiveStream.isActive=true;
     await saveData();
+    
     document.getElementById('start-live-btn').style.display='none';
     document.getElementById('stop-live-btn').style.display='flex';
+    
     showToast('پخش زنده شروع شد - در همه دستگاه‌ها فعال است');
   }catch(err){
     console.error('Camera error:',err);
@@ -856,32 +1001,46 @@ async function startLiveStream(){
 
 async function stopLiveStream(){
   if(!currentLiveStream)return;
-  if(localStream){localStream.getTracks().forEach(track=>track.stop());localStream=null;}
+  
+  if(localStream){
+    localStream.getTracks().forEach(track=>track.stop());
+    localStream=null;
+  }
+  
   const video=document.getElementById('live-video');
   video.srcObject=null;
   video.style.display='none';
+  
   currentLiveStream.isActive=false;
   await saveData();
+  
   document.getElementById('start-live-btn').style.display='flex';
   document.getElementById('stop-live-btn').style.display='none';
   document.getElementById('live-badge-indicator').style.display='none';
   document.getElementById('no-stream-msg').style.display='block';
   document.getElementById('no-stream-msg').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:60px;height:60px;color:#64748b;margin-bottom:12px;"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><div>پخش زنده متوقف شد</div>';
+  
   showToast('پخش زنده متوقف شد');
+  
   setTimeout(()=>{
     closeLiveStream();
     if(lastLiveGrade&&lastLiveSubject){
       showPreviousLives(lastLiveGrade,lastLiveSubject);
       document.getElementById('sessions-page').classList.add('active');
-    }
-  },1000);
+    }  },1000);
 }
 
 function closeLiveStream(){
-  if(localStream){localStream.getTracks().forEach(track=>track.stop());localStream=null;}
-  if(currentLiveStream&&currentLiveStream.isActive&&currentLiveStream.createdBy===currentUser.phone){
-    currentLiveStream.isActive=false;    saveData();
+  if(localStream){
+    localStream.getTracks().forEach(track=>track.stop());
+    localStream=null;
   }
+  
+  if(currentLiveStream&&currentLiveStream.isActive&&currentLiveStream.createdBy===currentUser.phone){
+    currentLiveStream.isActive=false;
+    saveData();
+  }
+  
   currentLiveStream=null;
   isCreator=false;
   document.getElementById('live-stream-page').classList.remove('active');
@@ -891,237 +1050,805 @@ function closeLiveStream(){
 
 async function switchCameraMode(mode){
   currentCameraMode=mode;
-  document.querySelectorAll('.cam-btn').forEach(btn=>{btn.classList.toggle('active',btn.dataset.mode===mode);});
+  document.querySelectorAll('.cam-btn').forEach(btn=>{
+    btn.classList.toggle('active',btn.dataset.mode===mode);
+  });
+  
   if(localStream&&isCreator){
     try{
       localStream.getTracks().forEach(track=>track.stop());
-      if(mode==='screen'){localStream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});}
-      else{const facingMode=mode==='front'?'user':'environment';localStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facingMode},audio:true});}
+      
+      if(mode==='screen'){
+        localStream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});
+      }else{
+        const facingMode=mode==='front'?'user':'environment';
+        localStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facingMode},audio:true});
+      }
+      
       const video=document.getElementById('live-video');
       video.srcObject=localStream;
+      
       showToast(mode==='front'?'دوربین جلو فعال شد':(mode==='back'?'دوربین عقب فعال شد':'ضبط صفحه فعال شد'));
-    }catch(err){console.error('Camera switch error:',err);showToast('خطا در تغییر دوربین');}
+    }catch(err){
+      console.error('Camera switch error:',err);
+      showToast('خطا در تغییر دوربین');
+    }
   }
 }
 
-async function deleteLiveStream(streamId){
-  if(!confirm('آیا مطمئن هستید که می‌خواهید این پخش زنده را حذف کنید؟'))return;
+async function deleteLiveStream(streamId){  if(!confirm('آیا مطمئن هستید که می‌خواهید این پخش زنده را حذف کنید؟'))return;
+  
   const idx=appData.liveStreams.findIndex(ls=>ls.id===streamId);
   if(idx!==-1){
     appData.liveStreams.splice(idx,1);
     await saveData();
     showToast('پخش زنده حذف شد - در همه دستگاه‌ها');
-    if(lastLiveGrade&&lastLiveSubject){showLiveNow(lastLiveGrade,lastLiveSubject);}
-    if(currentLiveStream&&currentLiveStream.id===streamId){closeLiveStream();}
+    
+    if(lastLiveGrade&&lastLiveSubject){
+      showLiveNow(lastLiveGrade,lastLiveSubject);
+    }
+    
+    if(currentLiveStream&&currentLiveStream.id===streamId){
+      closeLiveStream();
+    }
   }
 }
 
-function toggleOrientation(){isLandscape=!isLandscape;document.getElementById('live-stream-page').classList.toggle('landscape',isLandscape);showToast(isLandscape?'حالت افقی':'حالت عمودی');}
+function toggleOrientation(){
+  isLandscape=!isLandscape;
+  document.getElementById('live-stream-page').classList.toggle('landscape',isLandscape);
+  showToast(isLandscape?'حالت افقی':'حالت عمودی');
+}
 
 function toggleFullscreen(){
   const page=document.getElementById('live-stream-page');
-  if(!document.fullscreenElement){if(page.requestFullscreen)page.requestFullscreen();else if(page.webkitRequestFullscreen)page.webkitRequestFullscreen();}
-  else{if(document.exitFullscreen)document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen();}
+  if(!document.fullscreenElement){
+    if(page.requestFullscreen)page.requestFullscreen();
+    else if(page.webkitRequestFullscreen)page.webkitRequestFullscreen();
+  }else{
+    if(document.exitFullscreen)document.exitFullscreen();
+    else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
+  }
 }
 
 function loadChatList(){
-  const c=document.getElementById('chat-list-container');c.innerHTML='';
-  const td=document.createElement('div');td.className='chat-item';
+  const c=document.getElementById('chat-list-container');
+  c.innerHTML='';
+  
+  const td=document.createElement('div');
+  td.className='chat-item';
   const unreadTeacher=getUnreadCount(TEACHER_ACCOUNT.phone);
   td.innerHTML=`<div class="chat-avatar"><img src="${TEACHER_ACCOUNT.avatar}" onerror="this.src='IMG_20260712_192216_220.jpg'"></div><div class="chat-info"><div class="chat-name">استاد احسان بهشتی کیا <span class="verified-badge" style="width:18px;height:18px;"></span>${unreadTeacher>0?`<span class="chat-unread">${unreadTeacher}</span>`:''}</div><div class="chat-last">${getLastMessage(TEACHER_ACCOUNT.phone)||'برای گفتگو کلیک کنید'}</div></div>`;
-  td.onclick=()=>openPrivateChat(TEACHER_ACCOUNT.phone,'استاد احسان بهشتی کیا',TEACHER_ACCOUNT.avatar,true);c.appendChild(td);  Object.keys(SUPPORT_ACCOUNTS).forEach(p=>{
-    const s=SUPPORT_ACCOUNTS[p];const d=document.createElement('div');d.className='chat-item';
-    const unread=getUnreadCount(p);
+  td.onclick=()=>openPrivateChat(TEACHER_ACCOUNT.phone,'استاد احسان بهشتی کیا',TEACHER_ACCOUNT.avatar,true);
+  c.appendChild(td);
+  
+  Object.keys(SUPPORT_ACCOUNTS).forEach(p=>{
+    const s=SUPPORT_ACCOUNTS[p];
+    const d=document.createElement('div');
+    d.className='chat-item';    const unread=getUnreadCount(p);
     d.innerHTML=`<div class="chat-avatar"><img src="${s.avatar}" onerror="this.src='316b4205-1a5b-491e-81f7-2fc93d4fbc0f.png'"></div><div class="chat-info"><div class="chat-name">${s.firstname} ${s.lastname} <span class="verified-badge" style="width:18px;height:18px;"></span>${unread>0?`<span class="chat-unread">${unread}</span>`:''}</div><div class="chat-last">${getLastMessage(p)||'پشتیبانی برنامه'}</div></div>`;
-    d.onclick=()=>openPrivateChat(p,s.firstname+' '+s.lastname,s.avatar,true);c.appendChild(d);
+    d.onclick=()=>openPrivateChat(p,s.firstname+' '+s.lastname,s.avatar,true);
+    c.appendChild(d);
   });
 }
 
 function getLastMessage(chatId){
-  const k1=currentUser.phone+'-'+chatId,k2=chatId+'-'+currentUser.phone;
+  const k1=currentUser.phone+'-'+chatId;
+  const k2=chatId+'-'+currentUser.phone;
   const a=(appData.messages[k1]||[]).concat(appData.messages[k2]||[]).sort((x,y)=>new Date(y.time)-new Date(x.time));
   if(a.length===0)return '';
-  if(a[0].type==='voice')return 'پیام صوتی';if(a[0].type==='file')return 'فایل';if(a[0].type==='image')return 'تصویر';return a[0].text||'';
+  if(a[0].type==='voice')return 'پیام صوتی';
+  if(a[0].type==='file')return 'فایل';
+  if(a[0].type==='image')return 'تصویر';
+  return a[0].text||'';
 }
 
 function openPrivateChat(id,name,av,isVIP){
-  if(!isVIP&&!isVipActive(currentUser.vipChat)){showToast('ویژه چت نیاز دارید. با پشتیبانی تماس بگیرید.');return;}
+  if(!isVIP&&!isVipActive(currentUser.vipChat)){
+    showToast('ویژه چت نیاز دارید. با پشتیبانی تماس بگیرید.');
+    return;
+  }
+  
   currentChat={id,name,avatar:av};
   document.getElementById('chat-header-name').innerHTML=name+(id===TEACHER_ACCOUNT.phone||SUPPORT_ACCOUNTS[id]?' <span class="verified-badge" style="width:18px;height:18px;"></span>':'');
   document.getElementById('chat-header-img').src=av;
   document.getElementById('private-chat-modal').classList.add('active');
-  cancelReply();deleteVoicePreview();
+  
+  cancelReply();
+  deleteVoicePreview();
+  
   if(SUPPORT_ACCOUNTS[id]){
-    const k=currentUser.phone+'-'+id;if(!appData.messages[k])appData.messages[k]=[];
+    const k=currentUser.phone+'-'+id;
+    if(!appData.messages[k])appData.messages[k]=[];
+    
     if(!appData.messages[k].some(m=>m.text&&m.text.includes('خوش امدید'))){
-      appData.messages[k].push({sender:id,type:'text',text:'سلام خوش امدید به برنامه آینده نگر پشتیبانی هستم برای ارتباط تماس و یا بیشتر به شماره موبایل 09904844031 تماس بگیرید و برای ارتباط چت پیام دهید در کوتاه ترین زمان به شما پاسخ خواهیم داد ممنون متشکر از شما❤',time:new Date().toISOString(),read:true});
+      appData.messages[k].push({
+        sender:id,
+        type:'text',
+        text:'سلام خوش امدید به برنامه آینده نگر پشتیبانی هستم برای ارتباط تماس و یا بیشتر به شماره موبایل 09904844031 تماس بگیرید و برای ارتباط چت پیام دهید در کوتاه ترین زمان به شما پاسخ خواهیم داد ممنون متشکر از شما❤',
+        time:new Date().toISOString(),
+        read:true
+      });
       saveData();
     }
   }
+  
   loadMessages();
-  markReceivedMessagesAsRead();
-}
+  markReceivedMessagesAsRead();}
 
-function closePrivateChat(){document.getElementById('private-chat-modal').classList.remove('active');currentChat=null;cancelReply();deleteVoicePreview();}
+function closePrivateChat(){
+  document.getElementById('private-chat-modal').classList.remove('active');
+  currentChat=null;
+  cancelReply();
+  deleteVoicePreview();
+}
 
 function loadMessages(){
   if(!currentChat)return;
-  const k1=currentUser.phone+'-'+currentChat.id,k2=currentChat.id+'-'+currentUser.phone;
+  
+  const k1=currentUser.phone+'-'+currentChat.id;
+  const k2=currentChat.id+'-'+currentUser.phone;
   const all=(appData.messages[k1]||[]).concat(appData.messages[k2]||[]).sort((a,b)=>new Date(a.time)-new Date(b.time));
-  const c=document.getElementById('chat-messages');c.innerHTML='';
-  if(all.length===0){c.innerHTML='<div style="text-align:center;color:#94a3b8;padding:50px;">هنوز پیامی نیست</div>';return;}
+  
+  const c=document.getElementById('chat-messages');
+  c.innerHTML='';
+  
+  if(all.length===0){
+    c.innerHTML='<div style="text-align:center;color:#94a3b8;padding:50px;">هنوز پیامی نیست</div>';
+    return;
+  }
+  
   all.forEach(m=>{
-    const d=document.createElement('div');d.className='message '+(m.sender===currentUser.phone?'sent':'received');
-    if(m.read&&m.sender===currentUser.phone)d.classList.add('read');
+    const d=document.createElement('div');
+    d.className='message '+(m.sender===currentUser.phone?'sent':'received');
+    
+    if(m.read&&m.sender===currentUser.phone){
+      d.classList.add('read');
+    }
+    
     let h='';
-    if(m.replyTo)h+=`<div class="message-reply" style="background:rgba(0,0,0,0.15);padding:6px 10px;border-radius:10px;margin-bottom:8px;font-size:12px;border-right:3px solid rgba(255,255,255,0.5);">${escapeHtml(m.replyTo)}</div>`;
-    if(m.type==='text')h+=`<div>${escapeHtml(m.text)}</div>`;
-    else if(m.type==='voice'){h+=`<div class="message-voice"><div class="play-btn" onclick="playVoice('${m.audioData}',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div><div class="voice-info"><div class="voice-wave">`;for(let i=0;i<15;i++)h+=`<span style="height:${Math.random()*10+6}px"></span>`;h+=`</div><div class="voice-duration">${m.duration||''}</div></div></div>`;}
-    else if(m.type==='image')h+=`<img class="message-image" src="${m.fileData}">`;
-    else if(m.type==='file'){const ic=m.fileName&&m.fileName.endsWith('.mp4')?'🎬':'📎';h+=`<div class="message-file"><div class="file-icon">${ic}</div><div class="file-info"><div class="file-name">${escapeHtml(m.fileName||'فایل')}</div><div class="file-size">${m.fileSize||''}</div></div></div>`;}    h+=`<span class="message-time">${formatTime(m.time)}${m.sender===currentUser.phone?` <span class="message-status">${m.read?'✓✓':'✓'}</span>`:''}</span>`;
+    
+    if(m.replyTo){
+      h+=`<div class="message-reply" style="background:rgba(0,0,0,0.15);padding:6px 10px;border-radius:10px;margin-bottom:8px;font-size:12px;border-right:3px solid rgba(255,255,255,0.5);">${escapeHtml(m.replyTo)}</div>`;
+    }
+    
+    if(m.type==='text'){
+      h+=`<div>${escapeHtml(m.text)}</div>`;
+    }else if(m.type==='voice'){
+      h+=`<div class="message-voice"><div class="play-btn" onclick="playVoice('${m.audioData}',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div><div class="voice-info"><div class="voice-wave">`;
+      for(let i=0;i<15;i++){
+        h+=`<span style="height:${Math.random()*10+6}px"></span>`;
+      }
+      h+=`</div><div class="voice-duration">${m.duration||''}</div></div></div>`;
+    }else if(m.type==='image'){
+      h+=`<img class="message-image" src="${m.fileData}">`;
+    }else if(m.type==='file'){
+      const ic=m.fileName&&m.fileName.endsWith('.mp4')?'🎬':'📎';      h+=`<div class="message-file"><div class="file-icon">${ic}</div><div class="file-info"><div class="file-name">${escapeHtml(m.fileName||'فایل')}</div><div class="file-size">${m.fileSize||''}</div></div></div>`;
+    }
+    
+    h+=`<span class="message-time">${formatTime(m.time)}${m.sender===currentUser.phone?` <span class="message-status">${m.read?'✓✓':'✓'}</span>`:''}</span>`;
+    
     d.innerHTML=h;
-    d.addEventListener('contextmenu',e=>{e.preventDefault();if(m.sender===currentUser.phone&&confirm('حذف شود؟'))delMsg(k1,k2,m);});
+    
+    d.addEventListener('contextmenu',e=>{
+      e.preventDefault();
+      if(m.sender===currentUser.phone&&confirm('حذف شود؟')){
+        delMsg(k1,k2,m);
+      }
+    });
+    
     c.appendChild(d);
   });
-  setTimeout(()=>c.scrollTop=c.scrollHeight,50);
+  
+  setTimeout(()=>{
+    c.scrollTop=c.scrollHeight;
+  },50);
 }
 
-async function delMsg(k1,k2,m){if(appData.messages[k1])appData.messages[k1]=appData.messages[k1].filter(x=>x.time!==m.time);if(appData.messages[k2])appData.messages[k2]=appData.messages[k2].filter(x=>x.time!==m.time);await saveData();loadMessages();loadChatList();}
+async function delMsg(k1,k2,m){
+  if(appData.messages[k1]){
+    appData.messages[k1]=appData.messages[k1].filter(x=>x.time!==m.time);
+  }
+  if(appData.messages[k2]){
+    appData.messages[k2]=appData.messages[k2].filter(x=>x.time!==m.time);
+  }
+  await saveData();
+  loadMessages();
+  loadChatList();
+}
 
-async function sendMessage(){const i=document.getElementById('chat-message-input');const t=i.value.trim();if(!t||!currentChat)return;const k=currentUser.phone+'-'+currentChat.id;if(!appData.messages[k])appData.messages[k]=[];appData.messages[k].push({sender:currentUser.phone,type:'text',text:t,replyTo:currentReply?currentReply.text:null,time:new Date().toISOString(),read:false});await saveData();i.value='';cancelReply();loadMessages();loadChatList();}
+async function sendMessage(){
+  const i=document.getElementById('chat-message-input');
+  const t=i.value.trim();
+  
+  if(!t||!currentChat)return;
+  
+  const k=currentUser.phone+'-'+currentChat.id;
+  if(!appData.messages[k])appData.messages[k]=[];
+  
+  appData.messages[k].push({
+    sender:currentUser.phone,
+    type:'text',
+    text:t,
+    replyTo:currentReply?currentReply.text:null,
+    time:new Date().toISOString(),
+    read:false  });
+  
+  await saveData();
+  i.value='';
+  cancelReply();
+  loadMessages();
+  loadChatList();
+}
 
-async function sendFile(ev){const f=ev.target.files[0];if(!f||!currentChat)return;const r=new FileReader();r.onload=async e=>{const k=currentUser.phone+'-'+currentChat.id;if(!appData.messages[k])appData.messages[k]=[];const m={sender:currentUser.phone,replyTo:currentReply?currentReply.text:null,time:new Date().toISOString(),read:false};if(f.type.startsWith('image/')){m.type='image';m.fileData=e.target.result;m.fileName=f.name;}else{m.type='file';m.fileData=e.target.result;m.fileName=f.name;m.fileSize=formatFileSize(f.size);}appData.messages[k].push(m);await saveData();showToast('ارسال شد');loadMessages();loadChatList();};r.readAsDataURL(f);ev.target.value='';}
+async function sendFile(ev){
+  const f=ev.target.files[0];
+  
+  if(!f||!currentChat)return;
+  
+  const r=new FileReader();
+  r.onload=async e=>{
+    const k=currentUser.phone+'-'+currentChat.id;
+    if(!appData.messages[k])appData.messages[k]=[];
+    
+    const m={
+      sender:currentUser.phone,
+      replyTo:currentReply?currentReply.text:null,
+      time:new Date().toISOString(),
+      read:false
+    };
+    
+    if(f.type.startsWith('image/')){
+      m.type='image';
+      m.fileData=e.target.result;
+      m.fileName=f.name;
+    }else{
+      m.type='file';
+      m.fileData=e.target.result;
+      m.fileName=f.name;
+      m.fileSize=formatFileSize(f.size);
+    }
+    
+    appData.messages[k].push(m);
+    await saveData();
+    showToast('ارسال شد');
+    loadMessages();
+    loadChatList();
+  };
+  
+  r.readAsDataURL(f);
+  ev.target.value='';
+}
 
 function startRecording(){
-  if(!currentChat){showToast('ابتدا یک گفتگو انتخاب کنید');return;}
+  if(!currentChat){    showToast('ابتدا یک گفتگو انتخاب کنید');
+    return;
+  }
+  
   navigator.mediaDevices.getUserMedia({audio:true}).then(s=>{
-    mediaRecorder=new MediaRecorder(s);audioChunks=[];recordedBlob=null;
-    mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
+    mediaRecorder=new MediaRecorder(s);
+    audioChunks=[];
+    recordedBlob=null;
+    
+    mediaRecorder.ondataavailable=e=>{
+      audioChunks.push(e.data);
+    };
+    
     mediaRecorder.onstop=()=>{
       recordedBlob=new Blob(audioChunks,{type:'audio/webm'});
       document.getElementById('voice-timer').textContent=((Date.now()-recordingStartTime)/1000).toFixed(1)+' ثانیه';
       document.getElementById('voice-preview').classList.add('active');
       s.getTracks().forEach(t=>t.stop());
     };
-    mediaRecorder.start();recordingStartTime=Date.now();
+    
+    mediaRecorder.start();
+    recordingStartTime=Date.now();
     document.getElementById('voice-btn').classList.add('recording');
-  }).catch(()=>showToast('دسترسی میکروفون رد شد'));
+  }).catch(()=>{
+    showToast('دسترسی میکروفون رد شد');
+  });
 }
-function stopRecording(){if(mediaRecorder&&mediaRecorder.state!=='inactive'){mediaRecorder.stop();document.getElementById('voice-btn').classList.remove('recording');}}
+
+function stopRecording(){
+  if(mediaRecorder&&mediaRecorder.state!=='inactive'){
+    mediaRecorder.stop();
+    document.getElementById('voice-btn').classList.remove('recording');
+  }
+}
 
 let previewAudio=null;
-function playPreviewVoice(){if(!recordedBlob)return;if(previewAudio)previewAudio.pause();previewAudio=new Audio(URL.createObjectURL(recordedBlob));previewAudio.play();}
-function deleteVoicePreview(){if(previewAudio)previewAudio.pause();recordedBlob=null;document.getElementById('voice-preview').classList.remove('active');}
+
+function playPreviewVoice(){
+  if(!recordedBlob)return;
+  
+  if(previewAudio){
+    previewAudio.pause();
+    previewAudio=null;
+  }
+  
+  previewAudio=new Audio(URL.createObjectURL(recordedBlob));
+  previewAudio.play();
+}
+
+function deleteVoicePreview(){  if(previewAudio){
+    previewAudio.pause();
+    previewAudio=null;
+  }
+  recordedBlob=null;
+  document.getElementById('voice-preview').classList.remove('active');
+}
 
 async function confirmSendVoice(){
   if(!recordedBlob||!currentChat)return;
+  
   const r=new FileReader();
   r.onload=async e=>{
-    const k=currentUser.phone+'-'+currentChat.id;if(!appData.messages[k])appData.messages[k]=[];
-    appData.messages[k].push({sender:currentUser.phone,type:'voice',audioData:e.target.result,duration:document.getElementById('voice-timer').textContent,replyTo:currentReply?currentReply.text:null,time:new Date().toISOString(),read:false});
-    await saveData();deleteVoicePreview();loadMessages();loadChatList();showToast('ویس ارسال شد');
-  };r.readAsDataURL(recordedBlob);
+    const k=currentUser.phone+'-'+currentChat.id;
+    if(!appData.messages[k])appData.messages[k]=[];
+    
+    appData.messages[k].push({
+      sender:currentUser.phone,
+      type:'voice',
+      audioData:e.target.result,
+      duration:document.getElementById('voice-timer').textContent,
+      replyTo:currentReply?currentReply.text:null,
+      time:new Date().toISOString(),
+      read:false
+    });
+    
+    await saveData();
+    deleteVoicePreview();
+    loadMessages();
+    loadChatList();
+    showToast('ویس ارسال شد');
+  };
+  
+  r.readAsDataURL(recordedBlob);
 }
 
-function playVoice(d,btn){const a=new Audio(d);a.play();const h=btn.innerHTML;btn.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>';a.onended=()=>btn.innerHTML=h;}
-function cancelReply(){currentReply=null;}
-function openSupportFromProfile(){openPrivateChat('09904844031','پشتیبان اصلی','316b4205-1a5b-491e-81f7-2fc93d4fbc0f.png',true);}
+function playVoice(d,btn){
+  const a=new Audio(d);
+  a.play();
+  const h=btn.innerHTML;
+  btn.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>';
+  a.onended=()=>{
+    btn.innerHTML=h;
+  };
+}
 
-function openEditProfile(){document.getElementById('edit-firstname').value=currentUser.firstname||'';document.getElementById('edit-lastname').value=currentUser.lastname||'';document.getElementById('edit-school').value=currentUser.school||'';document.getElementById('edit-province').value=currentUser.province||'تهران';document.getElementById('edit-grade').value=currentUser.grade||'هفتم';document.getElementById('edit-age').value=currentUser.age||'';document.getElementById('edit-profile-modal').classList.add('active');}function closeEditProfile(){document.getElementById('edit-profile-modal').classList.remove('active');}
-async function saveProfile(){appData.users[currentUser.phone].firstname=document.getElementById('edit-firstname').value;appData.users[currentUser.phone].lastname=document.getElementById('edit-lastname').value;appData.users[currentUser.phone].school=document.getElementById('edit-school').value;appData.users[currentUser.phone].province=document.getElementById('edit-province').value;appData.users[currentUser.phone].grade=document.getElementById('edit-grade').value;appData.users[currentUser.phone].age=document.getElementById('edit-age').value;currentUser=appData.users[currentUser.phone];await saveData();loadUserData();closeEditProfile();showToast('پروفایل ذخیره شد');}
+function cancelReply(){
+  currentReply=null;
+}
+function openSupportFromProfile(){
+  openPrivateChat('09904844031','پشتیبان اصلی','316b4205-1a5b-491e-81f7-2fc93d4fbc0f.png',true);
+}
 
-function changeAvatar(){const i=document.createElement('input');i.type='file';i.accept='image/*';i.onchange=async e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async ev=>{appData.users[currentUser.phone].avatar=ev.target.result;currentUser=appData.users[currentUser.phone];await saveData();loadUserData();showToast('عکس تغییر کرد');};r.readAsDataURL(f);};i.click();}
+function openEditProfile(){
+  document.getElementById('edit-firstname').value=currentUser.firstname||'';
+  document.getElementById('edit-lastname').value=currentUser.lastname||'';
+  document.getElementById('edit-school').value=currentUser.school||'';
+  document.getElementById('edit-province').value=currentUser.province||'تهران';
+  document.getElementById('edit-grade').value=currentUser.grade||'هفتم';
+  document.getElementById('edit-age').value=currentUser.age||'';
+  document.getElementById('edit-profile-modal').classList.add('active');
+}
 
-function openAdminPanel(){document.getElementById('admin-page').classList.add('active');loadUsersList();loadActivityLogs();}
-function closeAdminPanel(){document.getElementById('admin-page').classList.remove('active');}
+function closeEditProfile(){
+  document.getElementById('edit-profile-modal').classList.remove('active');
+}
+
+async function saveProfile(){
+  appData.users[currentUser.phone].firstname=document.getElementById('edit-firstname').value;
+  appData.users[currentUser.phone].lastname=document.getElementById('edit-lastname').value;
+  appData.users[currentUser.phone].school=document.getElementById('edit-school').value;
+  appData.users[currentUser.phone].province=document.getElementById('edit-province').value;
+  appData.users[currentUser.phone].grade=document.getElementById('edit-grade').value;
+  appData.users[currentUser.phone].age=document.getElementById('edit-age').value;
+  
+  currentUser=appData.users[currentUser.phone];
+  await saveData();
+  loadUserData();
+  closeEditProfile();
+  showToast('پروفایل ذخیره شد');
+}
+
+function changeAvatar(){
+  const i=document.createElement('input');
+  i.type='file';
+  i.accept='image/*';
+  
+  i.onchange=async e=>{
+    const f=e.target.files[0];
+    if(!f)return;
+    
+    const r=new FileReader();
+    r.onload=async ev=>{
+      appData.users[currentUser.phone].avatar=ev.target.result;
+      currentUser=appData.users[currentUser.phone];
+      await saveData();
+      loadUserData();
+      showToast('عکس تغییر کرد');
+    };    
+    r.readAsDataURL(f);
+  };
+  
+  i.click();
+}
+
+function openAdminPanel(){
+  document.getElementById('admin-page').classList.add('active');
+  loadUsersList();
+  loadActivityLogs();
+}
+
+function closeAdminPanel(){
+  document.getElementById('admin-page').classList.remove('active');
+}
 
 async function addVideo(){
-  const t=document.getElementById('admin-video-type').value,g=document.getElementById('admin-grade').value,s=document.getElementById('admin-subject').value,c=parseInt(document.getElementById('admin-chapter-num').value)||1,sn=parseInt(document.getElementById('admin-session-num').value)||0,ti=document.getElementById('admin-video-title').value,l=document.getElementById('admin-video-link').value,d=document.getElementById('admin-video-desc').value;
-  if(!ti||!l)return showToast('عنوان و لینک الزامی است');
-  appData.videos.push({type:t,grade:g,subject:s,chapter:c,session:sn,title:ti,link:l,description:d,isLive:t==='live',addedBy:currentUser.phone,addedAt:new Date().toISOString()});
-  await saveData();showToast('ویدیو اضافه شد - در همه دستگاه‌ها اعمال می‌شود');document.getElementById('admin-video-title').value='';document.getElementById('admin-video-link').value='';document.getElementById('admin-video-desc').value='';
+  const t=document.getElementById('admin-video-type').value;
+  const g=document.getElementById('admin-grade').value;
+  const s=document.getElementById('admin-subject').value;
+  const c=parseInt(document.getElementById('admin-chapter-num').value)||1;
+  const sn=parseInt(document.getElementById('admin-session-num').value)||0;
+  const ti=document.getElementById('admin-video-title').value;
+  const l=document.getElementById('admin-video-link').value;
+  const d=document.getElementById('admin-video-desc').value;
+  
+  if(!ti||!l){
+    showToast('عنوان و لینک الزامی است');
+    return;
+  }
+  
+  appData.videos.push({
+    type:t,
+    grade:g,
+    subject:s,
+    chapter:c,
+    session:sn,
+    title:ti,
+    link:l,
+    description:d,
+    isLive:t==='live',
+    addedBy:currentUser.phone,
+    addedAt:new Date().toISOString()
+  });
+  
+  await saveData();
+  showToast('ویدیو اضافه شد - در همه دستگاه‌ها اعمال می‌شود');
+  document.getElementById('admin-video-title').value='';
+  document.getElementById('admin-video-link').value='';  document.getElementById('admin-video-desc').value='';
 }
 
 function loadUsersList(){
-  const c=document.getElementById('users-list-container');c.innerHTML='';
+  const c=document.getElementById('users-list-container');
+  c.innerHTML='';
+  
   const u=Object.values(appData.users).filter(x=>!x.isTeacher&&!x.isSupport);
-  if(u.length===0){c.innerHTML='<div style="text-align:center;color:#64748b;padding:30px;">کاربری ثبت‌نام نکرده</div>';return;}
+  
+  if(u.length===0){
+    c.innerHTML='<div style="text-align:center;color:#64748b;padding:30px;">کاربری ثبت‌نام نکرده</div>';
+    return;
+  }
+  
   u.forEach(user=>{
-    const d=document.createElement('div');d.className='user-list-item';
-    let b='';if(user.banned)b=user.banUntil==='permanent'?'<div class="ban-status">دائمی</div>':(user.banUntil&&new Date(user.banUntil)>new Date()?'<div class="ban-status">مسدود</div>':'');
+    const d=document.createElement('div');
+    d.className='user-list-item';
+    
+    let b='';
+    if(user.banned){
+      if(user.banUntil==='permanent'){
+        b='<div class="ban-status">دائمی</div>';
+      }else if(user.banUntil&&new Date(user.banUntil)>new Date()){
+        b='<div class="ban-status">مسدود</div>';
+      }
+    }
+    
     d.innerHTML=`<div class="user-info-admin"><div class="user-avatar-admin">${(user.firstname||'?')[0]}</div><div class="user-details"><h4>${user.firstname||''} ${user.lastname||''}</h4><p>${user.phone} | ${user.grade||'-'}</p>${b}</div></div><div class="user-actions"><button class="vip" onclick="openVipModal('${user.phone}')">ویژه</button><button class="msg" onclick="openAdminChat('${user.phone}','${user.firstname||''}','${user.avatar||''}')">پیام</button><button class="ban" onclick="openBanModal('${user.phone}')">${user.banned?'رفع بن':'بن'}</button></div>`;
+    
     c.appendChild(d);
   });
 }
 
 function openBanModal(p){
-  const u=appData.users[p];if(u&&u.banned){if(confirm('رفع بن شود؟')){u.banned=false;delete u.banUntil;delete u.banReason;saveData();loadUsersList();}return;}
-  banTargetPhone=p;document.getElementById('ban-modal').classList.add('active');
+  const u=appData.users[p];
+  
+  if(u&&u.banned){
+    if(confirm('رفع بن شود؟')){
+      u.banned=false;
+      delete u.banUntil;
+      delete u.banReason;
+      saveData();
+      loadUsersList();
+    }
+    return;
+  }
+  
+  banTargetPhone=p;
+  document.getElementById('ban-modal').classList.add('active');
 }
-function closeBanModal(){document.getElementById('ban-modal').classList.remove('active');banTargetPhone=null;}
+function closeBanModal(){
+  document.getElementById('ban-modal').classList.remove('active');
+  banTargetPhone=null;
+}
+
 async function confirmBan(){
   if(!banTargetPhone)return;
-  const dur=document.getElementById('ban-duration').value,r=document.getElementById('ban-reason').value.trim();
-  if(!r)return showToast('دلیل الزامی است');
-  if(appData.users[banTargetPhone]){appData.users[banTargetPhone].banned=true;appData.users[banTargetPhone].banReason=r;appData.users[banTargetPhone].banUntil=dur==='permanent'?'permanent':new Date(Date.now()+parseInt(dur)*86400000).toISOString();await saveData();loadUsersList();}
+  
+  const dur=document.getElementById('ban-duration').value;
+  const r=document.getElementById('ban-reason').value.trim();
+  
+  if(!r){
+    showToast('دلیل الزامی است');
+    return;
+  }
+  
+  if(appData.users[banTargetPhone]){
+    appData.users[banTargetPhone].banned=true;
+    appData.users[banTargetPhone].banReason=r;
+    
+    if(dur==='permanent'){
+      appData.users[banTargetPhone].banUntil='permanent';
+    }else{
+      appData.users[banTargetPhone].banUntil=new Date(Date.now()+parseInt(dur)*86400000).toISOString();
+    }
+    
+    await saveData();
+    loadUsersList();
+  }
+  
   closeBanModal();
 }
 
-function openVipModal(p){vipTargetPhone=p;document.getElementById('vip-modal').classList.add('active');}
-function closeVipModal(){document.getElementById('vip-modal').classList.remove('active');vipTargetPhone=null;}
+function openVipModal(p){
+  vipTargetPhone=p;
+  document.getElementById('vip-modal').classList.add('active');
+}
+
+function closeVipModal(){
+  document.getElementById('vip-modal').classList.remove('active');
+  vipTargetPhone=null;
+}
+
 async function confirmVip(){
   if(!vipTargetPhone)return;
-  const t=document.getElementById('vip-type').value,d=document.getElementById('vip-duration').value;
-  if(appData.users[vipTargetPhone]){
-    let e=d==='unlimited'?'unlimited':new Date(Date.now()+parseInt(d)*86400000).toISOString();
+  
+  const t=document.getElementById('vip-type').value;
+  const d=document.getElementById('vip-duration').value;
+    if(appData.users[vipTargetPhone]){
+    let e;
+    if(d==='unlimited'){
+      e='unlimited';
+    }else{
+      e=new Date(Date.now()+parseInt(d)*86400000).toISOString();
+    }
+    
     appData.users[vipTargetPhone][t]=e;
-    await saveData();showToast('ویژه اعمال شد');
-  }closeVipModal();}
+    await saveData();
+    showToast('ویژه اعمال شد');
+  }
+  
+  closeVipModal();
+}
 
-function openAdminChat(p,n,a){adminChatTarget={phone:p,name:n,avatar:a};document.getElementById('admin-chat-name').textContent=n;document.getElementById('admin-chat-img').src=a||'default.png';document.getElementById('admin-chat-modal').classList.add('active');loadAdminMessages();}
-function closeAdminChat(){document.getElementById('admin-chat-modal').classList.remove('active');adminChatTarget=null;}
+function openAdminChat(p,n,a){
+  adminChatTarget={phone:p,name:n,avatar:a};
+  document.getElementById('admin-chat-name').textContent=n;
+  document.getElementById('admin-chat-img').src=a||'default.png';
+  document.getElementById('admin-chat-modal').classList.add('active');
+  loadAdminMessages();
+}
+
+function closeAdminChat(){
+  document.getElementById('admin-chat-modal').classList.remove('active');
+  adminChatTarget=null;
+}
+
 function loadAdminMessages(){
   if(!adminChatTarget)return;
-  const k1=adminChatTarget.phone+'-'+currentUser.phone,k2=currentUser.phone+'-'+adminChatTarget.phone;
+  
+  const k1=adminChatTarget.phone+'-'+currentUser.phone;
+  const k2=currentUser.phone+'-'+adminChatTarget.phone;
   const a=(appData.messages[k1]||[]).concat(appData.messages[k2]||[]).sort((x,y)=>new Date(x.time)-new Date(y.time));
-  const c=document.getElementById('admin-chat-messages');c.innerHTML='';
-  if(a.length===0){c.innerHTML='<div style="text-align:center;color:#94a3b8;padding:50px;">پیامی نیست</div>';return;}
+  
+  const c=document.getElementById('admin-chat-messages');
+  c.innerHTML='';
+  
+  if(a.length===0){
+    c.innerHTML='<div style="text-align:center;color:#94a3b8;padding:50px;">پیامی نیست</div>';
+    return;
+  }
+  
   a.forEach(m=>{
-    const d=document.createElement('div');d.className='message '+(m.sender===currentUser.phone?'sent':'received');
-    let h='';if(m.replyTo)h+=`<div class="message-reply">${escapeHtml(m.replyTo)}</div>`;
-    if(m.type==='text')h+=`<div>${escapeHtml(m.text)}</div>`;
-    else if(m.type==='voice')h+='<div class="message-voice"><div class="play-btn" onclick="playVoice(\''+m.audioData+'\',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div><div class="voice-info"><div class="voice-wave"></div><div class="voice-duration">'+(m.duration||'')+'</div></div></div>';
-    else if(m.type==='image')h+=`<img class="message-image" src="${m.fileData}">`;
-    else if(m.type==='file')h+=`<div class="message-file"><div class="file-icon">📎</div><div class="file-info"><div class="file-name">${escapeHtml(m.fileName||'')}</div></div></div>`;
+    const d=document.createElement('div');
+    d.className='message '+(m.sender===currentUser.phone?'sent':'received');
+    
+    let h='';
+        if(m.replyTo){
+      h+=`<div class="message-reply">${escapeHtml(m.replyTo)}</div>`;
+    }
+    
+    if(m.type==='text'){
+      h+=`<div>${escapeHtml(m.text)}</div>`;
+    }else if(m.type==='voice'){
+      h+='<div class="message-voice"><div class="play-btn" onclick="playVoice(\''+m.audioData+'\',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div><div class="voice-info"><div class="voice-wave"></div><div class="voice-duration">'+(m.duration||'')+'</div></div></div>';
+    }else if(m.type==='image'){
+      h+=`<img class="message-image" src="${m.fileData}">`;
+    }else if(m.type==='file'){
+      h+=`<div class="message-file"><div class="file-icon">📎</div><div class="file-info"><div class="file-name">${escapeHtml(m.fileName||'')}</div></div></div>`;
+    }
+    
     h+=`<span class="message-time">${formatTime(m.time)}</span>`;
-    d.innerHTML=h;c.appendChild(d);
-  });c.scrollTop=c.scrollHeight;
+    
+    d.innerHTML=h;
+    c.appendChild(d);
+  });
+  
+  c.scrollTop=c.scrollHeight;
 }
-async function sendAdminMessage(){const i=document.getElementById('admin-chat-input');const t=i.value.trim();if(!t||!adminChatTarget)return;const k=currentUser.phone+'-'+adminChatTarget.phone;if(!appData.messages[k])appData.messages[k]=[];appData.messages[k].push({sender:currentUser.phone,type:'text',text:t,time:new Date().toISOString(),read:false});await saveData();i.value='';loadAdminMessages();}
-async function sendAdminFile(ev){const f=ev.target.files[0];if(!f||!adminChatTarget)return;const r=new FileReader();r.onload=async e=>{const k=currentUser.phone+'-'+adminChatTarget.phone;if(!appData.messages[k])appData.messages[k]=[];const m={sender:currentUser.phone,time:new Date().toISOString(),read:false};if(f.type.startsWith('image/')){m.type='image';m.fileData=e.target.result;m.fileName=f.name;}else{m.type='file';m.fileData=e.target.result;m.fileName=f.name;m.fileSize=formatFileSize(f.size);}appData.messages[k].push(m);await saveData();loadAdminMessages();};r.readAsDataURL(f);ev.target.value='';}
 
-function loadActivityLogs(){const c=document.getElementById('activity-logs');const a=appData.activity_logs.slice(-10).reverse();if(a.length===0){c.innerHTML='<div style="color:#64748b;padding:20px;">ثبت نشده</div>';return;}let h='';a.forEach(l=>{h+=`<div style="padding:10px;border-bottom:1px solid #e2e8f0;font-size:12px;"><div style="font-weight:700">${l.phone}</div><div>${l.action}</div><div style="color:#94a3b8">${formatTime(l.time)}</div></div>`;});c.innerHTML=h;}
-function logout(){localStorage.removeItem('riazi_current');window.location.reload();}
+async function sendAdminMessage(){
+  const i=document.getElementById('admin-chat-input');
+  const t=i.value.trim();
+  
+  if(!t||!adminChatTarget)return;
+  
+  const k=currentUser.phone+'-'+adminChatTarget.phone;
+  if(!appData.messages[k])appData.messages[k]=[];
+  
+  appData.messages[k].push({
+    sender:currentUser.phone,
+    type:'text',
+    text:t,
+    time:new Date().toISOString(),
+    read:false
+  });
+  
+  await saveData();
+  i.value='';
+  loadAdminMessages();
+}
+
+async function sendAdminFile(ev){
+  const f=ev.target.files[0];
+  
+  if(!f||!adminChatTarget)return;
+    const r=new FileReader();
+  r.onload=async e=>{
+    const k=currentUser.phone+'-'+adminChatTarget.phone;
+    if(!appData.messages[k])appData.messages[k]=[];
+    
+    const m={
+      sender:currentUser.phone,
+      time:new Date().toISOString(),
+      read:false
+    };
+    
+    if(f.type.startsWith('image/')){
+      m.type='image';
+      m.fileData=e.target.result;
+      m.fileName=f.name;
+    }else{
+      m.type='file';
+      m.fileData=e.target.result;
+      m.fileName=f.name;
+      m.fileSize=formatFileSize(f.size);
+    }
+    
+    appData.messages[k].push(m);
+    await saveData();
+    loadAdminMessages();
+  };
+  
+  r.readAsDataURL(f);
+  ev.target.value='';
+}
+
+function loadActivityLogs(){
+  const c=document.getElementById('activity-logs');
+  const a=appData.activity_logs.slice(-10).reverse();
+  
+  if(a.length===0){
+    c.innerHTML='<div style="color:#64748b;padding:20px;">ثبت نشده</div>';
+    return;
+  }
+  
+  let h='';
+  a.forEach(l=>{
+    h+=`<div style="padding:10px;border-bottom:1px solid #e2e8f0;font-size:12px;"><div style="font-weight:700">${l.phone}</div><div>${l.action}</div><div style="color:#94a3b8">${formatTime(l.time)}</div></div>`;
+  });
+  
+  c.innerHTML=h;
+}
+
+function logout(){
+  localStorage.removeItem('riazi_current');  window.location.reload();
+}
 
 function switchTab(tab){
-  if(tab==='chat'&&!isVipActive(currentUser.vipChat)){showToast('ویژه چت نیاز دارید');return;}
-  if(tab==='virtual-class'&&!isVipActive(currentUser.vipClass)){showToast('ویژه کلاس نیاز دارید');return;}
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  const map={home:0,'virtual-class':1,chat:2,store:3,profile:4};if(map[tab]!==undefined)document.querySelectorAll('.nav-item')[map[tab]].classList.add('active');
-  document.querySelectorAll('.content-section').forEach(s=>s.classList.remove('active'));document.getElementById(tab+'-section').classList.add('active');
-  if(tab==='store')loadStore();if(tab==='chat')loadChatList();
+  if(tab==='chat'&&!isVipActive(currentUser.vipChat)){
+    showToast('ویژه چت نیاز دارید');
+    return;
+  }
+  
+  if(tab==='virtual-class'&&!isVipActive(currentUser.vipClass)){
+    showToast('ویژه کلاس نیاز دارید');
+    return;
+  }
+  
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    n.classList.remove('active');
+  });
+  
+  const map={home:0,'virtual-class':1,chat:2,store:3,profile:4};
+  if(map[tab]!==undefined){
+    document.querySelectorAll('.nav-item')[map[tab]].classList.add('active');
+  }
+  
+  document.querySelectorAll('.content-section').forEach(s=>{
+    s.classList.remove('active');
+  });
+  
+  document.getElementById(tab+'-section').classList.add('active');
+  
+  if(tab==='store'){
+    loadStore();
+  }
+  
+  if(tab==='chat'){
+    loadChatList();
+  }
 }
 
 function loadStore(){
-  const c=document.getElementById('vip-packages-container');c.innerHTML='';
+  const c=document.getElementById('vip-packages-container');
+  c.innerHTML='';
+  
   VIP_PACKAGES.forEach(p=>{
-    const is=isVipActive(currentUser[p.id]);let f='';p.features.forEach(x=>f+=`<li>${x}</li>`);
-    c.innerHTML+=`<div class="vip-package"><div class="vip-package-header"><div class="vip-package-icon"><img src="${p.icon}"></div><div class="vip-package-title"><h3>${p.name} - ${p.durationText}</h3><p>${p.description}</p></div></div><div class="vip-package-price"><span class="price">${formatPrice(p.price)}</span><span class="currency">تومان</span></div><ul class="vip-package-features">${f}</ul><button class="btn-buy-vip" onclick="buyVip('${p.id}')" ${is?'disabled':''}>${is?'✓ فعال':'خرید ویژه'}</button></div>`;
-  });
+    const is=isVipActive(currentUser[p.id]);
+    let f='';
+    p.features.forEach(x=>{
+      f+=`<li>${x}</li>`;
+    });
+    
+    c.innerHTML+=`<div class="vip-package"><div class="vip-package-header"><div class="vip-package-icon"><img src="${p.icon}"></div><div class="vip-package-title"><h3>${p.name} - ${p.durationText}</h3><p>${p.description}</p></div></div><div class="vip-package-price"><span class="price">${formatPrice(p.price)}</span><span class="currency">تومان</span></div><ul class="vip-package-features">${f}</ul><button class="btn-buy-vip" onclick="buyVip('${p.id}')" ${is?'disabled':''}>${is?'✓ فعال':'خرید ویژه'}</button></div>`;  });
 }
-async function buyVip(id){const p=VIP_PACKAGES.find(x=>x.id===id);if(!p)return;if(confirm('خرید '+p.name+' به مبلغ '+formatPrice(p.price)+'؟')){const d=new Date();d.setDate(d.getDate()+p.duration);appData.users[currentUser.phone][id]=d.toISOString();currentUser=appData.users[currentUser.phone];await saveData();loadUserData();loadStore();showToast('✅ خرید شد');}}
-function playVideo(v){if(!isVipActive(currentUser.vipDownload)&&!isVipActive(currentUser.vipClass)&&!isVipActive(currentUser.vipChat)){showToast('نیاز به ویژه دارید');return;}document.getElementById('video-modal-title').textContent=v.title;document.getElementById('video-info-title').textContent=v.title;document.getElementById('video-info-desc').textContent=v.description||'';document.getElementById('video-player').querySelector('source').src=v.link;document.getElementById('video-player').load();document.getElementById('video-modal').classList.add('active');}
-function closeVideo(){document.getElementById('video-player').pause();document.getElementById('video-modal').classList.remove('active');}
+
+async function buyVip(id){
+  const p=VIP_PACKAGES.find(x=>x.id===id);
+  
+  if(!p)return;
+  
+  if(confirm('خرید '+p.name+' به مبلغ '+formatPrice(p.price)+'؟')){
+    const d=new Date();
+    d.setDate(d.getDate()+p.duration);
+    appData.users[currentUser.phone][id]=d.toISOString();
+    currentUser=appData.users[currentUser.phone];
+    await saveData();
+    loadUserData();
+    loadStore();
+    showToast('✅ خرید شد');
+  }
+}
+
+function playVideo(v){
+  if(!isVipActive(currentUser.vipDownload)&&!isVipActive(currentUser.vipClass)&&!isVipActive(currentUser.vipChat)){
+    showToast('نیاز به ویژه دارید');
+    return;
+  }
+  
+  document.getElementById('video-modal-title').textContent=v.title;
+  document.getElementById('video-info-title').textContent=v.title;
+  document.getElementById('video-info-desc').textContent=v.description||'';
+  document.getElementById('video-player').querySelector('source').src=v.link;
+  document.getElementById('video-player').load();
+  document.getElementById('video-modal').classList.add('active');
+}
+
+function closeVideo(){
+  document.getElementById('video-player').pause();
+  document.getElementById('video-modal').classList.remove('active');
+}
 
 window.onload=init;
 </script>
