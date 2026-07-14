@@ -5,247 +5,228 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ریاضی ره با آینده</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', Tahoma, sans-serif; -webkit-tap-highlight-color: transparent; }
-html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Vazirmatn',Tahoma,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:#000}
 @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
+.app-container{width:100%;height:100%;max-width:480px;margin:0 auto;position:relative;overflow:hidden;background:#000}
+#main-screen{background:url('b134c815-293d-4305-961e-88be7a91320b.png') center/cover no-repeat;background-attachment:fixed;position:relative;height:100vh;overflow-y:auto;overflow-x:hidden;padding-bottom:100px}
+#main-screen::-webkit-scrollbar{width:0}
+.top-header{background:linear-gradient(135deg,rgba(30,41,59,0.85) 0%,rgba(15,23,42,0.9) 100%);backdrop-filter:blur(25px);border-bottom-left-radius:35px;border-bottom-right-radius:35px;padding:18px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 8px 32px rgba(0,0,0,0.3);position:sticky;top:0;z-index:100}
+.profile-pic-small{width:50px;height:50px;border-radius:50%;border:2px solid #22c55e;overflow:hidden;background:#1e293b;flex-shrink:0}
+.profile-pic-small img{width:100%;height:100%;object-fit:cover}
+.user-info{flex:1;min-width:0}
+.user-name{color:#fff;font-size:16px;font-weight:700;display:flex;align-items:center;gap:6px}
+.user-grade{color:rgba(255,255,255,0.65);font-size:12px;margin-top:3px}
+.verified-badge{width:20px;height:20px;background:url('InShot_20260712_172518299.png') center/cover no-repeat;display:inline-flex;flex-shrink:0}
+.vip-badge{background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 100%);color:#000;font-size:10px;font-weight:800;padding:3px 8px;border-radius:12px;margin-right:5px}
+.vip-timer{background:linear-gradient(135deg,#8b5cf6 0%,#7c3aed 100%);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;margin-right:5px}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:linear-gradient(135deg,rgba(30,41,59,0.95) 0%,rgba(15,23,42,0.98) 100%);backdrop-filter:blur(25px);border-top:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-around;padding:10px 0 14px;z-index:1000;box-shadow:0 -8px 32px rgba(0,0,0,0.3)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:all 0.25s;color:rgba(255,255,255,0.5);font-size:11px;font-weight:600;padding:6px 0}
+.nav-item.active{color:#60a5fa}
+.nav-item.active .nav-icon-wrap{background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);transform:translateY(-4px);box-shadow:0 6px 20px rgba(59,130,246,0.5)}
+.nav-icon-wrap{width:38px;height:38px;border-radius:14px;display:flex;align-items:center;justify-content:center;transition:all 0.25s;background:rgba(255,255,255,0.05)}
+.nav-icon-wrap svg{width:20px;height:20px}
+.content-section{display:none;padding:20px;animation:fadeIn 0.35s ease}
+.content-section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.intro-videos{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px}
+.intro-video-card{background:linear-gradient(135deg,rgba(59,130,246,0.2) 0%,rgba(37,99,235,0.1) 100%);backdrop-filter:blur(15px);border-radius:18px;overflow:hidden;cursor:pointer;transition:all 0.25s;border:1px solid rgba(255,255,255,0.1)}
+.intro-video-card:active{transform:scale(0.96)}
+.intro-video-card .video-thumb{width:100%;height:110px;background:linear-gradient(135deg,#3b82f6 0%,#1d4ed8 100%);display:flex;align-items:center;justify-content:center}
+.intro-video-card .video-thumb svg{width:48px;height:48px;color:#fff}
+.intro-video-card .video-title{color:#fff;font-size:12px;font-weight:700;padding:12px;text-align:center}
+.section-title{color:#fff;font-size:18px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:8px;text-shadow:0 2px 10px rgba(0,0,0,0.5)}
+.grade-btn{background:linear-gradient(135deg,rgba(59,130,246,0.2) 0%,rgba(37,99,235,0.1) 100%);backdrop-filter:blur(15px);border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:24px;margin-bottom:14px;cursor:pointer;text-align:center;transition:all 0.25s}
+.grade-btn:active{transform:scale(0.97)}
+.grade-btn h3{color:#fff;font-size:18px;font-weight:700}
+.live-option-btn{background:linear-gradient(135deg,rgba(59,130,246,0.2) 0%,rgba(37,99,235,0.1) 100%);backdrop-filter:blur(15px);border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:18px;margin-bottom:14px;cursor:pointer;text-align:center;transition:all 0.25s;display:flex;align-items:center;justify-content:center;gap:12px}
+.live-option-btn:active{transform:scale(0.97)}
+.live-option-btn h3{color:#fff;font-size:16px;font-weight:700}
+.live-option-btn svg{width:24px;height:24px;color:#fff}
+.lesson-card,.session-card{background:linear-gradient(135deg,rgba(255,255,255,0.97) 0%,rgba(241,245,249,0.97) 100%);border-radius:16px;padding:18px;margin-bottom:12px;cursor:pointer;transition:all 0.25s;box-shadow:0 6px 20px rgba(0,0,0,0.15);display:flex;align-items:center;gap:14px}
+.lesson-card:active,.session-card:active{transform:scale(0.98)}
+.card-icon{width:50px;height:50px;background:linear-gradient(135deg,#3b82f6 0%,#1d4ed8 100%);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(59,130,246,0.3)}
+.card-icon svg{width:24px;height:24px;color:#fff}
+.card-info{flex:1}.card-title{color:#1e293b;font-size:15px;font-weight:700;margin-bottom:4px}
+.card-desc{color:#64748b;font-size:12px}
+.chat-list{background:linear-gradient(135deg,rgba(255,255,255,0.97) 0%,rgba(241,245,249,0.97) 100%);border-radius:22px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.15)}
+.chat-item{padding:16px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all 0.2s}
+.chat-item:last-child{border-bottom:none}
+.chat-item:active{background:#f1f5f9}
+.chat-item .chat-avatar{width:58px;height:58px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#3b82f6 0%,#1d4ed8 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.chat-item .chat-avatar img{width:100%;height:100%;object-fit:cover}
+.chat-item .chat-info{flex:1;min-width:0}
+.chat-item .chat-name{color:#1e293b;font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.chat-item .chat-last{color:#64748b;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.private-chat{position:fixed;top:0;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:#f1f5f9;z-index:2000;display:none;flex-direction:column}
+.private-chat.active{display:flex}
+.chat-header{background:linear-gradient(135deg,#3b82f6 0%,#1d4ed8 100%);padding:16px;display:flex;align-items:center;gap:12px;color:#fff;box-shadow:0 4px 20px rgba(0,0,0,0.15)}
+.chat-header .back-btn{background:none;border:none;color:#fff;font-size:24px;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center}
+.chat-header .chat-avatar-small{width:42px;height:42px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.3);flex-shrink:0}
+.chat-header .chat-avatar-small img{width:100%;height:100%;object-fit:cover}
+.chat-header .chat-user-info{flex:1;min-width:0}
+.chat-header .chat-user-name{font-weight:700;display:flex;align-items:center;gap:5px;font-size:15px}
+.chat-header .chat-user-status{font-size:11px;opacity:0.9;margin-top:2px}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;background:#f1f5f9}
+.message{margin-bottom:10px;max-width:78%;padding:12px 14px;border-radius:18px;font-size:14px;line-height:1.5;position:relative;animation:messageSlide 0.3s ease;word-wrap:break-word}
+@keyframes messageSlide{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.message.sent{background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);color:#fff;margin-right:auto;border-bottom-right-radius:6px}
+.message.received{background:#fff;color:#1e293b;margin-left:auto;border-bottom-left-radius:6px;border:1px solid #e2e8f0}
+.message .message-time{font-size:10px;opacity:0.7;margin-top:5px;display:block;text-align:left}
+.message-status{position:absolute;bottom:4px;left:8px;font-size:12px;font-weight:bold}
+.message.sent .message-status{color:rgba(255,255,255,0.7)}
+.message.sent.read .message-status{color:#4ade80}
+.message-voice{display:flex;align-items:center;gap:10px;min-width:180px}
+.message-voice .play-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.message-voice .play-btn svg{width:16px;height:16px;color:#fff}
+.message-voice .voice-info{flex:1}
+.message-voice .voice-wave{height:20px;display:flex;align-items:center;gap:2px;margin-bottom:3px}
+.message-voice .voice-wave span{width:3px;background:rgba(255,255,255,0.7);border-radius:2px}
+.message-voice .voice-duration{font-size:11px;opacity:0.9}
+.message-image{max-width:100%;border-radius:12px;margin-bottom:6px;cursor:pointer;display:block}
+.message-file{background:rgba(255,255,255,0.2);padding:10px 12px;border-radius:12px;display:flex;align-items:center;gap:10px;min-width:180px}
+.message-file .file-icon{width:36px;height:36px;background:rgba(255,255,255,0.25);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px}
+.message-file .file-info{flex:1;min-width:0}
+.message-file .file-name{font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.message-file .file-size{font-size:10px;opacity:0.8;margin-top:2px}
+.chat-input-area{background:#fff;padding:12px;display:flex;gap:8px;align-items:center;box-shadow:0 -4px 20px rgba(0,0,0,0.05);border-top:1px solid #e2e8f0}
+.chat-input-area input[type="text"]{flex:1;border:1.5px solid #e2e8f0;border-radius:25px;padding:12px 16px;font-family:inherit;outline:none;font-size:14px}
+.chat-input-area input[type="text"]:focus{border-color:#3b82f6}
+.chat-input-area .attach-btn,.chat-input-area .voice-btn{background:#f1f5f9;border:none;width:46px;height:46px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0}
+.chat-input-area .attach-btn svg,.chat-input-area .voice-btn svg{width:20px;height:20px;color:#3b82f6}
+.chat-input-area .voice-btn.recording{background:#ef4444;animation:pulse 1s ease infinite}
+.chat-input-area .voice-btn.recording svg{color:#fff}
+.chat-input-area .send-btn{background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);color:#fff;border:none;width:46px;height:46px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(59,130,246,0.4);flex-shrink:0}.chat-input-area .send-btn svg{width:20px;height:20px;color:#fff}
+.voice-preview{background:#fff;padding:10px 14px;border-top:1px solid #e2e8f0;display:none;align-items:center;gap:10px}
+.voice-preview.active{display:flex}
+.voice-preview .play-preview{width:38px;height:38px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;border:none}
+.voice-preview .play-preview svg{width:16px;height:16px;color:#fff}
+.voice-preview .timer{color:#1e293b;font-size:14px;font-weight:700;flex:1}
+.voice-preview .delete-voice{background:#fef2f2;border:none;width:36px;height:36px;border-radius:50%;color:#ef4444;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.voice-preview .send-voice{background:linear-gradient(135deg,#22c55e 0%,#16a34a 100%);border:none;width:36px;height:36px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.reply-preview{background:#fff;padding:10px 14px;border-top:1px solid #e2e8f0;display:none;align-items:center;gap:10px}
+.reply-preview.active{display:flex}
+.reply-preview .reply-content{flex:1;min-width:0}
+.reply-preview .reply-label{font-size:11px;color:#3b82f6;font-weight:700;margin-bottom:3px}
+.reply-preview .reply-text{font-size:12px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reply-preview .close-reply{background:none;border:none;color:#94a3b8;font-size:20px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.profile-header{background:linear-gradient(135deg,rgba(30,41,59,0.85) 0%,rgba(15,23,42,0.9) 100%);backdrop-filter:blur(20px);border-radius:24px;padding:32px 20px;text-align:center;margin-bottom:20px;border:1px solid rgba(255,255,255,0.08)}
+.profile-avatar-large{width:110px;height:110px;border-radius:50%;border:3px solid #22c55e;overflow:hidden;margin:0 auto 16px;background:#1e293b;cursor:pointer;box-shadow:0 8px 25px rgba(34,197,94,0.3)}
+.profile-avatar-large img{width:100%;height:100%;object-fit:cover}
+.profile-name-large{color:#fff;font-size:22px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:8px}
+.profile-phone{color:rgba(255,255,255,0.65);font-size:13px;direction:ltr}
+.profile-menu{background:linear-gradient(135deg,rgba(255,255,255,0.97) 0%,rgba(241,245,249,0.97) 100%);border-radius:22px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.15)}
+.menu-item{padding:18px 20px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all 0.2s}
+.menu-item:last-child{border-bottom:none}
+.menu-item:active{background:#f1f5f9}
+.menu-icon-wrap{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);box-shadow:0 4px 12px rgba(59,130,246,0.3);flex-shrink:0}
+.menu-icon-wrap svg{width:20px;height:20px;color:#fff}
+.menu-item .menu-text{flex:1;color:#1e293b;font-size:14px;font-weight:600}
+.menu-item .menu-arrow{color:#94a3b8;font-size:18px}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(5px);z-index:3000;display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.active{display:flex}
+.modal-content{background:#fff;width:100%;max-width:480px;border-radius:30px 30px 0 0;padding:25px;animation:slideUp 0.35s ease;max-height:85vh;overflow-y:auto}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.modal-header h3{color:#1e293b;font-size:19px;font-weight:800}
+.modal-header .close-btn{background:#f1f5f9;border:none;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;color:#64748b;display:flex;align-items:center;justify-content:center}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;color:#475569;font-size:13px;font-weight:700;margin-bottom:8px}
+.form-group input,.form-group select,.form-group textarea{width:100%;border:1.5px solid #e2e8f0;border-radius:14px;padding:13px 14px;font-family:inherit;font-size:14px;outline:none;transition:border-color 0.2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#3b82f6}
+.form-group textarea{resize:vertical;min-height:80px}
+.btn-save{width:100%;background:linear-gradient(135deg,#22c55e 0%,#16a34a 100%);color:#fff;border:none;padding:15px;border-radius:16px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;margin-top:10px;box-shadow:0 6px 20px rgba(34,197,94,0.35)}
+.video-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:4000;display:none;flex-direction:column}
+.video-modal.active{display:flex}
+.video-modal-header{padding:16px;display:flex;justify-content:space-between;align-items:center;color:#fff;background:rgba(0,0,0,0.5)}
+.video-modal-header .close-video{background:rgba(255,255,255,0.1);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.video-container{flex:1;display:flex;align-items:center;justify-content:center;background:#000}
+.video-container video{width:100%;height:100%;object-fit:contain}
+.video-info{background:#1e293b;color:#fff;padding:20px}
+.video-info h3{font-size:16px;margin-bottom:8px;font-weight:700}
+.video-info p{font-size:13px;color:#94a3b8}
+.sessions-page{position:fixed;top:0;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:url('b134c815-293d-4305-961e-88be7a91320b.png') center/cover no-repeat;background-attachment:fixed;z-index:2500;display:none;flex-direction:column;overflow-y:auto}.sessions-page.active{display:flex}
+.sessions-header{background:linear-gradient(135deg,rgba(30,41,59,0.95) 0%,rgba(15,23,42,0.98) 100%);backdrop-filter:blur(20px);padding:16px 20px;display:flex;align-items:center;gap:12px;color:#fff;position:sticky;top:0;z-index:10;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.sessions-header .back-btn{background:rgba(255,255,255,0.1);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.sessions-list{padding:20px}
+.admin-page{position:fixed;top:0;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:#f1f5f9;z-index:3500;display:none;flex-direction:column;overflow-y:auto}
+.admin-page.active{display:flex}
+.admin-header{background:linear-gradient(135deg,#3b82f6 0%,#1d4ed8 100%);padding:16px 20px;display:flex;align-items:center;gap:12px;color:#fff;position:sticky;top:0;z-index:10;box-shadow:0 4px 20px rgba(0,0,0,0.15)}
+.admin-header .back-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.admin-header h2{font-size:18px;flex:1;font-weight:800}
+.admin-content{padding:20px}
+.admin-section{background:#fff;border-radius:22px;padding:22px;margin-bottom:20px;box-shadow:0 4px 15px rgba(0,0,0,0.06)}
+.admin-title{color:#1e293b;font-size:16px;font-weight:800;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.admin-title .title-icon{width:36px;height:36px;background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(59,130,246,0.3);flex-shrink:0}
+.admin-title .title-icon svg{width:18px;height:18px;color:#fff}
+.admin-card{background:#f8fafc;border-radius:14px;padding:16px;margin-bottom:14px}
+.admin-card label{display:block;color:#475569;font-size:12px;font-weight:700;margin-bottom:8px}
+.admin-card input,.admin-card select,.admin-card textarea{width:100%;border:1.5px solid #e2e8f0;border-radius:12px;padding:12px;font-family:inherit;font-size:13px;margin-bottom:12px;outline:none}
+.admin-card input:focus,.admin-card select:focus,.admin-card textarea:focus{border-color:#3b82f6}
+.btn-admin{width:100%;background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);color:#fff;border:none;padding:14px;border-radius:14px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(59,130,246,0.35)}
+.user-list-item{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,0.05);gap:10px;flex-wrap:wrap}
+.user-list-item .user-info-admin{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.user-list-item .user-avatar-admin{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:700;flex-shrink:0}
+.user-list-item .user-details h4{color:#1e293b;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-list-item .user-details p{color:#64748b;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-actions{display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0}
+.user-actions button{background:#3b82f6;color:#fff;border:none;padding:7px 10px;border-radius:10px;font-size:10px;cursor:pointer;font-weight:600;white-space:nowrap}
+.user-actions button.ban{background:#ef4444}
+.user-actions button.vip{background:#f59e0b}
+.user-actions button.msg{background:#22c55e}
+.ban-status{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;font-size:10px;padding:3px 8px;border-radius:8px;margin-top:4px;display:inline-block;font-weight:600}
+.store-header{background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%);border-radius:24px;padding:30px 20px;text-align:center;margin-bottom:25px;box-shadow:0 10px 30px rgba(245,158,11,0.4)}
+.store-header h2{color:#fff;font-size:24px;font-weight:800;margin-bottom:8px}
+.store-header p{color:rgba(255,255,255,0.9);font-size:13px}
+.vip-packages{display:grid;gap:16px}
+.vip-package{background:linear-gradient(135deg,rgba(255,255,255,0.97) 0%,rgba(241,245,249,0.97) 100%);border-radius:20px;padding:22px;box-shadow:0 6px 20px rgba(0,0,0,0.15);position:relative;overflow:hidden}
+.vip-package-header{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.vip-package-icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.15);overflow:hidden;background:#fff}
+.vip-package-icon img{width:100%;height:100%;object-fit:cover}
+.vip-package-title{flex:1}
+.vip-package-title h3{color:#1e293b;font-size:16px;font-weight:700;margin-bottom:4px}
+.vip-package-title p{color:#64748b;font-size:12px}
+.vip-package-price{text-align:left;margin-bottom:16px}
+.vip-package-price .price{color:#1e293b;font-size:22px;font-weight:800}
+.vip-package-price .currency{color:#64748b;font-size:12px;margin-right:4px}
+.vip-package-features{margin-bottom:16px}
+.vip-package-features li{color:#475569;font-size:12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;list-style:none}
+.vip-package-features li::before{content:'✓';color:#22c55e;font-weight:700;font-size:14px}
+.btn-buy-vip{width:100%;background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%);color:#fff;border:none;padding:14px;border-radius:14px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(245,158,11,0.35);transition:all 0.2s}
+.btn-buy-vip:active{transform:scale(0.98)}
+.btn-buy-vip:disabled{background:linear-gradient(135deg,#94a3b8 0%,#64748b 100%);box-shadow:none;cursor:not-allowed}.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);color:#fff;padding:14px 26px;border-radius:28px;font-size:14px;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;box-shadow:0 8px 30px rgba(0,0,0,0.3);font-weight:600}
+.toast.show{opacity:1}
+.logout-btn{background:rgba(239,68,68,0.2);color:#ef4444;border:1px solid rgba(239,68,68,0.3);padding:8px 14px;border-radius:12px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
 
-.app-container { width: 100%; height: 100%; max-width: 480px; margin: 0 auto; position: relative; overflow: hidden; background: #000; }
-
-#main-screen { background: url('b134c815-293d-4305-961e-88be7a91320b.png') center/cover no-repeat; background-attachment: fixed; position: relative; height: 100vh; overflow-y: auto; overflow-x: hidden; padding-bottom: 100px; }
-#main-screen::-webkit-scrollbar { width: 0; }
-
-.top-header { background: linear-gradient(135deg, rgba(30,41,59,0.85) 0%, rgba(15,23,42,0.9) 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-bottom-left-radius: 35px; border-bottom-right-radius: 35px; padding: 18px 20px; display: flex; align-items: center; gap: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); position: sticky; top: 0; z-index: 100; }
-.profile-pic-small { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #22c55e; overflow: hidden; background: #1e293b; flex-shrink: 0; box-shadow: 0 4px 15px rgba(34,197,94,0.3); }
-.profile-pic-small img { width: 100%; height: 100%; object-fit: cover; }
-.user-info { flex: 1; min-width: 0; }
-.user-name { color: #fff; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
-.user-grade { color: rgba(255,255,255,0.65); font-size: 12px; margin-top: 3px; }
-.verified-badge { width: 20px; height: 20px; background: url('InShot_20260712_172518299.png') center/cover no-repeat; display: inline-flex; flex-shrink: 0; }
-.vip-badge { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: #000; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 12px; margin-right: 5px; box-shadow: 0 2px 8px rgba(245,158,11,0.4); }
-.vip-timer { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 12px; margin-right: 5px; box-shadow: 0 2px 8px rgba(139,92,246,0.4); }
-
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; background: linear-gradient(135deg, rgba(30,41,59,0.95) 0%, rgba(15,23,42,0.98) 100%); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-around; padding: 10px 0 14px; z-index: 1000; box-shadow: 0 -8px 32px rgba(0,0,0,0.3); }
-.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: all 0.25s; color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 600; padding: 6px 0; }
-.nav-item.active { color: #60a5fa; }
-.nav-item.active .nav-icon-wrap { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); transform: translateY(-4px); box-shadow: 0 6px 20px rgba(59,130,246,0.5); }
-.nav-icon-wrap { width: 38px; height: 38px; border-radius: 14px; display: flex; align-items: center; justify-content: center; transition: all 0.25s; background: rgba(255,255,255,0.05); }
-.nav-icon-wrap svg { width: 20px; height: 20px; }
-
-.content-section { display: none; padding: 20px; animation: fadeIn 0.35s ease; }
-.content-section.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-
-.intro-videos { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 28px; }
-.intro-video-card { background: linear-gradient(135deg, rgba(59,130,246,0.2) 0%, rgba(37,99,235,0.1) 100%); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 18px; overflow: hidden; cursor: pointer; transition: all 0.25s; border: 1px solid rgba(255,255,255,0.1); }
-.intro-video-card:active { transform: scale(0.96); }
-.intro-video-card .video-thumb { width: 100%; height: 110px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); display: flex; align-items: center; justify-content: center; }
-.intro-video-card .video-thumb svg { width: 48px; height: 48px; color: #fff; }
-.intro-video-card .video-title { color: #fff; font-size: 12px; font-weight: 700; padding: 12px; text-align: center; }
-
-.section-title { color: #fff; font-size: 18px; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-.section-title svg { width: 22px; height: 22px; }
-
-.grade-btn { background: linear-gradient(135deg, rgba(59,130,246,0.2) 0%, rgba(37,99,235,0.1) 100%); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 24px; margin-bottom: 14px; cursor: pointer; text-align: center; transition: all 0.25s; }
-.grade-btn:active { transform: scale(0.97); }
-.grade-btn h3 { color: #fff; font-size: 18px; font-weight: 700; }
-.subject-btn { background: linear-gradient(135deg, rgba(59,130,246,0.2) 0%, rgba(37,99,235,0.1) 100%); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 18px; margin-bottom: 14px; cursor: pointer; text-align: center; transition: all 0.25s; }
-.subject-btn:active { transform: scale(0.97); }
-.subject-btn h3 { color: #fff; font-size: 16px; font-weight: 700; }
-
-.live-option-btn { background: linear-gradient(135deg, rgba(59,130,246,0.2) 0%, rgba(37,99,235,0.1) 100%); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 18px; margin-bottom: 14px; cursor: pointer; text-align: center; transition: all 0.25s; display: flex; align-items: center; justify-content: center; gap: 12px; }
-.live-option-btn:active { transform: scale(0.97); }
-.live-option-btn h3 { color: #fff; font-size: 16px; font-weight: 700; }
-.live-option-btn svg { width: 24px; height: 24px; color: #fff; }
-
-.lesson-card, .session-card { background: linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(241,245,249,0.97) 100%); border-radius: 16px; padding: 18px; margin-bottom: 12px; cursor: pointer; transition: all 0.25s; box-shadow: 0 6px 20px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 14px; }
-.lesson-card:active, .session-card:active { transform: scale(0.98); }
-.card-icon { width: 50px; height: 50px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
-.card-icon svg { width: 24px; height: 24px; color: #fff; }
-.card-info { flex: 1; }
-.card-title { color: #1e293b; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
-.card-desc { color: #64748b; font-size: 12px; }
-
-.chat-list { background: linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(241,245,249,0.97) 100%); border-radius: 22px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
-.chat-item { padding: 16px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all 0.2s; }
-.chat-item:last-child { border-bottom: none; }
-.chat-item:active { background: #f1f5f9; }
-.chat-item .chat-avatar { width: 58px; height: 58px; border-radius: 50%; overflow: hidden; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.chat-item .chat-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.chat-item .chat-info { flex: 1; min-width: 0; }
-.chat-item .chat-name { color: #1e293b; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
-.chat-item .chat-last { color: #64748b; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-.private-chat { position: fixed; top: 0; left: 0; right: 0; bottom: 0; max-width: 480px; margin: 0 auto; background: #f1f5f9; z-index: 2000; display: none; flex-direction: column; }
-.private-chat.active { display: flex; }
-.chat-header { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); padding: 16px; display: flex; align-items: center; gap: 12px; color: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
-.chat-header .back-btn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
-.chat-header .chat-avatar-small { width: 42px; height: 42px; border-radius: 50%; overflow: hidden; border: 2px solid rgba(255,255,255,0.3); flex-shrink: 0; }
-.chat-header .chat-avatar-small img { width: 100%; height: 100%; object-fit: cover; }
-.chat-header .chat-user-info { flex: 1; min-width: 0; }
-.chat-header .chat-user-name { font-weight: 700; display: flex; align-items: center; gap: 5px; font-size: 15px; }
-.chat-header .chat-user-status { font-size: 11px; opacity: 0.9; margin-top: 2px; }
-
-.chat-messages { flex: 1; overflow-y: auto; padding: 16px; background: #f1f5f9; }
-.message { margin-bottom: 10px; max-width: 78%; padding: 12px 14px; border-radius: 18px; font-size: 14px; line-height: 1.5; position: relative; animation: messageSlide 0.3s ease; word-wrap: break-word; }
-@keyframes messageSlide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.message.sent { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #fff; margin-right: auto; border-bottom-right-radius: 6px; }
-.message.received { background: #fff; color: #1e293b; margin-left: auto; border-bottom-left-radius: 6px; border: 1px solid #e2e8f0; }
-.message .message-time { font-size: 10px; opacity: 0.7; margin-top: 5px; display: block; text-align: left; }
-.message .message-reply { background: rgba(0,0,0,0.15); padding: 6px 10px; border-radius: 10px; margin-bottom: 8px; font-size: 12px; border-right: 3px solid rgba(255,255,255,0.5); }
-.message.received .message-reply { background: #f1f5f9; border-right: 3px solid #3b82f6; }
-.message-status { position: absolute; bottom: 4px; left: 8px; font-size: 12px; font-weight: bold; }
-.message.sent .message-status { color: rgba(255,255,255,0.7); }
-.message.sent.read .message-status { color: #4ade80; }
-.message-voice { display: flex; align-items: center; gap: 10px; min-width: 180px; }
-.message-voice .play-btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
-.message-voice .play-btn svg { width: 16px; height: 16px; color: #fff; }
-.message-voice .voice-info { flex: 1; }
-.message-voice .voice-wave { height: 20px; display: flex; align-items: center; gap: 2px; margin-bottom: 3px; }
-.message-voice .voice-wave span { width: 3px; background: rgba(255,255,255,0.7); border-radius: 2px; }
-.message-voice .voice-duration { font-size: 11px; opacity: 0.9; }
-.message-image { max-width: 100%; border-radius: 12px; margin-bottom: 6px; cursor: pointer; display: block; }
-.message-file { background: rgba(255,255,255,0.2); padding: 10px 12px; border-radius: 12px; display: flex; align-items: center; gap: 10px; min-width: 180px; }
-.message-file .file-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.25); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }
-.message-file .file-info { flex: 1; min-width: 0; }
-.message-file .file-name { font-weight: 600; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.message-file .file-size { font-size: 10px; opacity: 0.8; margin-top: 2px; }
-
-.chat-input-area { background: #fff; padding: 12px; display: flex; gap: 8px; align-items: center; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); border-top: 1px solid #e2e8f0; }
-.chat-input-area input[type="text"] { flex: 1; border: 1.5px solid #e2e8f0; border-radius: 25px; padding: 12px 16px; font-family: inherit; outline: none; font-size: 14px; }
-.chat-input-area input[type="text"]:focus { border-color: #3b82f6; }
-.chat-input-area .attach-btn, .chat-input-area .voice-btn { background: #f1f5f9; border: none; width: 46px; height: 46px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
-.chat-input-area .attach-btn:active, .chat-input-area .voice-btn:active { background: #e2e8f0; }
-.chat-input-area .attach-btn svg, .chat-input-area .voice-btn svg { width: 20px; height: 20px; color: #3b82f6; }
-.chat-input-area .voice-btn.recording { background: #ef4444; animation: pulse 1s ease infinite; }
-.chat-input-area .voice-btn.recording svg { color: #fff; }
-.chat-input-area .send-btn { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #fff; border: none; width: 46px; height: 46px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(59,130,246,0.4); flex-shrink: 0; }
-.chat-input-area .send-btn svg { width: 20px; height: 20px; color: #fff; }
-
-.voice-preview { background: #fff; padding: 10px 14px; border-top: 1px solid #e2e8f0; display: none; align-items: center; gap: 10px; }
-.voice-preview.active { display: flex; }
-.voice-preview .play-preview { width: 38px; height: 38px; border-radius: 50%; background: #3b82f6; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; border: none; }
-.voice-preview .play-preview svg { width: 16px; height: 16px; color: #fff; }
-.voice-preview .timer { color: #1e293b; font-size: 14px; font-weight: 700; flex: 1; }
-.voice-preview .delete-voice { background: #fef2f2; border: none; width: 36px; height: 36px; border-radius: 50%; color: #ef4444; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.voice-preview .send-voice { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); border: none; width: 36px; height: 36px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-
-.reply-preview { background: #fff; padding: 10px 14px; border-top: 1px solid #e2e8f0; display: none; align-items: center; gap: 10px; }
-.reply-preview.active { display: flex; }
-.reply-preview .reply-content { flex: 1; min-width: 0; }
-.reply-preview .reply-label { font-size: 11px; color: #3b82f6; font-weight: 700; margin-bottom: 3px; }
-.reply-preview .reply-text { font-size: 12px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.reply-preview .close-reply { background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-
-.profile-header { background: linear-gradient(135deg, rgba(30,41,59,0.85) 0%, rgba(15,23,42,0.9) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 24px; padding: 32px 20px; text-align: center; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.08); }
-.profile-avatar-large { width: 110px; height: 110px; border-radius: 50%; border: 3px solid #22c55e; overflow: hidden; margin: 0 auto 16px; background: #1e293b; cursor: pointer; box-shadow: 0 8px 25px rgba(34,197,94,0.3); }
-.profile-avatar-large img { width: 100%; height: 100%; object-fit: cover; }
-.profile-name-large { color: #fff; font-size: 22px; font-weight: 800; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.profile-phone { color: rgba(255,255,255,0.65); font-size: 13px; direction: ltr; }
-
-.profile-menu { background: linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(241,245,249,0.97) 100%); border-radius: 22px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
-.menu-item { padding: 18px 20px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all 0.2s; }
-.menu-item:last-child { border-bottom: none; }
-.menu-item:active { background: #f1f5f9; }.menu-icon-wrap { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); box-shadow: 0 4px 12px rgba(59,130,246,0.3); flex-shrink: 0; }
-.menu-icon-wrap svg { width: 20px; height: 20px; color: #fff; }
-.menu-item .menu-text { flex: 1; color: #1e293b; font-size: 14px; font-weight: 600; }
-.menu-item .menu-arrow { color: #94a3b8; font-size: 18px; }
-
-.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); z-index: 3000; display: none; align-items: flex-end; justify-content: center; }
-.modal-overlay.active { display: flex; }
-.modal-content { background: #fff; width: 100%; max-width: 480px; border-radius: 30px 30px 0 0; padding: 25px; animation: slideUp 0.35s ease; max-height: 85vh; overflow-y: auto; }
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
-.modal-header h3 { color: #1e293b; font-size: 19px; font-weight: 800; }
-.modal-header .close-btn { background: #f1f5f9; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 20px; cursor: pointer; color: #64748b; display: flex; align-items: center; justify-content: center; }
-.form-group { margin-bottom: 16px; }
-.form-group label { display: block; color: #475569; font-size: 13px; font-weight: 700; margin-bottom: 8px; }
-.form-group input, .form-group select, .form-group textarea { width: 100%; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 13px 14px; font-family: inherit; font-size: 14px; outline: none; transition: border-color 0.2s; }
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #3b82f6; }
-.form-group textarea { resize: vertical; min-height: 80px; }
-.btn-save { width: 100%; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #fff; border: none; padding: 15px; border-radius: 16px; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 10px; box-shadow: 0 6px 20px rgba(34,197,94,0.35); }
-
-.video-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 4000; display: none; flex-direction: column; }
-.video-modal.active { display: flex; }
-.video-modal-header { padding: 16px; display: flex; justify-content: space-between; align-items: center; color: #fff; background: rgba(0,0,0,0.5); }
-.video-modal-header .close-video { background: rgba(255,255,255,0.1); border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.video-container { flex: 1; display: flex; align-items: center; justify-content: center; background: #000; }
-.video-container video { width: 100%; height: 100%; object-fit: contain; }
-.video-info { background: #1e293b; color: #fff; padding: 20px; }
-.video-info h3 { font-size: 16px; margin-bottom: 8px; font-weight: 700; }
-.video-info p { font-size: 13px; color: #94a3b8; }
-
-.sessions-page { position: fixed; top: 0; left: 0; right: 0; bottom: 0; max-width: 480px; margin: 0 auto; background: url('b134c815-293d-4305-961e-88be7a91320b.png') center/cover no-repeat; background-attachment: fixed; z-index: 2500; display: none; flex-direction: column; overflow-y: auto; }
-.sessions-page.active { display: flex; }
-.sessions-header { background: linear-gradient(135deg, rgba(30,41,59,0.95) 0%, rgba(15,23,42,0.98) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 16px 20px; display: flex; align-items: center; gap: 12px; color: #fff; position: sticky; top: 0; z-index: 10; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-.sessions-header .back-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.sessions-list { padding: 20px; }
-
-.admin-page { position: fixed; top: 0; left: 0; right: 0; bottom: 0; max-width: 480px; margin: 0 auto; background: #f1f5f9; z-index: 3500; display: none; flex-direction: column; overflow-y: auto; }
-.admin-page.active { display: flex; }
-.admin-header { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); padding: 16px 20px; display: flex; align-items: center; gap: 12px; color: #fff; position: sticky; top: 0; z-index: 10; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
-.admin-header .back-btn { background: rgba(255,255,255,0.2); border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.admin-header h2 { font-size: 18px; flex: 1; font-weight: 800; }
-.admin-content { padding: 20px; }
-.admin-section { background: #fff; border-radius: 22px; padding: 22px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); }
-.admin-title { color: #1e293b; font-size: 16px; font-weight: 800; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
-.admin-title .title-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(59,130,246,0.3); flex-shrink: 0; }
-.admin-title .title-icon svg { width: 18px; height: 18px; color: #fff; }
-.admin-card { background: #f8fafc; border-radius: 14px; padding: 16px; margin-bottom: 14px; }
-.admin-card label { display: block; color: #475569; font-size: 12px; font-weight: 700; margin-bottom: 8px; }
-.admin-card input, .admin-card select, .admin-card textarea { width: 100%; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 12px; font-family: inherit; font-size: 13px; margin-bottom: 12px; outline: none; }
-.admin-card input:focus, .admin-card select:focus, .admin-card textarea:focus { border-color: #3b82f6; }
-.btn-admin { width: 100%; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #fff; border: none; padding: 14px; border-radius: 14px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 6px 20px rgba(59,130,246,0.35); }
-.user-list-item { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.05); gap: 10px; flex-wrap: wrap; }
-.user-list-item .user-info-admin { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
-.user-list-item .user-avatar-admin { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; font-weight: 700; flex-shrink: 0; }
-.user-list-item .user-details h4 { color: #1e293b; font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.user-list-item .user-details p { color: #64748b; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.user-actions { display: flex; gap: 5px; flex-wrap: wrap; flex-shrink: 0; }
-.user-actions button { background: #3b82f6; color: #fff; border: none; padding: 7px 10px; border-radius: 10px; font-size: 10px; cursor: pointer; font-weight: 600; white-space: nowrap; }
-.user-actions button.ban { background: #ef4444; }
-.user-actions button.vip { background: #f59e0b; }
-.user-actions button.msg { background: #22c55e; }
-.ban-status { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; font-size: 10px; padding: 3px 8px; border-radius: 8px; margin-top: 4px; display: inline-block; font-weight: 600; }
-
-.store-header { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 24px; padding: 30px 20px; text-align: center; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(245,158,11,0.4); }
-.store-header h2 { color: #fff; font-size: 24px; font-weight: 800; margin-bottom: 8px; }
-.store-header p { color: rgba(255,255,255,0.9); font-size: 13px; }
-.vip-packages { display: grid; gap: 16px; }
-.vip-package { background: linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(241,245,249,0.97) 100%); border-radius: 20px; padding: 22px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); position: relative; overflow: hidden; }
-.vip-package::before { content: ''; position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, transparent 100%); border-radius: 0 0 0 100%; }
-.vip-package-header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
-.vip-package-icon { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; background: #fff; }
-.vip-package-icon img { width: 100%; height: 100%; object-fit: cover; }
-.vip-package-title { flex: 1; }
-.vip-package-title h3 { color: #1e293b; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-.vip-package-title p { color: #64748b; font-size: 12px; }
-.vip-package-price { text-align: left; margin-bottom: 16px; }
-.vip-package-price .price { color: #1e293b; font-size: 22px; font-weight: 800; }
-.vip-package-price .currency { color: #64748b; font-size: 12px; margin-right: 4px; }
-.vip-package-features { margin-bottom: 16px; }
-.vip-package-features li { color: #475569; font-size: 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; list-style: none; }
-.vip-package-features li::before { content: '✓'; color: #22c55e; font-weight: 700; font-size: 14px; }
-.btn-buy-vip { width: 100%; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; border: none; padding: 14px; border-radius: 14px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 6px 20px rgba(245,158,11,0.35); transition: all 0.2s; }
-.btn-buy-vip:active { transform: scale(0.98); }
-.btn-buy-vip:disabled { background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%); box-shadow: none; cursor: not-allowed; }
-
-.toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #fff; padding: 14px 26px; border-radius: 28px; font-size: 14px; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; box-shadow: 0 8px 30px rgba(0,0,0,0.3); font-weight: 600; }
-.toast.show { opacity: 1; }
-.logout-btn { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 8px 14px; border-radius: 12px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-
-/* Live Streaming */
-.live-stream-page { position: fixed; top: 0; left: 0; right: 0; bottom: 0; max-width: 480px; margin: 0 auto; background: #000; z-index: 5000; display: none; flex-direction: column; }
-.live-stream-page.active { display: flex; }
-.live-video-container { flex: 1; position: relative; background: #000; }
-.live-video-container video { width: 100%; height: 100%; object-fit: contain; }
-.live-controls { background: rgba(0,0,0,0.8); padding: 20px; display: flex; gap: 12px; justify-content: center; }
-.live-btn { padding: 12px 24px; border-radius: 12px; border: none; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
-.live-btn.start { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #fff; }
-.live-btn.stop { background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); color: #fff; }
-.live-btn.close { background: rgba(255,255,255,0.2); color: #fff; }.live-badge-indicator { position: absolute; top: 16px; right: 16px; background: #ef4444; color: #fff; padding: 6px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; display: none; align-items: center; gap: 6px; }
-.live-badge-indicator.active { display: flex; }
-.live-badge-indicator::before { content: ''; width: 8px; height: 8px; background: #fff; border-radius: 50%; animation: pulse 1.5s ease infinite; }
+/* ===== صفحه پخش زنده ===== */
+.live-stream-page{position:fixed;top:0;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:#000;z-index:6000;display:none;flex-direction:column}
+.live-stream-page.active{display:flex}
+.live-stream-page.landscape{max-width:100%;width:100%}
+.live-top-bar{background:linear-gradient(135deg,rgba(30,41,59,0.95) 0%,rgba(15,23,42,0.98) 100%);padding:12px 16px;display:flex;align-items:center;gap:10px;color:#fff}
+.live-top-bar .back-btn{background:rgba(255,255,255,0.1);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.live-top-bar .live-info{flex:1;min-width:0}
+.live-top-bar .live-title{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.live-top-bar .live-subtitle{font-size:11px;opacity:0.8;margin-top:2px}
+.live-badge-live{background:#ef4444;color:#fff;padding:4px 10px;border-radius:10px;font-size:11px;font-weight:700;display:none;align-items:center;gap:5px;animation:pulse 1.5s ease infinite}
+.live-badge-live::before{content:'';width:6px;height:6px;background:#fff;border-radius:50%}
+.live-video-area{flex:1;background:#000;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.live-video-area iframe{width:100%;height:100%;border:none}
+.live-video-area .no-stream{color:#fff;text-align:center;padding:30px}
+.live-video-area .no-stream svg{width:60px;height:60px;color:#64748b;margin-bottom:12px}
+.camera-selector{background:rgba(0,0,0,0.85);padding:12px;display:none;gap:8px;justify-content:center;flex-wrap:wrap}
+.camera-selector.active{display:flex}
+.cam-btn{background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);color:#fff;padding:10px 14px;border-radius:12px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s}
+.cam-btn:active{transform:scale(0.95)}
+.cam-btn.active{background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);border-color:#3b82f6}
+.cam-btn svg{width:16px;height:16px}
+.live-controls{background:rgba(0,0,0,0.9);padding:12px;display:flex;gap:10px;justify-content:center;align-items:center;border-top:1px solid rgba(255,255,255,0.1)}
+.live-ctrl-btn{background:rgba(255,255,255,0.1);border:none;color:#fff;width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.live-ctrl-btn:active{transform:scale(0.92)}
+.live-ctrl-btn svg{width:20px;height:20px}
+.live-ctrl-btn.start-live,.live-ctrl-btn.stop-live{background:linear-gradient(135deg,#ef4444 0%,#dc2626 100%);width:auto;padding:0 18px;border-radius:22px;font-family:inherit;font-size:13px;font-weight:700;gap:6px}
+.live-ctrl-btn.stop-live{background:linear-gradient(135deg,#6b7280 0%,#4b5563 100%)}
+.live-stream-page.landscape{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(90deg);width:100vh;height:100vw;max-width:none}
 </style>
 </head>
 <body>
@@ -262,8 +243,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
     </div>
 
     <div id="home-section" class="content-section active">
-      <div class="intro-videos">
-        <div class="intro-video-card" onclick="playIntroVideo('program')"><div class="video-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></div><div class="video-title">معرفی برنامه</div></div>
+      <div class="intro-videos">        <div class="intro-video-card" onclick="playIntroVideo('program')"><div class="video-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></div><div class="video-title">معرفی برنامه</div></div>
         <div class="intro-video-card" onclick="openTeachersPage()"><div class="video-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg></div><div class="video-title">معرفی استاد</div></div>
       </div>
       <div class="section-title">پایه تحصیلی خود را انتخاب کنید</div>
@@ -280,7 +260,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
     </div>
 
     <div id="chat-section" class="content-section">
-      <div class="section-title" style="color:#fff; margin-bottom:16px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>گفتگوها</div>
+      <div class="section-title" style="color:#fff; margin-bottom:16px;">گفتگوها</div>
       <div class="chat-list" id="chat-list-container"></div>
     </div>
 
@@ -292,7 +272,8 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
     <div id="profile-section" class="content-section">
       <div class="profile-header">
         <div class="profile-avatar-large" onclick="changeAvatar()"><img id="profile-large-img" src=""></div>
-        <div class="profile-name-large" id="profile-name-large"></div>        <div class="profile-phone" id="profile-phone"></div>
+        <div class="profile-name-large" id="profile-name-large"></div>
+        <div class="profile-phone" id="profile-phone"></div>
         <div id="profile-vip-badges" style="margin-top:14px; display:flex; gap:6px; justify-content:center; flex-wrap:wrap;"></div>
       </div>
       <div class="profile-menu">
@@ -311,7 +292,6 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
       <div class="nav-item" onclick="switchTab('profile')"><div class="nav-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div><span>پروفایل</span></div>
     </div>
   </div>
-
   <div id="sessions-page" class="sessions-page">
     <div class="sessions-header"><button class="back-btn" onclick="closeSessionsPage()">‹</button><div style="flex:1;"><div id="sessions-page-title" style="font-weight:800; font-size:17px;"></div><div id="sessions-page-subtitle" style="font-size:12px; opacity:0.8; margin-top:2px;"></div></div></div>
     <div class="sessions-list" id="sessions-list"></div>
@@ -341,7 +321,8 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
       <div class="modal-header"><h3>ویرایش پروفایل</h3><button class="close-btn" onclick="closeEditProfile()">×</button></div>
       <div class="form-group"><label>نام</label><input type="text" id="edit-firstname"></div>
       <div class="form-group"><label>نام خانوادگی</label><input type="text" id="edit-lastname"></div>
-      <div class="form-group"><label>نام مدرسه</label><input type="text" id="edit-school"></div>      <div class="form-group"><label>استان</label><select id="edit-province"><option>تهران</option><option>اصفهان</option><option>فارس</option><option>خراسان رضوی</option><option>آذربایجان شرقی</option><option>مازندران</option><option>گیلان</option><option>البرز</option><option>خوزستان</option><option>کرمان</option></select></div>
+      <div class="form-group"><label>نام مدرسه</label><input type="text" id="edit-school"></div>
+      <div class="form-group"><label>استان</label><select id="edit-province"><option>تهران</option><option>اصفهان</option><option>فارس</option><option>خراسان رضوی</option><option>آذربایجان شرقی</option><option>مازندران</option><option>گیلان</option><option>البرز</option><option>خوزستان</option><option>کرمان</option></select></div>
       <div class="form-group"><label>پایه تحصیلی</label><select id="edit-grade"><option value="هفتم">هفتم</option><option value="هشتم">هشتم</option><option value="نهم">نهم</option></select></div>
       <div class="form-group"><label>سن</label><input type="number" id="edit-age" min="5" max="99"></div>
       <button class="btn-save" onclick="saveProfile()">ذخیره تغییرات</button>
@@ -354,16 +335,50 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
     <div class="video-info"><h3 id="video-info-title"></h3><p id="video-info-desc"></p></div>
   </div>
 
-  <!-- پخش زنده -->
+  <!-- ===== صفحه پخش زنده ===== -->
   <div id="live-stream-page" class="live-stream-page">
-    <div class="live-video-container">
-      <video id="live-video" autoplay playsinline></video>
-      <div class="live-badge-indicator" id="live-badge">🔴 زنده</div>
+    <div class="live-top-bar">
+      <button class="back-btn" onclick="closeLiveStream()">‹</button>
+      <div class="live-info">
+        <div class="live-title" id="live-stream-title">پخش زنده</div>
+        <div class="live-subtitle" id="live-stream-subtitle"></div>      </div>
+      <div class="live-badge-live" id="live-badge-indicator">زنده</div>
+    </div>
+    <div class="live-video-area" id="live-video-area">
+      <div class="no-stream" id="no-stream-msg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+        <div>در انتظار شروع پخش زنده...</div>
+      </div>
+    </div>
+    <div class="camera-selector" id="camera-selector">
+      <button class="cam-btn active" data-mode="front" onclick="switchCameraMode('front')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        دوربین جلو
+      </button>
+      <button class="cam-btn" data-mode="back" onclick="switchCameraMode('back')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        دوربین عقب
+      </button>
+      <button class="cam-btn" data-mode="screen" onclick="switchCameraMode('screen')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        ضبط صفحه
+      </button>
     </div>
     <div class="live-controls">
-      <button class="live-btn start" id="start-live-btn" onclick="startLiveStream()">شروع پخش</button>
-      <button class="live-btn stop" id="stop-live-btn" onclick="stopLiveStream()" style="display:none;">توقف پخش</button>
-      <button class="live-btn close" onclick="closeLiveStream()">بستن</button>
+      <button class="live-ctrl-btn start-live" id="start-live-btn" onclick="startLiveStream()">
+        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg>
+        شروع پخش
+      </button>
+      <button class="live-ctrl-btn stop-live" id="stop-live-btn" onclick="stopLiveStream()" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="8" y="8" width="8" height="8" rx="1"/></svg>
+        توقف
+      </button>
+      <button class="live-ctrl-btn" onclick="toggleOrientation()" title="چرخش">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      </button>
+      <button class="live-ctrl-btn" onclick="toggleFullscreen()" title="تمام صفحه">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+      </button>
     </div>
   </div>
 
@@ -374,35 +389,26 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
         <div class="admin-title"><div class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></div>پخش زنده جدید</div>
         <div class="admin-card">
           <label>پایه تحصیلی</label>
-          <select id="live-grade">
-            <option value="هفتم">هفتم</option>
-            <option value="هشتم">هشتم</option>
-            <option value="نهم">نهم</option>
-          </select>
-          <label>درس</label>
-          <select id="live-subject">
-            <option value="math">ریاضی</option>
-            <option value="science">علوم</option>
-            <option value="english">انگلیسی</option>
-            <option value="farsi">فارسی</option>
-          </select>
+          <select id="live-grade"><option value="هفتم">هفتم</option><option value="هشتم">هشتم</option><option value="نهم">نهم</option></select>
+          <label>درس</label>          <select id="live-subject"><option value="math">ریاضی</option><option value="science">علوم</option><option value="english">انگلیسی</option><option value="farsi">فارسی</option></select>
           <label>موضوع</label>
           <input type="text" id="live-title" placeholder="موضوع پخش زنده">
           <label>توضیحات</label>
           <textarea id="live-description" placeholder="توضیحات پخش زنده"></textarea>
-          <button class="btn-admin" onclick="createLiveStream()">ایجاد پخش زنده</button>        </div>
+          <button class="btn-admin" onclick="createLiveStream()">ایجاد و شروع پخش زنده</button>
+        </div>
       </div>
       <div class="admin-section">
-        <div class="admin-title"><div class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg></div>اضافه کردن ویدیو / پخش زنده</div>
+        <div class="admin-title"><div class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg></div>اضافه کردن ویدیو</div>
         <div class="admin-card">
-          <label>نوع ویدیو</label><select id="admin-video-type"><option value="lesson">درس آموزشی</option><option value="live">پخش زنده</option></select>
+          <label>نوع ویدیو</label><select id="admin-video-type"><option value="lesson">درس آموزشی</option><option value="live">پخش زنده قبلی</option></select>
           <label>پایه تحصیلی</label><select id="admin-grade"><option value="هفتم">هفتم</option><option value="هشتم">هشتم</option><option value="نهم">نهم</option></select>
           <label>درس</label><select id="admin-subject"><option value="math">ریاضی</option><option value="science">علوم</option><option value="english">انگلیسی</option><option value="farsi">فارسی</option></select>
           <label>شماره درس/فصل</label><input type="number" id="admin-chapter-num" min="1" placeholder="شماره درس">
-          <label>شماره جلسه</label><input type="number" id="admin-session-num" min="1" placeholder="شماره جلسه (برای پخش زنده 0 بگذارید)">
+          <label>شماره جلسه</label><input type="number" id="admin-session-num" min="1" placeholder="شماره جلسه">
           <label>عنوان</label><input type="text" id="admin-video-title" placeholder="عنوان">
           <label>لینک ویدیو</label><input type="text" id="admin-video-link" placeholder="لینک">
-          <label>توضیحات (مخصوص پخش زنده)</label><textarea id="admin-video-desc" placeholder="توضیحات پخش زنده"></textarea>
+          <label>توضیحات</label><textarea id="admin-video-desc" placeholder="توضیحات"></textarea>
           <button class="btn-admin" onclick="addVideo()">افزودن</button>
         </div>
       </div>
@@ -433,13 +439,13 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
   <div id="ban-modal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header"><h3>مسدود کردن کاربر</h3><button class="close-btn" onclick="closeBanModal()">×</button></div>
-      <div class="form-group"><label>مدت زمان مسدودی</label><select id="ban-duration"><option value="1">1 روز</option><option value="3">3 روز</option><option value="7">7 روز</option><option value="30">30 روز</option><option value="90">90 روز</option><option value="365">1 سال</option><option value="permanent">دائمی</option></select></div>
-      <div class="form-group"><label>دلیل مسدودی</label><textarea id="ban-reason" placeholder="دلیل مسدود کردن کاربر را بنویسید..."></textarea></div>
+      <div class="form-group"><label>مدت زمان مسدودی</label><select id="ban-duration"><option value="1">1 روز</option><option value="3">3 روز</option><option value="7">7 روز</option><option value="30">30 روز</option><option value="90">90 روز</option><option value="365">1 سال</option><option value="permanent">دائمی</option></select></div>      <div class="form-group"><label>دلیل مسدودی</label><textarea id="ban-reason" placeholder="دلیل مسدود کردن کاربر را بنویسید..."></textarea></div>
       <button class="btn-save" style="background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%); box-shadow:0 6px 20px rgba(239,68,68,0.35);" onclick="confirmBan()">تایید مسدودی</button>
     </div>
   </div>
 
-  <div id="vip-modal" class="modal-overlay">    <div class="modal-content">
+  <div id="vip-modal" class="modal-overlay">
+    <div class="modal-content">
       <div class="modal-header"><h3>اعطای ویژه به کاربر</h3><button class="close-btn" onclick="closeVipModal()">×</button></div>
       <div class="form-group"><label>نوع ویژه</label><select id="vip-type"><option value="vipDownload">ویژه دانلود</option><option value="vipChat">ویژه چت</option><option value="vipClass">ویژه کلاس مجازی</option></select></div>
       <div class="form-group"><label>مدت زمان (روز)</label><select id="vip-duration"><option value="3">3 روز</option><option value="7">7 روز</option><option value="30">30 روز (1 ماه)</option><option value="150">150 روز (5 ماه)</option><option value="365">365 روز (1 سال)</option><option value="unlimited">دائمی (نامحدود)</option></select></div>
@@ -450,539 +456,531 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
 
 <div class="toast" id="toast"></div>
 
+<script src="https://meet.jit.si/external_api.js"></script>
+
 <script>
-const JSONBIN_CONFIG = { MASTER_KEY: '$2a$10$G8pgSWnFz4w/.voj3lfBPuJL7luRXAXiR/fIufC3YIB4.qRkZSjSS', BIN_ID: '6a53f4c8f5f4af5e298541fe', BASE_URL: 'https://api.jsonbin.io/v3/b' };
-const TEACHER_ACCOUNT = { phone: '09904844001', password: 'Par1617230', firstname: 'احسان', lastname: 'بهشتی کیا', isTeacher: true, isSupport: true, avatar: 'IMG_20260712_192216_220.jpg' };
-const SUPPORT_ACCOUNTS = { '09904844031': { firstname: 'پشتیبان', lastname: 'اصلی', isSupport: true, avatar: '316b4205-1a5b-491e-81f7-2fc93d4fbc0f.png' } };
-
-const VIP_PACKAGES = [
-  { id: 'vipDownload', name: 'ویژه دانلود', description: 'امکان دانلود ویدیوهای آموزشی', price: 25000, duration: 30, durationText: '1 ماه', icon: 'InShot_20260618_223059887.png', features: ['دانلود نامحدود ویدیوها', 'دسترسی آفلاین', 'کیفیت Full HD', 'ذخیره در دستگاه'] },
-  { id: 'vipChat', name: 'ویژه چت', description: 'دسترسی به بخش چت با استاد و پشتیبانی', price: 50000, duration: 30, durationText: '1 ماه', icon: 'InShot_20260618_223001651.png', features: ['چت با استاد احسان', 'پشتیبانی 24 ساعته', 'ارسال فایل و ویس', 'پاسخگویی سریع'] },
-  { id: 'vipClass', name: 'ویژه کلاس مجازی', description: 'شرکت در کلاس‌های مجازی زنده', price: 100000, duration: 30, durationText: '1 ماه', icon: 'InShot_20260618_222940843.png', features: ['کلاس‌های زنده هفتگی', 'پرسش و پاسخ مستقیم', 'جزوات اختصاصی', 'آزمون‌های آنلاین'] }
+const JSONBIN_CONFIG={MASTER_KEY:'$2a$10$G8pgSWnFz4w/.voj3lfBPuJL7luRXAXiR/fIufC3YIB4.qRkZSjSS',BIN_ID:'6a53f4c8f5f4af5e298541fe',BASE_URL:'https://api.jsonbin.io/v3/b'};
+const TEACHER_ACCOUNT={phone:'09904844001',password:'Par1617230',firstname:'احسان',lastname:'بهشتی کیا',isTeacher:true,isSupport:true,avatar:'IMG_20260712_192216_220.jpg'};
+const SUPPORT_ACCOUNTS={'09904844031':{firstname:'پشتیبان',lastname:'اصلی',isSupport:true,avatar:'316b4205-1a5b-491e-81f7-2fc93d4fbc0f.png'}};
+const VIP_PACKAGES=[
+  {id:'vipDownload',name:'ویژه دانلود',description:'امکان دانلود ویدیوهای آموزشی',price:25000,duration:30,durationText:'1 ماه',icon:'InShot_20260618_223059887.png',features:['دانلود نامحدود ویدیوها','دسترسی آفلاین','کیفیت Full HD','ذخیره در دستگاه']},
+  {id:'vipChat',name:'ویژه چت',description:'دسترسی به بخش چت با استاد و پشتیبانی',price:50000,duration:30,durationText:'1 ماه',icon:'InShot_20260618_223001651.png',features:['چت با استاد احسان','پشتیبانی 24 ساعته','ارسال فایل و ویس','پاسخگویی سریع']},
+  {id:'vipClass',name:'ویژه کلاس مجازی',description:'شرکت در کلاس‌های مجازی زنده',price:100000,duration:30,durationText:'1 ماه',icon:'InShot_20260618_222940843.png',features:['کلاس‌های زنده هفتگی','پرسش و پاسخ مستقیم','جزوات اختصاصی','آزمون‌های آنلاین']}
 ];
+const SUBJECTS={'math':{name:'ریاضی',lessons:8},'science':{name:'علوم',lessons:13},'english':{name:'انگلیسی',lessons:8},'farsi':{name:'فارسی',lessons:20}};
 
-const SUBJECTS = {
-  'math': { name: 'ریاضی', lessons: 8 },
-  'science': { name: 'علوم', lessons: 13 },
-  'english': { name: 'انگلیسی', lessons: 8 },
-  'farsi': { name: 'فارسی', lessons: 20 }
-};
+let currentUser=null,currentChat=null,currentReply=null,mediaRecorder=null,audioChunks=[],recordingStartTime=null,recordedBlob=null,banTargetPhone=null,vipTargetPhone=null,adminChatTarget=null;
+let appData={users:{},videos:[],messages:{},activity_logs:[],liveStreams:[]};
+let isSaving=false,pendingSave=false,syncInterval=null,currentLiveStream=null,jitsiApi=null,currentCameraMode='front',isLandscape=false;
 
-let currentUser = null, currentChat = null, currentReply = null, mediaRecorder = null, audioChunks = [], recordingStartTime = null, recordedBlob = null, banTargetPhone = null, vipTargetPhone = null, adminChatTarget = null;
-let appData = { users: {}, videos: [], messages: {}, activity_logs: [], liveStreams: [] };
-let isSaving = false, pendingSave = false;
-let localStream = null;
-let syncInterval = null;
+function startSync(){if(syncInterval)clearInterval(syncInterval);syncInterval=setInterval(async()=>{await loadData();if(currentChat)loadMessages();loadChatList();},5000);}
 
-// همگام‌سازی خودکار هر 5 ثانیه
-function startSync() {
-  if (syncInterval) clearInterval(syncInterval);
-  syncInterval = setInterval(async () => {
-    await loadData();
-    if (currentChat) loadMessages();
-    loadChatList();
-  }, 5000);
+async function fetchFromJSONBin(){try{const res=await fetch(JSONBIN_CONFIG.BASE_URL+'/'+JSONBIN_CONFIG.BIN_ID+'/latest',{headers:{'X-Master-Key':JSONBIN_CONFIG.MASTER_KEY}});if(!res.ok)throw new Error();const data=await res.json();const r=data.record||{};if(!r.users)r.users={};if(!r.videos)r.videos=[];if(!r.messages)r.messages={};if(!r.activity_logs)r.activity_logs=[];if(!r.liveStreams)r.liveStreams=[];return r;}catch(e){return getLocalStorageData();}}
+
+async function saveToJSONBin(data){try{const res=await fetch(JSONBIN_CONFIG.BASE_URL+'/'+JSONBIN_CONFIG.BIN_ID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_CONFIG.MASTER_KEY},body:JSON.stringify(data)});return res.ok;}catch(e){saveToLocalStorage(data);return false;}}
+
+function getLocalStorageData(){return{users:JSON.parse(localStorage.getItem('riazi_users')||'{}'),videos:JSON.parse(localStorage.getItem('riazi_videos')||'[]'),messages:JSON.parse(localStorage.getItem('riazi_messages')||'{}'),activity_logs:JSON.parse(localStorage.getItem('riazi_activity_logs')||'[]'),liveStreams:JSON.parse(localStorage.getItem('riazi_liveStreams')||'[]')};}
+
+function saveToLocalStorage(data){localStorage.setItem('riazi_users',JSON.stringify(data.users||{}));localStorage.setItem('riazi_videos',JSON.stringify(data.videos||[]));localStorage.setItem('riazi_messages',JSON.stringify(data.messages||{}));localStorage.setItem('riazi_activity_logs',JSON.stringify(data.activity_logs||[]));localStorage.setItem('riazi_liveStreams',JSON.stringify(data.liveStreams||[]));}
+
+async function loadData(){const d=await fetchFromJSONBin();appData=d;saveToLocalStorage(appData);return appData;}
+async function saveData(){saveToLocalStorage(appData);if(isSaving){pendingSave=true;return;}isSaving=true;await saveToJSONBin(appData);isSaving=false;if(pendingSave){pendingSave=false;await saveData();}}
+
+function getVipRemaining(v){if(!v||v==='none')return null;if(v==='unlimited')return 'دائمی';const d=new Date(v),n=new Date();if(d<=n)return 'منقضی';const diff=d-n;const days=Math.floor(diff/86400000);const hrs=Math.floor((diff%86400000)/3600000);return days>0?days+' روز و '+hrs+' ساعت':hrs+' ساعت';}
+function isVipActive(v){return v&&(v==='unlimited'||new Date(v)>new Date());}
+function formatPrice(p){return p.toLocaleString('fa-IR');}function formatTime(iso){const d=new Date(iso);return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');}
+function escapeHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+function formatFileSize(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB';}
+function logUserActivity(phone,action){appData.activity_logs.push({phone,action,time:new Date().toISOString()});saveData();}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+async function init(){
+  const phone=localStorage.getItem('riazi_current');
+  if(!phone){window.location.href='index.html';return;}
+  appData=getLocalStorageData();currentUser=appData.users[phone];
+  if(!currentUser){await loadData();currentUser=appData.users[phone];if(!currentUser){localStorage.removeItem('riazi_current');window.location.href='index.html';return;}}
+  if(currentUser.banned){if(currentUser.banUntil==='permanent'||(currentUser.banUntil&&new Date(currentUser.banUntil)>new Date())){showToast('حساب مسدود شده: '+(currentUser.banReason||''));localStorage.removeItem('riazi_current');setTimeout(()=>window.location.href='index.html',2000);return;}else{delete appData.users[phone].banned;delete appData.users[phone].banUntil;delete appData.users[phone].banReason;saveData();currentUser=appData.users[phone];}}
+  if(!appData.users[TEACHER_ACCOUNT.phone])appData.users[TEACHER_ACCOUNT.phone]={...TEACHER_ACCOUNT,grade:'همه',age:'30',school:'آموزشگاه',province:'تهران',contact:TEACHER_ACCOUNT.phone,isTeacher:true,isSupport:true,vipDownload:'unlimited',vipChat:'unlimited',vipClass:'unlimited',registeredAt:new Date().toISOString()};
+  for(const p in SUPPORT_ACCOUNTS){if(!appData.users[p])appData.users[p]={...SUPPORT_ACCOUNTS[p],grade:'همه',age:'25',school:'پشتیبانی',province:'تهران',contact:p,password:'123456789',isSupport:true,vipDownload:'unlimited',vipChat:'unlimited',vipClass:'unlimited',registeredAt:new Date().toISOString()};else{appData.users[p].isSupport=true;appData.users[p].vipDownload='unlimited';appData.users[p].vipChat='unlimited';appData.users[p].vipClass='unlimited';}}
+  if(!currentUser.vipDownloadGiven){const d=new Date();d.setDate(d.getDate()+3);appData.users[phone].vipDownload=d.toISOString();appData.users[phone].vipDownloadGiven=true;}
+  if(!currentUser.vipChatGiven){const d=new Date();d.setDate(d.getDate()+3);appData.users[phone].vipChat=d.toISOString();appData.users[phone].vipChatGiven=true;}
+  loadUserData();loadChatList();loadStore();saveData();startSync();
 }
 
-async function fetchFromJSONBin() {
-  try {
-    const res = await fetch(JSONBIN_CONFIG.BASE_URL + '/' + JSONBIN_CONFIG.BIN_ID + '/latest', { headers: { 'X-Master-Key': JSONBIN_CONFIG.MASTER_KEY } });
-    if (!res.ok) throw new Error();
-    const data = await res.json();    const r = data.record || {};
-    if (!r.users) r.users = {}; if (!r.videos) r.videos = []; if (!r.messages) r.messages = {}; if (!r.activity_logs) r.activity_logs = []; if (!r.liveStreams) r.liveStreams = [];
-    return r;
-  } catch (e) { return getLocalStorageData(); }
+function loadUserData(){
+  const name=currentUser.firstname+' '+(currentUser.lastname||'');
+  document.getElementById('header-user-name').textContent=currentUser.firstname;
+  document.getElementById('header-user-grade').textContent='پایه '+(currentUser.grade||'')+(currentUser.school?' | '+currentUser.school:'');
+  const av=currentUser.avatar||'InShot_20260712_161951935.png';
+  document.getElementById('header-profile-img').src=av;document.getElementById('profile-large-img').src=av;
+  if(currentUser.isSupport||currentUser.isTeacher)document.getElementById('header-verified-badge').style.display='inline-flex';
+  document.getElementById('header-vip-badge').style.display=(isVipActive(currentUser.vipDownload)||isVipActive(currentUser.vipChat)||isVipActive(currentUser.vipClass))?'inline-block':'none';
+  document.getElementById('profile-name-large').innerHTML=name+((currentUser.isSupport||currentUser.isTeacher)?'<span class="verified-badge" style="width:22px;height:22px;"></span>':'');
+  document.getElementById('profile-phone').textContent=currentUser.phone;
+  let b='';
+  if(isVipActive(currentUser.vipDownload))b+='<span class="vip-badge">ویژه دانلود</span><span class="vip-timer">'+getVipRemaining(currentUser.vipDownload)+'</span>';
+  if(isVipActive(currentUser.vipChat))b+='<span class="vip-badge">ویژه چت</span><span class="vip-timer">'+getVipRemaining(currentUser.vipChat)+'</span>';
+  if(isVipActive(currentUser.vipClass))b+='<span class="vip-badge">ویژه کلاس</span><span class="vip-timer">'+getVipRemaining(currentUser.vipClass)+'</span>';
+  document.getElementById('profile-vip-badges').innerHTML=b;
+  document.getElementById('admin-menu-item').style.display=(currentUser.isTeacher||currentUser.isSupport)?'flex':'none';
 }
 
-async function saveToJSONBin(data) {
-  try {
-    const res = await fetch(JSONBIN_CONFIG.BASE_URL + '/' + JSONBIN_CONFIG.BIN_ID, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_CONFIG.MASTER_KEY }, body: JSON.stringify(data) });
-    return res.ok;
-  } catch (e) { saveToLocalStorage(data); return false; }
+function selectHomeGrade(g){
+  document.getElementById('sessions-page-title').textContent='پایه '+g;
+  document.getElementById('sessions-page-subtitle').textContent='درس مورد نظر را انتخاب کنید';
+  const l=document.getElementById('sessions-list');l.innerHTML='';
+  Object.keys(SUBJECTS).forEach(k=>{
+    const s=SUBJECTS[k];
+    const d=document.createElement('div');d.className='lesson-card';
+    d.innerHTML=`<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></div><div class="card-info"><div class="card-title">${s.name}</div><div class="card-desc">${s.lessons} درس</div></div>`;
+    d.onclick=()=>showLessons(g,k);l.appendChild(d);
+  });
+  document.getElementById('sessions-page').classList.add('active');
 }
-
-function getLocalStorageData() {
-  return { users: JSON.parse(localStorage.getItem('riazi_users') || '{}'), videos: JSON.parse(localStorage.getItem('riazi_videos') || '[]'), messages: JSON.parse(localStorage.getItem('riazi_messages') || '{}'), activity_logs: JSON.parse(localStorage.getItem('riazi_activity_logs') || '[]'), liveStreams: JSON.parse(localStorage.getItem('riazi_liveStreams') || '[]') };
-}
-
-function saveToLocalStorage(data) {
-  localStorage.setItem('riazi_users', JSON.stringify(data.users || {}));
-  localStorage.setItem('riazi_videos', JSON.stringify(data.videos || []));
-  localStorage.setItem('riazi_messages', JSON.stringify(data.messages || {}));
-  localStorage.setItem('riazi_activity_logs', JSON.stringify(data.activity_logs || []));
-  localStorage.setItem('riazi_liveStreams', JSON.stringify(data.liveStreams || []));
-}
-
-async function loadData() { const d = await fetchFromJSONBin(); appData = d; saveToLocalStorage(appData); return appData; }
-async function saveData() {
-  saveToLocalStorage(appData);
-  if (isSaving) { pendingSave = true; return; }
-  isSaving = true; await saveToJSONBin(appData); isSaving = false;
-  if (pendingSave) { pendingSave = false; await saveData(); }
-}
-
-function getVipRemaining(v) { if (!v || v === 'none') return null; if (v === 'unlimited') return 'دائمی'; const d = new Date(v), n = new Date(); if (d <= n) return 'منقضی'; const diff = d - n; const days = Math.floor(diff / 86400000); const hrs = Math.floor((diff % 86400000) / 3600000); return days > 0 ? days + ' روز و ' + hrs + ' ساعت' : hrs + ' ساعت'; }
-function isVipActive(v) { return v && (v === 'unlimited' || new Date(v) > new Date()); }
-function formatPrice(p) { return p.toLocaleString('fa-IR'); }
-function formatTime(iso) { const d = new Date(iso); return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0'); }
-function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
-function formatFileSize(b) { if (b < 1024) return b + ' B'; if (b < 1048576) return (b/1024).toFixed(1) + ' KB'; return (b/1048576).toFixed(1) + ' MB'; }
-function logUserActivity(phone, action) { appData.activity_logs.push({ phone, action, time: new Date().toISOString() }); saveData(); }
-function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
-
-async function init() {
-  const phone = localStorage.getItem('riazi_current');
-  if (!phone) { window.location.href = 'index.html'; return; }
-  appData = getLocalStorageData(); currentUser = appData.users[phone];
-  if (!currentUser) { await loadData(); currentUser = appData.users[phone]; if (!currentUser) { localStorage.removeItem('riazi_current'); window.location.href = 'index.html'; return; } }
-  if (currentUser.banned) {
-    if (currentUser.banUntil === 'permanent' || (currentUser.banUntil && new Date(currentUser.banUntil) > new Date())) {
-      showToast('حساب مسدود شده: ' + (currentUser.banReason || '')); localStorage.removeItem('riazi_current'); setTimeout(() => window.location.href = 'index.html', 2000); return;    } else { delete appData.users[phone].banned; delete appData.users[phone].banUntil; delete appData.users[phone].banReason; saveData(); currentUser = appData.users[phone]; }
-  }
-  if (!appData.users[TEACHER_ACCOUNT.phone]) appData.users[TEACHER_ACCOUNT.phone] = { ...TEACHER_ACCOUNT, grade: 'همه', age: '30', school: 'آموزشگاه', province: 'تهران', contact: TEACHER_ACCOUNT.phone, isTeacher: true, isSupport: true, vipDownload: 'unlimited', vipChat: 'unlimited', vipClass: 'unlimited', registeredAt: new Date().toISOString() };
-  for (const p in SUPPORT_ACCOUNTS) { if (!appData.users[p]) appData.users[p] = { ...SUPPORT_ACCOUNTS[p], grade: 'همه', age: '25', school: 'پشتیبانی', province: 'تهران', contact: p, password: '123456789', isSupport: true, vipDownload: 'unlimited', vipChat: 'unlimited', vipClass: 'unlimited', registeredAt: new Date().toISOString() }; else { appData.users[p].isSupport = true; appData.users[p].vipDownload = 'unlimited'; appData.users[p].vipChat = 'unlimited'; appData.users[p].vipClass = 'unlimited'; } }
-  if (!currentUser.vipDownloadGiven) { const d = new Date(); d.setDate(d.getDate() + 3); appData.users[phone].vipDownload = d.toISOString(); appData.users[phone].vipDownloadGiven = true; }
-  if (!currentUser.vipChatGiven) { const d = new Date(); d.setDate(d.getDate() + 3); appData.users[phone].vipChat = d.toISOString(); appData.users[phone].vipChatGiven = true; }
-  loadUserData(); loadChatList(); loadStore(); saveData();
-  startSync(); // شروع همگام‌سازی خودکار
-}
-
-function loadUserData() {
-  const name = currentUser.firstname + ' ' + (currentUser.lastname || '');
-  document.getElementById('header-user-name').textContent = currentUser.firstname;
-  document.getElementById('header-user-grade').textContent = 'پایه ' + (currentUser.grade || '') + (currentUser.school ? ' | ' + currentUser.school : '');
-  const av = currentUser.avatar || 'InShot_20260712_161951935.png';
-  document.getElementById('header-profile-img').src = av; document.getElementById('profile-large-img').src = av;
-  if (currentUser.isSupport || currentUser.isTeacher) document.getElementById('header-verified-badge').style.display = 'inline-flex';
-  document.getElementById('header-vip-badge').style.display = (isVipActive(currentUser.vipDownload) || isVipActive(currentUser.vipChat) || isVipActive(currentUser.vipClass)) ? 'inline-block' : 'none';
-  document.getElementById('profile-name-large').innerHTML = name + ((currentUser.isSupport || currentUser.isTeacher) ? '<span class="verified-badge" style="width:22px;height:22px;"></span>' : '');
-  document.getElementById('profile-phone').textContent = currentUser.phone;
-  let b = '';
-  if (isVipActive(currentUser.vipDownload)) b += '<span class="vip-badge">ویژه دانلود</span><span class="vip-timer">' + getVipRemaining(currentUser.vipDownload) + '</span>';
-  if (isVipActive(currentUser.vipChat)) b += '<span class="vip-badge">ویژه چت</span><span class="vip-timer">' + getVipRemaining(currentUser.vipChat) + '</span>';
-  if (isVipActive(currentUser.vipClass)) b += '<span class="vip-badge">ویژه کلاس</span><span class="vip-timer">' + getVipRemaining(currentUser.vipClass) + '</span>';
-  document.getElementById('profile-vip-badges').innerHTML = b;
-  document.getElementById('admin-menu-item').style.display = (currentUser.isTeacher || currentUser.isSupport) ? 'flex' : 'none';
-}
-
-function selectHomeGrade(g) {
-  document.getElementById('sessions-page-title').textContent = 'پایه ' + g;
-  document.getElementById('sessions-page-subtitle').textContent = 'درس مورد نظر را انتخاب کنید';
-  const l = document.getElementById('sessions-list'); l.innerHTML = '';
-  Object.keys(SUBJECTS).forEach(k => {
-    const s = SUBJECTS[k];
-    const d = document.createElement('div'); d.className = 'lesson-card';
-    d.innerHTML = `<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></div><div class="card-info"><div class="card-title">${s.name}</div><div class="card-desc">${s.lessons} درس</div></div>`;
-    d.onclick = () => showLessons(g, k); l.appendChild(d);
+function selectVirtualGrade(g){
+  document.getElementById('sessions-page-title').textContent='کلاس مجازی - پایه '+g;
+  document.getElementById('sessions-page-subtitle').textContent='درس را انتخاب کنید';
+  const l=document.getElementById('sessions-list');l.innerHTML='';
+  Object.keys(SUBJECTS).forEach(k=>{
+    const s=SUBJECTS[k];
+    const d=document.createElement('div');d.className='lesson-card';
+    d.innerHTML=`<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253"/></svg></div><div class="card-info"><div class="card-title">${s.name}</div><div class="card-desc">کلاس‌های زنده و ضبط شده</div></div>`;
+    d.onclick=()=>showLiveOptions(g,k);l.appendChild(d);
   });
   document.getElementById('sessions-page').classList.add('active');
 }
 
-function selectVirtualGrade(g) {
-  document.getElementById('sessions-page-title').textContent = 'کلاس مجازی - پایه ' + g;
-  document.getElementById('sessions-page-subtitle').textContent = 'درس را انتخاب کنید';
-  const l = document.getElementById('sessions-list'); l.innerHTML = '';
-  Object.keys(SUBJECTS).forEach(k => {
-    const s = SUBJECTS[k];
-    const d = document.createElement('div'); d.className = 'lesson-card';
-    d.innerHTML = `<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253"/></svg></div><div class="card-info"><div class="card-title">${s.name}</div><div class="card-desc">کلاس‌های زنده و ضبط شده</div></div>`;
-    d.onclick = () => showLiveOptions(g, k); l.appendChild(d);  });
-  document.getElementById('sessions-page').classList.add('active');
-}
-
-function showLessons(g, k) {
-  const s = SUBJECTS[k];
-  document.getElementById('sessions-page-title').textContent = s.name + ' - پایه ' + g;
-  document.getElementById('sessions-page-subtitle').textContent = s.lessons + ' درس';
-  const l = document.getElementById('sessions-list'); l.innerHTML = '';
-  for (let i = 1; i <= s.lessons; i++) {
-    const d = document.createElement('div'); d.className = 'lesson-card';
-    d.innerHTML = `<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13"/></svg></div><div class="card-info"><div class="card-title">درس ${i}</div><div class="card-desc">10 جلسه آموزشی</div></div>`;
-    d.onclick = () => showSessions(g, k, i); l.appendChild(d);
+function showLessons(g,k){
+  const s=SUBJECTS[k];
+  document.getElementById('sessions-page-title').textContent=s.name+' - پایه '+g;
+  document.getElementById('sessions-page-subtitle').textContent=s.lessons+' درس';
+  const l=document.getElementById('sessions-list');l.innerHTML='';
+  for(let i=1;i<=s.lessons;i++){
+    const d=document.createElement('div');d.className='lesson-card';
+    d.innerHTML=`<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13"/></svg></div><div class="card-info"><div class="card-title">درس ${i}</div><div class="card-desc">10 جلسه آموزشی</div></div>`;
+    d.onclick=()=>showSessions(g,k,i);l.appendChild(d);
   }
 }
 
-function showSessions(g, k, lessonNum) {
-  const s = SUBJECTS[k];
-  document.getElementById('sessions-page-title').textContent = s.name + ' - درس ' + lessonNum;
-  document.getElementById('sessions-page-subtitle').textContent = '10 جلسه';
-  const l = document.getElementById('sessions-list'); l.innerHTML = '';
-  const vids = appData.videos.filter(v => v.grade === g && v.subject === k && v.chapter == lessonNum && v.type === 'lesson');
-  for (let i = 1; i <= 10; i++) {
-    const vid = vids.find(x => x.session == i);
-    const d = document.createElement('div'); d.className = 'session-card';
-    if (vid) {
-      d.innerHTML = `<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="card-info"><div class="card-title">${vid.title}</div><div class="card-desc">جلسه ${i}</div></div>`;
-      d.onclick = () => playVideo(vid);
-    } else {
-      d.innerHTML = `<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="card-info"><div class="card-title">جلسه ${i}</div><div class="card-desc">به زودی</div></div>`;
+function showSessions(g,k,lessonNum){
+  const s=SUBJECTS[k];
+  document.getElementById('sessions-page-title').textContent=s.name+' - درس '+lessonNum;
+  document.getElementById('sessions-page-subtitle').textContent='10 جلسه';
+  const l=document.getElementById('sessions-list');l.innerHTML='';
+  const vids=appData.videos.filter(v=>v.grade===g&&v.subject===k&&v.chapter==lessonNum&&v.type==='lesson');
+  for(let i=1;i<=10;i++){
+    const vid=vids.find(x=>x.session==i);
+    const d=document.createElement('div');d.className='session-card';
+    if(vid){
+      d.innerHTML=`<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="card-info"><div class="card-title">${vid.title}</div><div class="card-desc">جلسه ${i}</div></div>`;
+      d.onclick=()=>playVideo(vid);
+    }else{
+      d.innerHTML=`<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="card-info"><div class="card-title">جلسه ${i}</div><div class="card-desc">به زودی</div></div>`;
     }
     l.appendChild(d);
   }
 }
 
-function showLiveOptions(g, k) {
-  const s = SUBJECTS[k];
-  document.getElementById('sessions-page-title').textContent = s.name + ' - پایه ' + g;
-  document.getElementById('sessions-page-subtitle').textContent = '';
-  const l = document.getElementById('sessions-list'); l.innerHTML = '';
-  
-  const live = document.createElement('div'); live.className = 'live-option-btn';
-  live.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2zm0-8h2v6h-2z"/></svg><h3>پخش زنده</h3>`;
-  live.onclick = () => showLiveNow(g, k); l.appendChild(live);
-  
-  const prev = document.createElement('div'); prev.className = 'live-option-btn';
-  prev.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><h3>پخش زنده قبلی</h3>`;
-  prev.onclick = () => showPreviousLives(g, k); l.appendChild(prev);
+function showLiveOptions(g,k){
+  const s=SUBJECTS[k];
+  document.getElementById('sessions-page-title').textContent=s.name+' - پایه '+g;
+  document.getElementById('sessions-page-subtitle').textContent='';
+  const l=document.getElementById('sessions-list');l.innerHTML='';
+  const live=document.createElement('div');live.className='live-option-btn';  live.innerHTML=`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2zm0-8h2v6h-2z"/></svg><h3>پخش زنده</h3>`;
+  live.onclick=()=>showLiveNow(g,k);l.appendChild(live);
+  const prev=document.createElement('div');prev.className='live-option-btn';
+  prev.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><h3>پخش زنده قبلی</h3>`;
+  prev.onclick=()=>showPreviousLives(g,k);l.appendChild(prev);
 }
-function showLiveNow(g, k) {
-  document.getElementById('sessions-page-title').textContent = 'پخش زنده';
-  document.getElementById('sessions-page-subtitle').textContent = '';
-  const l = document.getElementById('sessions-list'); l.innerHTML = '';
-  const vids = appData.videos.filter(v => v.grade === g && v.subject === k && v.type === 'live' && v.isLive);
-  const liveStreams = appData.liveStreams.filter(ls => ls.grade === g && ls.subject === k && ls.isActive);
-  
-  if (vids.length === 0 && liveStreams.length === 0) l.innerHTML = '<div style="text-align:center;color:#fff;padding:40px;">پخش زنده‌ای وجود ندارد</div>';
-  else {
-    liveStreams.forEach(ls => {
-      const d = document.createElement('div'); d.className = 'session-card';
-      d.innerHTML = `<div class="card-icon" style="background:linear-gradient(135deg,#ef4444,#dc2626)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2zm0-8h2v6h-2z"/></svg></div><div class="card-info"><div class="card-title">${ls.title}</div><div class="card-desc">${ls.description || ''}</div></div>`;
-      d.onclick = () => joinLiveStream(ls); l.appendChild(d);
-    });
-    vids.forEach(v => {
-      const d = document.createElement('div'); d.className = 'session-card';
-      d.innerHTML = `<div class="card-icon" style="background:linear-gradient(135deg,#ef4444,#dc2626)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2zm0-8h2v6h-2z"/></svg></div><div class="card-info"><div class="card-title">${v.title}</div><div class="card-desc">${v.description || ''}</div></div>`;
-      d.onclick = () => playVideo(v); l.appendChild(d);
+
+function showLiveNow(g,k){
+  document.getElementById('sessions-page-title').textContent='پخش زنده';
+  document.getElementById('sessions-page-subtitle').textContent='';
+  const l=document.getElementById('sessions-list');l.innerHTML='';
+  const liveStreams=appData.liveStreams.filter(ls=>ls.grade===g&&ls.subject===k&&ls.isActive);
+  if(liveStreams.length===0){l.innerHTML='<div style="text-align:center;color:#fff;padding:40px;">پخش زنده‌ای در حال انجام نیست</div>';}
+  else{
+    liveStreams.forEach(ls=>{
+      const d=document.createElement('div');d.className='session-card';
+      d.innerHTML=`<div class="card-icon" style="background:linear-gradient(135deg,#ef4444,#dc2626)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2zm0-8h2v6h-2z"/></svg></div><div class="card-info"><div class="card-title">🔴 ${ls.title}</div><div class="card-desc">${ls.description||'در حال پخش'}</div></div>`;
+      d.onclick=()=>joinLiveStream(ls);l.appendChild(d);
     });
   }
 }
 
-function showPreviousLives(g, k) {
-  document.getElementById('sessions-page-title').textContent = 'پخش زنده قبلی';
-  document.getElementById('sessions-page-subtitle').textContent = '';
-  const l = document.getElementById('sessions-list'); l.innerHTML = '';
-  const vids = appData.videos.filter(v => v.grade === g && v.subject === k && v.type === 'live' && !v.isLive);
-  if (vids.length === 0) l.innerHTML = '<div style="text-align:center;color:#fff;padding:40px;">ویدیویی وجود ندارد</div>';
-  else vids.forEach(v => {
-    const d = document.createElement('div'); d.className = 'session-card';
-    d.innerHTML = `<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="card-info"><div class="card-title">${v.title}</div><div class="card-desc">${v.description || ''}</div></div>`;
-    d.onclick = () => playVideo(v); l.appendChild(d);
+function showPreviousLives(g,k){
+  document.getElementById('sessions-page-title').textContent='پخش زنده قبلی';
+  document.getElementById('sessions-page-subtitle').textContent='';
+  const l=document.getElementById('sessions-list');l.innerHTML='';
+  const vids=appData.videos.filter(v=>v.grade===g&&v.subject===k&&v.type==='live'&&!v.isLive);
+  if(vids.length===0)l.innerHTML='<div style="text-align:center;color:#fff;padding:40px;">ویدیویی وجود ندارد</div>';
+  else vids.forEach(v=>{
+    const d=document.createElement('div');d.className='session-card';
+    d.innerHTML=`<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="card-info"><div class="card-title">${v.title}</div><div class="card-desc">${v.description||''}</div></div>`;
+    d.onclick=()=>playVideo(v);l.appendChild(d);
   });
 }
 
-function openTeachersPage() {
-  document.getElementById('sessions-page-title').textContent = 'معرفی اساتید';
-  document.getElementById('sessions-page-subtitle').textContent = '';
-  const l = document.getElementById('sessions-list'); l.innerHTML = '';
-  const t = [
-    {n:'استاد ریاضی', d:'احسان بهشتی کیا', v:'teacher_math.mp4'},
-    {n:'استاد علوم', d:'به زودی', v:'teacher_science.mp4'},
-    {n:'استاد فارسی', d:'به زودی', v:'teacher_farsi.mp4'},
-    {n:'استاد انگلیسی', d:'به زودی', v:'teacher_english.mp4'}
-  ];
-  t.forEach(x => {
-    const d = document.createElement('div'); d.className = 'session-card';
-    d.innerHTML = `<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg></div><div class="card-info"><div class="card-title">${x.n}</div><div class="card-desc">${x.d}</div></div>`;
-    d.onclick = () => playVideo({title:x.n, link:x.v, grade:'', chapter:0, session:0}); l.appendChild(d);
-  });  document.getElementById('sessions-page').classList.add('active');
+function openTeachersPage(){
+  document.getElementById('sessions-page-title').textContent='معرفی اساتید';
+  document.getElementById('sessions-page-subtitle').textContent='';
+  const l=document.getElementById('sessions-list');l.innerHTML='';
+  const t=[{n:'استاد ریاضی',d:'احسان بهشتی کیا',v:'teacher_math.mp4'},{n:'استاد علوم',d:'به زودی',v:'teacher_science.mp4'},{n:'استاد فارسی',d:'به زودی',v:'teacher_farsi.mp4'},{n:'استاد انگلیسی',d:'به زودی',v:'teacher_english.mp4'}];
+  t.forEach(x=>{
+    const d=document.createElement('div');d.className='session-card';
+    d.innerHTML=`<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg></div><div class="card-info"><div class="card-title">${x.n}</div><div class="card-desc">${x.d}</div></div>`;
+    d.onclick=()=>playVideo({title:x.n,link:x.v,grade:'',chapter:0,session:0});l.appendChild(d);
+  });
+  document.getElementById('sessions-page').classList.add('active');
 }
 
-function closeSessionsPage() { document.getElementById('sessions-page').classList.remove('active'); }
-function playIntroVideo(t) { playVideo({ title: t === 'program' ? 'معرفی برنامه' : 'معرفی برنامه', link: 'intro.mp4', grade: '', chapter: 0, session: 0 }); }
+function closeSessionsPage(){document.getElementById('sessions-page').classList.remove('active');}
+function playIntroVideo(t){playVideo({title:'معرفی برنامه',link:'intro.mp4',grade:'',chapter:0,session:0});}
+// ===== پخش زنده =====
+async function createLiveStream(){
+  const grade=document.getElementById('live-grade').value;
+  const subject=document.getElementById('live-subject').value;
+  const title=document.getElementById('live-title').value;
+  const description=document.getElementById('live-description').value;
+  if(!title){showToast('موضوع را وارد کنید');return;}
+  const streamId='riazi_'+Date.now();
+  const newStream={id:streamId,grade:grade,subject:subject,title:title,description:description,createdBy:currentUser.phone,creatorName:currentUser.firstname+' '+(currentUser.lastname||''),createdAt:new Date().toISOString(),isActive:true,roomName:streamId};
+  appData.liveStreams.push(newStream);
+  await saveData();
+  document.getElementById('live-title').value='';
+  document.getElementById('live-description').value='';
+  openLiveStreamPage(newStream,true);
+}
 
-function loadChatList() {
-  const c = document.getElementById('chat-list-container'); c.innerHTML = '';
-  const td = document.createElement('div'); td.className = 'chat-item';
-  td.innerHTML = `<div class="chat-avatar"><img src="${TEACHER_ACCOUNT.avatar}" onerror="this.src='IMG_20260712_192216_220.jpg'"></div><div class="chat-info"><div class="chat-name">استاد احسان بهشتی کیا <span class="verified-badge" style="width:18px;height:18px;"></span></div><div class="chat-last">${getLastMessage(TEACHER_ACCOUNT.phone) || 'برای گفتگو کلیک کنید'}</div></div>`;
-  td.onclick = () => openPrivateChat(TEACHER_ACCOUNT.phone, 'استاد احسان بهشتی کیا', TEACHER_ACCOUNT.avatar, true); c.appendChild(td);
-  Object.keys(SUPPORT_ACCOUNTS).forEach(p => {
-    const s = SUPPORT_ACCOUNTS[p]; const d = document.createElement('div'); d.className = 'chat-item';
-    d.innerHTML = `<div class="chat-avatar"><img src="${s.avatar}" onerror="this.src='316b4205-1a5b-491e-81f7-2fc93d4fbc0f.png'"></div><div class="chat-info"><div class="chat-name">${s.firstname} ${s.lastname} <span class="verified-badge" style="width:18px;height:18px;"></span></div><div class="chat-last">${getLastMessage(p) || 'پشتیبانی برنامه'}</div></div>`;
-    d.onclick = () => openPrivateChat(p, s.firstname + ' ' + s.lastname, s.avatar, true); c.appendChild(d);
+function openLiveStreamPage(stream,isCreator){
+  currentLiveStream=stream;
+  document.getElementById('live-stream-page').classList.add('active');
+  document.getElementById('live-stream-title').textContent=stream.title;
+  document.getElementById('live-stream-subtitle').textContent=(SUBJECTS[stream.subject]?.name||stream.subject)+' - پایه '+stream.grade;
+  const camSelector=document.getElementById('camera-selector');
+  if(isCreator){
+    camSelector.classList.add('active');
+    document.getElementById('start-live-btn').style.display='flex';
+    document.getElementById('stop-live-btn').style.display='none';
+  }else{
+    camSelector.classList.remove('active');
+    document.getElementById('start-live-btn').style.display='none';
+    document.getElementById('stop-live-btn').style.display='none';
+  }
+  document.getElementById('live-badge-indicator').style.display=stream.isActive?'flex':'none';
+  document.getElementById('no-stream-msg').style.display=stream.isActive?'none':'block';
+  if(stream.isActive)joinJitsiRoom(stream.roomName,isCreator);
+}
+
+function joinLiveStream(stream){
+  if(!isVipActive(currentUser.vipClass)){showToast('برای تماشای پخش زنده باید ویژه کلاس مجازی داشته باشید');return;}
+  openLiveStreamPage(stream,false);
+}
+
+function joinJitsiRoom(roomName,isCreator){
+  const videoArea=document.getElementById('live-video-area');
+  videoArea.innerHTML='<div id="jitsi-container" style="width:100%;height:100%;"></div>';
+  const domain='meet.jit.si';
+  const options={
+    roomName:roomName,
+    parentNode:document.getElementById('jitsi-container'),
+    width:'100%',    height:'100%',
+    configOverwrite:{
+      startWithAudioMuted:!isCreator,
+      startWithVideoMuted:!isCreator,
+      disableDeepLinking:true,
+      prejoinPageEnabled:false,
+      disableProfile:true,
+      hideConferenceSubject:true,
+      disableJoinLeaveSounds:true,
+      enableClosePage:false,
+      disableThirdPartyRequests:true,
+      constraints:{video:{facingMode:currentCameraMode==='front'?'user':(currentCameraMode==='back'?'environment':undefined),height:{ideal:720,max:720},width:{ideal:1280,max:1280}}}
+    },
+    interfaceConfigOverwrite:{
+      SHOW_JITSI_WATERMARK:false,
+      SHOW_WATERMARK_FOR_GUESTS:false,
+      SHOW_BRAND_WATERMARK:false,
+      SHOW_POWERED_BY:false,
+      DISABLE_TRANSCRIPTION_SUBTITLES:true,
+      DISABLE_VIDEO_BACKGROUND:true,
+      TOOLBAR_BUTTONS:isCreator?['microphone','camera','desktop','fullscreen','hangup']:['microphone','camera','fullscreen','hangup'],
+      filmStripOnly:false,
+      DISPLAY_WELCOME_PAGE_CONTENT:false,
+      MOBILE_APP_PROMO:false,
+      HIDE_INVITE_MORE_HIGHLIGHT:true
+    },
+    userInfo:{displayName:currentUser.firstname+' '+(currentUser.lastname||''),email:currentUser.phone+'@riazi.app'}
+  };
+  try{
+    if(jitsiApi){jitsiApi.dispose();}
+    jitsiApi=new JitsiMeetExternalAPI(domain,options);
+    jitsiApi.addEventListener('videoConferenceJoined',()=>{
+      document.getElementById('live-badge-indicator').style.display='flex';
+      document.getElementById('no-stream-msg').style.display='none';
+      if(isCreator){
+        if(currentCameraMode==='screen'){setTimeout(()=>{jitsiApi.executeCommand('toggleShareScreen');},1500);}
+      }else{
+        jitsiApi.executeCommand('toggleAudio');
+        jitsiApi.executeCommand('toggleVideo');
+      }
+    });
+    jitsiApi.addEventListener('videoConferenceLeft',()=>{closeLiveStream();});
+  }catch(err){console.error('Jitsi error:',err);showToast('خطا در اتصال به پخش زنده');}
+}
+
+function switchCameraMode(mode){
+  currentCameraMode=mode;
+  document.querySelectorAll('.cam-btn').forEach(btn=>{btn.classList.toggle('active',btn.dataset.mode===mode);});
+  if(jitsiApi&&currentLiveStream&&currentLiveStream.isActive){
+    if(mode==='screen'){jitsiApi.executeCommand('toggleShareScreen');}    else{jitsiApi.executeCommand('video unmute');const facingMode=mode==='front'?'user':'environment';try{jitsiApi.executeCommand('setVideoInputDevice',facingMode);}catch(e){}}
+  }
+  showToast(mode==='front'?'دوربین جلو فعال شد':(mode==='back'?'دوربین عقب فعال شد':'ضبط صفحه فعال شد'));
+}
+
+function startLiveStream(){
+  if(!currentLiveStream)return;
+  currentLiveStream.isActive=true;
+  saveData();
+  document.getElementById('start-live-btn').style.display='none';
+  document.getElementById('stop-live-btn').style.display='flex';
+  document.getElementById('live-badge-indicator').style.display='flex';
+  joinJitsiRoom(currentLiveStream.roomName,true);
+  showToast('پخش زنده شروع شد');
+}
+
+async function stopLiveStream(){
+  if(!currentLiveStream)return;
+  if(jitsiApi){jitsiApi.dispose();jitsiApi=null;}
+  currentLiveStream.isActive=false;
+  await saveData();
+  document.getElementById('start-live-btn').style.display='flex';
+  document.getElementById('stop-live-btn').style.display='none';
+  document.getElementById('live-badge-indicator').style.display='none';
+  const videoArea=document.getElementById('live-video-area');
+  videoArea.innerHTML='<div class="no-stream" id="no-stream-msg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:60px;height:60px;color:#64748b;margin-bottom:12px;"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><div>پخش زنده متوقف شد</div></div>';
+  showToast('پخش زنده متوقف شد');
+}
+
+function closeLiveStream(){
+  if(jitsiApi){jitsiApi.dispose();jitsiApi=null;}
+  if(currentLiveStream&&currentLiveStream.isActive&&currentLiveStream.createdBy===currentUser.phone){currentLiveStream.isActive=false;saveData();}
+  currentLiveStream=null;
+  document.getElementById('live-stream-page').classList.remove('active');
+  document.getElementById('live-stream-page').classList.remove('landscape');
+  isLandscape=false;
+  const videoArea=document.getElementById('live-video-area');
+  videoArea.innerHTML='<div class="no-stream" id="no-stream-msg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:60px;height:60px;color:#64748b;margin-bottom:12px;"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><div>در انتظار شروع پخش زنده...</div></div>';
+}
+
+function toggleOrientation(){
+  isLandscape=!isLandscape;
+  document.getElementById('live-stream-page').classList.toggle('landscape',isLandscape);
+  showToast(isLandscape?'حالت افقی':'حالت عمودی');
+}
+
+function toggleFullscreen(){
+  const page=document.getElementById('live-stream-page');
+  if(!document.fullscreenElement){if(page.requestFullscreen)page.requestFullscreen();else if(page.webkitRequestFullscreen)page.webkitRequestFullscreen();}
+  else{if(document.exitFullscreen)document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen();}}
+
+function loadChatList(){
+  const c=document.getElementById('chat-list-container');c.innerHTML='';
+  const td=document.createElement('div');td.className='chat-item';
+  td.innerHTML=`<div class="chat-avatar"><img src="${TEACHER_ACCOUNT.avatar}" onerror="this.src='IMG_20260712_192216_220.jpg'"></div><div class="chat-info"><div class="chat-name">استاد احسان بهشتی کیا <span class="verified-badge" style="width:18px;height:18px;"></span></div><div class="chat-last">${getLastMessage(TEACHER_ACCOUNT.phone)||'برای گفتگو کلیک کنید'}</div></div>`;
+  td.onclick=()=>openPrivateChat(TEACHER_ACCOUNT.phone,'استاد احسان بهشتی کیا',TEACHER_ACCOUNT.avatar,true);c.appendChild(td);
+  Object.keys(SUPPORT_ACCOUNTS).forEach(p=>{
+    const s=SUPPORT_ACCOUNTS[p];const d=document.createElement('div');d.className='chat-item';
+    d.innerHTML=`<div class="chat-avatar"><img src="${s.avatar}" onerror="this.src='316b4205-1a5b-491e-81f7-2fc93d4fbc0f.png'"></div><div class="chat-info"><div class="chat-name">${s.firstname} ${s.lastname} <span class="verified-badge" style="width:18px;height:18px;"></span></div><div class="chat-last">${getLastMessage(p)||'پشتیبانی برنامه'}</div></div>`;
+    d.onclick=()=>openPrivateChat(p,s.firstname+' '+s.lastname,s.avatar,true);c.appendChild(d);
   });
 }
 
-function getLastMessage(chatId) {
-  const k1 = currentUser.phone + '-' + chatId, k2 = chatId + '-' + currentUser.phone;
-  const a = (appData.messages[k1]||[]).concat(appData.messages[k2]||[]).sort((x,y)=>new Date(y.time)-new Date(x.time));
-  if (a.length===0) return '';
-  if (a[0].type==='voice') return 'پیام صوتی'; if (a[0].type==='file') return 'فایل'; if (a[0].type==='image') return 'تصویر'; return a[0].text||'';
+function getLastMessage(chatId){
+  const k1=currentUser.phone+'-'+chatId,k2=chatId+'-'+currentUser.phone;
+  const a=(appData.messages[k1]||[]).concat(appData.messages[k2]||[]).sort((x,y)=>new Date(y.time)-new Date(x.time));
+  if(a.length===0)return '';
+  if(a[0].type==='voice')return 'پیام صوتی';if(a[0].type==='file')return 'فایل';if(a[0].type==='image')return 'تصویر';return a[0].text||'';
 }
 
-function openPrivateChat(id, name, av, isVIP) {
-  if (!isVIP && !isVipActive(currentUser.vipChat)) { showToast('ویژه چت نیاز دارید. با پشتیبانی تماس بگیرید.'); return; }
-  currentChat = { id, name, avatar: av };
-  document.getElementById('chat-header-name').innerHTML = name + (id===TEACHER_ACCOUNT.phone || SUPPORT_ACCOUNTS[id] ? ' <span class="verified-badge" style="width:18px;height:18px;"></span>' : '');
-  document.getElementById('chat-header-img').src = av;
+function openPrivateChat(id,name,av,isVIP){
+  if(!isVIP&&!isVipActive(currentUser.vipChat)){showToast('ویژه چت نیاز دارید. با پشتیبانی تماس بگیرید.');return;}
+  currentChat={id,name,avatar:av};
+  document.getElementById('chat-header-name').innerHTML=name+(id===TEACHER_ACCOUNT.phone||SUPPORT_ACCOUNTS[id]?' <span class="verified-badge" style="width:18px;height:18px;"></span>':'');
+  document.getElementById('chat-header-img').src=av;
   document.getElementById('private-chat-modal').classList.add('active');
-  cancelReply(); deleteVoicePreview();
-  if (SUPPORT_ACCOUNTS[id]) {
-    const k = currentUser.phone + '-' + id; if (!appData.messages[k]) appData.messages[k] = [];
-    if (!appData.messages[k].some(m=>m.text && m.text.includes('خوش امدید'))) {
-      appData.messages[k].push({ sender: id, type: 'text', text: 'سلام خوش امدید به برنامه آینده نگر پشتیبانی هستم برای ارتباط تماس و یا بیشتر به شماره موبایل 09904844031 تماس بگیرید و برای ارتباط چت پیام دهید در کوتاه ترین زمان به شما پاسخ خواهیم داد ممنون متشکر از شما❤', time: new Date().toISOString(), read: true });
+  cancelReply();deleteVoicePreview();
+  if(SUPPORT_ACCOUNTS[id]){
+    const k=currentUser.phone+'-'+id;if(!appData.messages[k])appData.messages[k]=[];
+    if(!appData.messages[k].some(m=>m.text&&m.text.includes('خوش امدید'))){
+      appData.messages[k].push({sender:id,type:'text',text:'سلام خوش امدید به برنامه آینده نگر پشتیبانی هستم برای ارتباط تماس و یا بیشتر به شماره موبایل 09904844031 تماس بگیرید و برای ارتباط چت پیام دهید در کوتاه ترین زمان به شما پاسخ خواهیم داد ممنون متشکر از شما❤',time:new Date().toISOString(),read:true});
       saveData();
     }
   }
   loadMessages();
 }
 
-function closePrivateChat() { document.getElementById('private-chat-modal').classList.remove('active'); currentChat = null; cancelReply(); deleteVoicePreview(); }
+function closePrivateChat(){document.getElementById('private-chat-modal').classList.remove('active');currentChat=null;cancelReply();deleteVoicePreview();}
 
-function loadMessages() {
-  const k1 = currentUser.phone + '-' + currentChat.id, k2 = currentChat.id + '-' + currentUser.phone;
-  const all = (appData.messages[k1]||[]).concat(appData.messages[k2]||[]).sort((a,b)=>new Date(a.time)-new Date(b.time));
-  const c = document.getElementById('chat-messages'); c.innerHTML = '';
-  if (all.length===0) { c.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:50px;">هنوز پیامی نیست</div>'; return; }
-  all.forEach(m => {    const d = document.createElement('div'); d.className = 'message ' + (m.sender===currentUser.phone ? 'sent' : 'received');
-    if (m.read && m.sender===currentUser.phone) d.classList.add('read');
-    let h = '';
-    if (m.replyTo) h += `<div class="message-reply">${escapeHtml(m.replyTo)}</div>`;
-    if (m.type==='text') h += `<div>${escapeHtml(m.text)}</div>`;
-    else if (m.type==='voice') { h += `<div class="message-voice"><div class="play-btn" onclick="playVoice('${m.audioData}',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div><div class="voice-info"><div class="voice-wave">`; for(let i=0;i<15;i++) h+=`<span style="height:${Math.random()*10+6}px"></span>`; h+=`</div><div class="voice-duration">${m.duration||''}</div></div></div>`; }
-    else if (m.type==='image') h += `<img class="message-image" src="${m.fileData}">`;
-    else if (m.type==='file') { const ic = m.fileName&&m.fileName.endsWith('.mp4')?'🎬':'📎'; h += `<div class="message-file"><div class="file-icon">${ic}</div><div class="file-info"><div class="file-name">${escapeHtml(m.fileName||'فایل')}</div><div class="file-size">${m.fileSize||''}</div></div></div>`; }
-    h += `<span class="message-time">${formatTime(m.time)}${m.sender===currentUser.phone?` <span class="message-status">${m.read?'✓✓':'✓'}</span>`:''}</span>`;
-    d.innerHTML = h;
-    d.addEventListener('contextmenu', e=>{e.preventDefault(); if(m.sender===currentUser.phone && confirm('حذف شود؟')) delMsg(k1,k2,m);});
+function loadMessages(){
+  const k1=currentUser.phone+'-'+currentChat.id,k2=currentChat.id+'-'+currentUser.phone;
+  const all=(appData.messages[k1]||[]).concat(appData.messages[k2]||[]).sort((a,b)=>new Date(a.time)-new Date(b.time));
+  const c=document.getElementById('chat-messages');c.innerHTML='';
+  if(all.length===0){c.innerHTML='<div style="text-align:center;color:#94a3b8;padding:50px;">هنوز پیامی نیست</div>';return;}
+  all.forEach(m=>{
+    const d=document.createElement('div');d.className='message '+(m.sender===currentUser.phone?'sent':'received');
+    if(m.read&&m.sender===currentUser.phone)d.classList.add('read');
+    let h='';
+    if(m.replyTo)h+=`<div class="message-reply" style="background:rgba(0,0,0,0.15);padding:6px 10px;border-radius:10px;margin-bottom:8px;font-size:12px;border-right:3px solid rgba(255,255,255,0.5);">${escapeHtml(m.replyTo)}</div>`;    if(m.type==='text')h+=`<div>${escapeHtml(m.text)}</div>`;
+    else if(m.type==='voice'){h+=`<div class="message-voice"><div class="play-btn" onclick="playVoice('${m.audioData}',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div><div class="voice-info"><div class="voice-wave">`;for(let i=0;i<15;i++)h+=`<span style="height:${Math.random()*10+6}px"></span>`;h+=`</div><div class="voice-duration">${m.duration||''}</div></div></div>`;}
+    else if(m.type==='image')h+=`<img class="message-image" src="${m.fileData}">`;
+    else if(m.type==='file'){const ic=m.fileName&&m.fileName.endsWith('.mp4')?'🎬':'📎';h+=`<div class="message-file"><div class="file-icon">${ic}</div><div class="file-info"><div class="file-name">${escapeHtml(m.fileName||'فایل')}</div><div class="file-size">${m.fileSize||''}</div></div></div>`;}
+    h+=`<span class="message-time">${formatTime(m.time)}${m.sender===currentUser.phone?` <span class="message-status">${m.read?'✓✓':'✓'}</span>`:''}</span>`;
+    d.innerHTML=h;
+    d.addEventListener('contextmenu',e=>{e.preventDefault();if(m.sender===currentUser.phone&&confirm('حذف شود؟'))delMsg(k1,k2,m);});
     c.appendChild(d);
   });
-  setTimeout(()=>c.scrollTop=c.scrollHeight, 50);
+  setTimeout(()=>c.scrollTop=c.scrollHeight,50);
 }
 
-async function delMsg(k1,k2,m) { if(appData.messages[k1]) appData.messages[k1]=appData.messages[k1].filter(x=>x.time!==m.time); if(appData.messages[k2]) appData.messages[k2]=appData.messages[k2].filter(x=>x.time!==m.time); await saveData(); loadMessages(); loadChatList(); }
+async function delMsg(k1,k2,m){if(appData.messages[k1])appData.messages[k1]=appData.messages[k1].filter(x=>x.time!==m.time);if(appData.messages[k2])appData.messages[k2]=appData.messages[k2].filter(x=>x.time!==m.time);await saveData();loadMessages();loadChatList();}
 
-async function sendMessage() { const i=document.getElementById('chat-message-input'); const t=i.value.trim(); if(!t) return; const k=currentUser.phone+'-'+currentChat.id; if(!appData.messages[k]) appData.messages[k]=[]; appData.messages[k].push({sender:currentUser.phone, type:'text', text:t, replyTo:currentReply?currentReply.text:null, time:new Date().toISOString(), read:false}); await saveData(); i.value=''; cancelReply(); loadMessages(); loadChatList(); }
+async function sendMessage(){const i=document.getElementById('chat-message-input');const t=i.value.trim();if(!t)return;const k=currentUser.phone+'-'+currentChat.id;if(!appData.messages[k])appData.messages[k]=[];appData.messages[k].push({sender:currentUser.phone,type:'text',text:t,replyTo:currentReply?currentReply.text:null,time:new Date().toISOString(),read:false});await saveData();i.value='';cancelReply();loadMessages();loadChatList();}
 
-async function sendFile(ev) { const f=ev.target.files[0]; if(!f||!currentChat) return; const r=new FileReader(); r.onload=async e=>{ const k=currentUser.phone+'-'+currentChat.id; if(!appData.messages[k]) appData.messages[k]=[]; const m={sender:currentUser.phone, replyTo:currentReply?currentReply.text:null, time:new Date().toISOString(), read:false}; if(f.type.startsWith('image/')){m.type='image'; m.fileData=e.target.result; m.fileName=f.name;} else{m.type='file'; m.fileData=e.target.result; m.fileName=f.name; m.fileSize=formatFileSize(f.size);} appData.messages[k].push(m); await saveData(); showToast('ارسال شد'); loadMessages(); loadChatList(); }; r.readAsDataURL(f); ev.target.value=''; }
+async function sendFile(ev){const f=ev.target.files[0];if(!f||!currentChat)return;const r=new FileReader();r.onload=async e=>{const k=currentUser.phone+'-'+currentChat.id;if(!appData.messages[k])appData.messages[k]=[];const m={sender:currentUser.phone,replyTo:currentReply?currentReply.text:null,time:new Date().toISOString(),read:false};if(f.type.startsWith('image/')){m.type='image';m.fileData=e.target.result;m.fileName=f.name;}else{m.type='file';m.fileData=e.target.result;m.fileName=f.name;m.fileSize=formatFileSize(f.size);}appData.messages[k].push(m);await saveData();showToast('ارسال شد');loadMessages();loadChatList();};r.readAsDataURL(f);ev.target.value='';}
 
-function startRecording() {
-  if(!currentChat) { showToast('ابتدا یک گفتگو انتخاب کنید'); return; }
+function startRecording(){
+  if(!currentChat){showToast('ابتدا یک گفتگو انتخاب کنید');return;}
   navigator.mediaDevices.getUserMedia({audio:true}).then(s=>{
-    mediaRecorder=new MediaRecorder(s); audioChunks=[]; recordedBlob=null;
+    mediaRecorder=new MediaRecorder(s);audioChunks=[];recordedBlob=null;
     mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
     mediaRecorder.onstop=()=>{
-      recordedBlob=new Blob(audioChunks, {type:'audio/webm'});
+      recordedBlob=new Blob(audioChunks,{type:'audio/webm'});
       document.getElementById('voice-timer').textContent=((Date.now()-recordingStartTime)/1000).toFixed(1)+' ثانیه';
       document.getElementById('voice-preview').classList.add('active');
       s.getTracks().forEach(t=>t.stop());
     };
-    mediaRecorder.start(); recordingStartTime=Date.now();
+    mediaRecorder.start();recordingStartTime=Date.now();
     document.getElementById('voice-btn').classList.add('recording');
   }).catch(()=>showToast('دسترسی میکروفون رد شد'));
 }
-function stopRecording() { if(mediaRecorder && mediaRecorder.state!=='inactive') { mediaRecorder.stop(); document.getElementById('voice-btn').classList.remove('recording'); } }
+function stopRecording(){if(mediaRecorder&&mediaRecorder.state!=='inactive'){mediaRecorder.stop();document.getElementById('voice-btn').classList.remove('recording');}}
 
 let previewAudio=null;
-function playPreviewVoice() { if(!recordedBlob) return; if(previewAudio) previewAudio.pause(); previewAudio=new Audio(URL.createObjectURL(recordedBlob)); previewAudio.play(); }
-function deleteVoicePreview() { if(previewAudio) previewAudio.pause(); recordedBlob=null; document.getElementById('voice-preview').classList.remove('active'); }
+function playPreviewVoice(){if(!recordedBlob)return;if(previewAudio)previewAudio.pause();previewAudio=new Audio(URL.createObjectURL(recordedBlob));previewAudio.play();}
+function deleteVoicePreview(){if(previewAudio)previewAudio.pause();recordedBlob=null;document.getElementById('voice-preview').classList.remove('active');}
 
-async function confirmSendVoice() {
-  if(!recordedBlob||!currentChat) return;
+async function confirmSendVoice(){
+  if(!recordedBlob||!currentChat)return;
   const r=new FileReader();
   r.onload=async e=>{
-    const k=currentUser.phone+'-'+currentChat.id; if(!appData.messages[k]) appData.messages[k]=[];
-    appData.messages[k].push({sender:currentUser.phone, type:'voice', audioData:e.target.result, duration:document.getElementById('voice-timer').textContent, replyTo:currentReply?currentReply.text:null, time:new Date().toISOString(), read:false});
-    await saveData(); deleteVoicePreview(); loadMessages(); loadChatList(); showToast('ویس ارسال شد');  }; r.readAsDataURL(recordedBlob);
+    const k=currentUser.phone+'-'+currentChat.id;if(!appData.messages[k])appData.messages[k]=[];
+    appData.messages[k].push({sender:currentUser.phone,type:'voice',audioData:e.target.result,duration:document.getElementById('voice-timer').textContent,replyTo:currentReply?currentReply.text:null,time:new Date().toISOString(),read:false});
+    await saveData();deleteVoicePreview();loadMessages();loadChatList();showToast('ویس ارسال شد');
+  };r.readAsDataURL(recordedBlob);
 }
 
-function playVoice(d, btn) { const a=new Audio(d); a.play(); const h=btn.innerHTML; btn.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>'; a.onended=()=>btn.innerHTML=h; }
-function replyToMessage(m) { currentReply=m; document.getElementById('reply-text').textContent=m.type==='voice'?'ویس':m.type==='image'?'عکس':m.text; document.getElementById('reply-preview').classList.add('active'); document.getElementById('chat-message-input').focus(); }
-function cancelReply() { currentReply=null; document.getElementById('reply-preview').classList.remove('active'); }
-function openSupportFromProfile() { openPrivateChat('09904844031', 'پشتیبان اصلی', '316b4205-1a5b-491e-81f7-2fc93d4fbc0f.png', true); }
+function playVoice(d,btn){const a=new Audio(d);a.play();const h=btn.innerHTML;btn.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>';a.onended=()=>btn.innerHTML=h;}function replyToMessage(m){currentReply=m;document.getElementById('reply-text').textContent=m.type==='voice'?'ویس':m.type==='image'?'عکس':m.text;document.getElementById('reply-preview').classList.add('active');document.getElementById('chat-message-input').focus();}
+function cancelReply(){currentReply=null;document.getElementById('reply-preview').classList.remove('active');}
+function openSupportFromProfile(){openPrivateChat('09904844031','پشتیبان اصلی','316b4205-1a5b-491e-81f7-2fc93d4fbc0f.png',true);}
 
-function openEditProfile() { document.getElementById('edit-firstname').value=currentUser.firstname||''; document.getElementById('edit-lastname').value=currentUser.lastname||''; document.getElementById('edit-school').value=currentUser.school||''; document.getElementById('edit-province').value=currentUser.province||'تهران'; document.getElementById('edit-grade').value=currentUser.grade||'هفتم'; document.getElementById('edit-age').value=currentUser.age||''; document.getElementById('edit-profile-modal').classList.add('active'); }
-function closeEditProfile() { document.getElementById('edit-profile-modal').classList.remove('active'); }
-async function saveProfile() { appData.users[currentUser.phone].firstname=document.getElementById('edit-firstname').value; appData.users[currentUser.phone].lastname=document.getElementById('edit-lastname').value; appData.users[currentUser.phone].school=document.getElementById('edit-school').value; appData.users[currentUser.phone].province=document.getElementById('edit-province').value; appData.users[currentUser.phone].grade=document.getElementById('edit-grade').value; appData.users[currentUser.phone].age=document.getElementById('edit-age').value; currentUser=appData.users[currentUser.phone]; await saveData(); loadUserData(); closeEditProfile(); showToast('پروفایل ذخیره شد'); }
+function openEditProfile(){document.getElementById('edit-firstname').value=currentUser.firstname||'';document.getElementById('edit-lastname').value=currentUser.lastname||'';document.getElementById('edit-school').value=currentUser.school||'';document.getElementById('edit-province').value=currentUser.province||'تهران';document.getElementById('edit-grade').value=currentUser.grade||'هفتم';document.getElementById('edit-age').value=currentUser.age||'';document.getElementById('edit-profile-modal').classList.add('active');}
+function closeEditProfile(){document.getElementById('edit-profile-modal').classList.remove('active');}
+async function saveProfile(){appData.users[currentUser.phone].firstname=document.getElementById('edit-firstname').value;appData.users[currentUser.phone].lastname=document.getElementById('edit-lastname').value;appData.users[currentUser.phone].school=document.getElementById('edit-school').value;appData.users[currentUser.phone].province=document.getElementById('edit-province').value;appData.users[currentUser.phone].grade=document.getElementById('edit-grade').value;appData.users[currentUser.phone].age=document.getElementById('edit-age').value;currentUser=appData.users[currentUser.phone];await saveData();loadUserData();closeEditProfile();showToast('پروفایل ذخیره شد');}
 
-function changeAvatar() { const i=document.createElement('input'); i.type='file'; i.accept='image/*'; i.onchange=async e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=async ev=>{ appData.users[currentUser.phone].avatar=ev.target.result; currentUser=appData.users[currentUser.phone]; await saveData(); loadUserData(); showToast('عکس تغییر کرد'); }; r.readAsDataURL(f); }; i.click(); }
+function changeAvatar(){const i=document.createElement('input');i.type='file';i.accept='image/*';i.onchange=async e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async ev=>{appData.users[currentUser.phone].avatar=ev.target.result;currentUser=appData.users[currentUser.phone];await saveData();loadUserData();showToast('عکس تغییر کرد');};r.readAsDataURL(f);};i.click();}
 
-function openAdminPanel() { document.getElementById('admin-page').classList.add('active'); loadUsersList(); loadActivityLogs(); }
-function closeAdminPanel() { document.getElementById('admin-page').classList.remove('active'); }
+function openAdminPanel(){document.getElementById('admin-page').classList.add('active');loadUsersList();loadActivityLogs();}
+function closeAdminPanel(){document.getElementById('admin-page').classList.remove('active');}
 
-// ایجاد پخش زنده
-async function createLiveStream() {
-  const grade = document.getElementById('live-grade').value;
-  const subject = document.getElementById('live-subject').value;
-  const title = document.getElementById('live-title').value;
-  const description = document.getElementById('live-description').value;
-  
-  if (!title) { showToast('موضوع را وارد کنید'); return; }
-  
-  const streamId = 'live_' + Date.now();
-  const newStream = {
-    id: streamId,
-    grade: grade,
-    subject: subject,
-    title: title,
-    description: description,
-    createdBy: currentUser.phone,
-    createdAt: new Date().toISOString(),
-    isActive: false,
-    roomName: 'riazi_' + streamId
-  };
-  
-  appData.liveStreams.push(newStream);
-  await saveData();
-  showToast('پخش زنده ایجاد شد');
-  document.getElementById('live-title').value = '';
-  document.getElementById('live-description').value = '';
-  
-  // باز کردن صفحه پخش زنده
-  openLiveStreamPage(newStream);
+async function addVideo(){
+  const t=document.getElementById('admin-video-type').value,g=document.getElementById('admin-grade').value,s=document.getElementById('admin-subject').value,c=parseInt(document.getElementById('admin-chapter-num').value)||1,sn=parseInt(document.getElementById('admin-session-num').value)||0,ti=document.getElementById('admin-video-title').value,l=document.getElementById('admin-video-link').value,d=document.getElementById('admin-video-desc').value;
+  if(!ti||!l)return showToast('عنوان و لینک الزامی است');
+  appData.videos.push({type:t,grade:g,subject:s,chapter:c,session:sn,title:ti,link:l,description:d,isLive:t==='live',addedBy:currentUser.phone,addedAt:new Date().toISOString()});
+  await saveData();showToast('اضافه شد');document.getElementById('admin-video-title').value='';document.getElementById('admin-video-link').value='';document.getElementById('admin-video-desc').value='';
 }
 
-function openLiveStreamPage(stream) {  document.getElementById('live-stream-page').classList.add('active');
-  document.getElementById('live-stream-page').dataset.streamId = stream.id;
-  document.getElementById('start-live-btn').style.display = 'inline-block';
-  document.getElementById('stop-live-btn').style.display = 'none';
-  document.getElementById('live-badge').classList.remove('active');
-}
-
-async function startLiveStream() {
-  const streamId = document.getElementById('live-stream-page').dataset.streamId;
-  const stream = appData.liveStreams.find(s => s.id === streamId);
-  if (!stream) return;
-  
-  try {
-    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    const video = document.getElementById('live-video');
-    video.srcObject = localStream;
-    
-    stream.isActive = true;
-    await saveData();
-    
-    document.getElementById('start-live-btn').style.display = 'none';
-    document.getElementById('stop-live-btn').style.display = 'inline-block';
-    document.getElementById('live-badge').classList.add('active');
-    
-    showToast('پخش زنده شروع شد');
-  } catch (err) {
-    showToast('دسترسی به دوربین رد شد');
-  }
-}
-
-async function stopLiveStream() {
-  const streamId = document.getElementById('live-stream-page').dataset.streamId;
-  const stream = appData.liveStreams.find(s => s.id === streamId);
-  if (!stream) return;
-  
-  if (localStream) {
-    localStream.getTracks().forEach(track => track.stop());
-    localStream = null;
-  }
-  
-  stream.isActive = false;
-  await saveData();
-  
-  document.getElementById('start-live-btn').style.display = 'inline-block';
-  document.getElementById('stop-live-btn').style.display = 'none';
-  document.getElementById('live-badge').classList.remove('active');
-  
-  showToast('پخش زنده متوقف شد');
-}
-function closeLiveStream() {
-  if (localStream) {
-    localStream.getTracks().forEach(track => track.stop());
-    localStream = null;
-  }
-  document.getElementById('live-stream-page').classList.remove('active');
-}
-
-function joinLiveStream(stream) {
-  // استفاده از Jitsi Meet برای پخش زنده
-  const roomName = stream.roomName || 'riazi_' + stream.id;
-  const jitsiUrl = `https://meet.jit.si/${roomName}`;
-  window.open(jitsiUrl, '_blank');
-}
-
-async function addVideo() {
-  const t=document.getElementById('admin-video-type').value, g=document.getElementById('admin-grade').value, s=document.getElementById('admin-subject').value, c=parseInt(document.getElementById('admin-chapter-num').value)||1, sn=parseInt(document.getElementById('admin-session-num').value)||0, ti=document.getElementById('admin-video-title').value, l=document.getElementById('admin-video-link').value, d=document.getElementById('admin-video-desc').value;
-  if(!ti||!l) return showToast('عنوان و لینک الزامی است');
-  appData.videos.push({type:t, grade:g, subject:s, chapter:c, session:sn, title:ti, link:l, description:d, isLive:t==='live', addedBy:currentUser.phone, addedAt:new Date().toISOString()});
-  await saveData(); showToast('اضافه شد'); document.getElementById('admin-video-title').value=''; document.getElementById('admin-video-link').value=''; document.getElementById('admin-video-desc').value='';
-}
-
-function loadUsersList() {
-  const c=document.getElementById('users-list-container'); c.innerHTML='';
+function loadUsersList(){
+  const c=document.getElementById('users-list-container');c.innerHTML='';
   const u=Object.values(appData.users).filter(x=>!x.isTeacher&&!x.isSupport);
-  if(u.length===0) { c.innerHTML='<div style="text-align:center;color:#64748b;padding:30px;">کاربری نیست</div>'; return; }
+  if(u.length===0){c.innerHTML='<div style="text-align:center;color:#64748b;padding:30px;">کاربری نیست</div>';return;}
   u.forEach(user=>{
-    const d=document.createElement('div'); d.className='user-list-item';
-    let b=''; if(user.banned) b=user.banUntil==='permanent'?'<div class="ban-status">دائمی</div>':(user.banUntil&&new Date(user.banUntil)>new Date()?'<div class="ban-status">مسدود</div>':'');
+    const d=document.createElement('div');d.className='user-list-item';
+    let b='';if(user.banned)b=user.banUntil==='permanent'?'<div class="ban-status">دائمی</div>':(user.banUntil&&new Date(user.banUntil)>new Date()?'<div class="ban-status">مسدود</div>':'');
     d.innerHTML=`<div class="user-info-admin"><div class="user-avatar-admin">${(user.firstname||'?')[0]}</div><div class="user-details"><h4>${user.firstname||''} ${user.lastname||''}</h4><p>${user.phone} | ${user.grade||'-'}</p>${b}</div></div><div class="user-actions"><button class="vip" onclick="openVipModal('${user.phone}')">ویژه</button><button class="msg" onclick="openAdminChat('${user.phone}','${user.firstname||''}','${user.avatar||''}')">پیام</button><button class="ban" onclick="openBanModal('${user.phone}')">${user.banned?'رفع بن':'بن'}</button></div>`;
     c.appendChild(d);
   });
 }
 
-function openBanModal(p) {
-  const u=appData.users[p]; if(u&&u.banned) { if(confirm('رفع بن شود؟')) { u.banned=false; delete u.banUntil; delete u.banReason; saveData(); loadUsersList(); } return; }
-  banTargetPhone=p; document.getElementById('ban-modal').classList.add('active');
+function openBanModal(p){
+  const u=appData.users[p];if(u&&u.banned){if(confirm('رفع بن شود؟')){u.banned=false;delete u.banUntil;delete u.banReason;saveData();loadUsersList();}return;}
+  banTargetPhone=p;document.getElementById('ban-modal').classList.add('active');
 }
-function closeBanModal() { document.getElementById('ban-modal').classList.remove('active'); banTargetPhone=null; }
-async function confirmBan() {
-  if(!banTargetPhone) return;
-  const dur=document.getElementById('ban-duration').value, r=document.getElementById('ban-reason').value.trim();
-  if(!r) return showToast('دلیل الزامی است');
-  if(appData.users[banTargetPhone]) { appData.users[banTargetPhone].banned=true; appData.users[banTargetPhone].banReason=r; appData.users[banTargetPhone].banUntil=dur==='permanent'?'permanent':new Date(Date.now()+parseInt(dur)*86400000).toISOString(); await saveData(); loadUsersList(); }
+function closeBanModal(){document.getElementById('ban-modal').classList.remove('active');banTargetPhone=null;}
+async function confirmBan(){
+  if(!banTargetPhone)return;
+  const dur=document.getElementById('ban-duration').value,r=document.getElementById('ban-reason').value.trim();
+  if(!r)return showToast('دلیل الزامی است');
+  if(appData.users[banTargetPhone]){appData.users[banTargetPhone].banned=true;appData.users[banTargetPhone].banReason=r;appData.users[banTargetPhone].banUntil=dur==='permanent'?'permanent':new Date(Date.now()+parseInt(dur)*86400000).toISOString();await saveData();loadUsersList();}
   closeBanModal();
 }
 
-function openVipModal(p) { vipTargetPhone=p; document.getElementById('vip-modal').classList.add('active'); }
-function closeVipModal() { document.getElementById('vip-modal').classList.remove('active'); vipTargetPhone=null; }
-async function confirmVip() {  if(!vipTargetPhone) return;
-  const t=document.getElementById('vip-type').value, d=document.getElementById('vip-duration').value;
-  if(appData.users[vipTargetPhone]) {
-    let e = d==='unlimited'?'unlimited':new Date(Date.now()+parseInt(d)*86400000).toISOString();
+function openVipModal(p){vipTargetPhone=p;document.getElementById('vip-modal').classList.add('active');}
+function closeVipModal(){document.getElementById('vip-modal').classList.remove('active');vipTargetPhone=null;}
+async function confirmVip(){
+  if(!vipTargetPhone)return;
+  const t=document.getElementById('vip-type').value,d=document.getElementById('vip-duration').value;  if(appData.users[vipTargetPhone]){
+    let e=d==='unlimited'?'unlimited':new Date(Date.now()+parseInt(d)*86400000).toISOString();
     appData.users[vipTargetPhone][t]=e;
-    await saveData(); showToast('ویژه اعمال شد');
-  } closeVipModal();
+    await saveData();showToast('ویژه اعمال شد');
+  }closeVipModal();
 }
 
-function openAdminChat(p,n,a) { adminChatTarget={phone:p, name:n, avatar:a}; document.getElementById('admin-chat-name').textContent=n; document.getElementById('admin-chat-img').src=a||'default.png'; document.getElementById('admin-chat-modal').classList.add('active'); loadAdminMessages(); }
-function closeAdminChat() { document.getElementById('admin-chat-modal').classList.remove('active'); adminChatTarget=null; }
-function loadAdminMessages() {
-  if(!adminChatTarget) return;
-  const k1=adminChatTarget.phone+'-'+currentUser.phone, k2=currentUser.phone+'-'+adminChatTarget.phone;
+function openAdminChat(p,n,a){adminChatTarget={phone:p,name:n,avatar:a};document.getElementById('admin-chat-name').textContent=n;document.getElementById('admin-chat-img').src=a||'default.png';document.getElementById('admin-chat-modal').classList.add('active');loadAdminMessages();}
+function closeAdminChat(){document.getElementById('admin-chat-modal').classList.remove('active');adminChatTarget=null;}
+function loadAdminMessages(){
+  if(!adminChatTarget)return;
+  const k1=adminChatTarget.phone+'-'+currentUser.phone,k2=currentUser.phone+'-'+adminChatTarget.phone;
   const a=(appData.messages[k1]||[]).concat(appData.messages[k2]||[]).sort((x,y)=>new Date(x.time)-new Date(y.time));
-  const c=document.getElementById('admin-chat-messages'); c.innerHTML='';
-  if(a.length===0) { c.innerHTML='<div style="text-align:center;color:#94a3b8;padding:50px;">پیامی نیست</div>'; return; }
+  const c=document.getElementById('admin-chat-messages');c.innerHTML='';
+  if(a.length===0){c.innerHTML='<div style="text-align:center;color:#94a3b8;padding:50px;">پیامی نیست</div>';return;}
   a.forEach(m=>{
-    const d=document.createElement('div'); d.className='message '+(m.sender===currentUser.phone?'sent':'received');
-    let h=''; if(m.replyTo) h+=`<div class="message-reply">${escapeHtml(m.replyTo)}</div>`;
-    if(m.type==='text') h+=`<div>${escapeHtml(m.text)}</div>`;
-    else if(m.type==='voice') h+='<div class="message-voice"><div class="play-btn" onclick="playVoice(\''+m.audioData+'\',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div><div class="voice-info"><div class="voice-wave"></div><div class="voice-duration">'+(m.duration||'')+'</div></div></div>';
-    else if(m.type==='image') h+=`<img class="message-image" src="${m.fileData}">`;
-    else if(m.type==='file') h+=`<div class="message-file"><div class="file-icon">📎</div><div class="file-info"><div class="file-name">${escapeHtml(m.fileName||'')}</div></div></div>`;
+    const d=document.createElement('div');d.className='message '+(m.sender===currentUser.phone?'sent':'received');
+    let h='';if(m.replyTo)h+=`<div class="message-reply">${escapeHtml(m.replyTo)}</div>`;
+    if(m.type==='text')h+=`<div>${escapeHtml(m.text)}</div>`;
+    else if(m.type==='voice')h+='<div class="message-voice"><div class="play-btn" onclick="playVoice(\''+m.audioData+'\',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div><div class="voice-info"><div class="voice-wave"></div><div class="voice-duration">'+(m.duration||'')+'</div></div></div>';
+    else if(m.type==='image')h+=`<img class="message-image" src="${m.fileData}">`;
+    else if(m.type==='file')h+=`<div class="message-file"><div class="file-icon">📎</div><div class="file-info"><div class="file-name">${escapeHtml(m.fileName||'')}</div></div></div>`;
     h+=`<span class="message-time">${formatTime(m.time)}</span>`;
-    d.innerHTML=h; c.appendChild(d);
-  }); c.scrollTop=c.scrollHeight;
+    d.innerHTML=h;c.appendChild(d);
+  });c.scrollTop=c.scrollHeight;
 }
-async function sendAdminMessage() { const i=document.getElementById('admin-chat-input'); const t=i.value.trim(); if(!t||!adminChatTarget) return; const k=currentUser.phone+'-'+adminChatTarget.phone; if(!appData.messages[k]) appData.messages[k]=[]; appData.messages[k].push({sender:currentUser.phone, type:'text', text:t, time:new Date().toISOString(), read:false}); await saveData(); i.value=''; loadAdminMessages(); }
-async function sendAdminFile(ev) { const f=ev.target.files[0]; if(!f||!adminChatTarget) return; const r=new FileReader(); r.onload=async e=>{ const k=currentUser.phone+'-'+adminChatTarget.phone; if(!appData.messages[k]) appData.messages[k]=[]; const m={sender:currentUser.phone, time:new Date().toISOString(), read:false}; if(f.type.startsWith('image/')){m.type='image'; m.fileData=e.target.result; m.fileName=f.name;} else{m.type='file'; m.fileData=e.target.result; m.fileName=f.name; m.fileSize=formatFileSize(f.size);} appData.messages[k].push(m); await saveData(); loadAdminMessages(); }; r.readAsDataURL(f); ev.target.value=''; }
+async function sendAdminMessage(){const i=document.getElementById('admin-chat-input');const t=i.value.trim();if(!t||!adminChatTarget)return;const k=currentUser.phone+'-'+adminChatTarget.phone;if(!appData.messages[k])appData.messages[k]=[];appData.messages[k].push({sender:currentUser.phone,type:'text',text:t,time:new Date().toISOString(),read:false});await saveData();i.value='';loadAdminMessages();}
+async function sendAdminFile(ev){const f=ev.target.files[0];if(!f||!adminChatTarget)return;const r=new FileReader();r.onload=async e=>{const k=currentUser.phone+'-'+adminChatTarget.phone;if(!appData.messages[k])appData.messages[k]=[];const m={sender:currentUser.phone,time:new Date().toISOString(),read:false};if(f.type.startsWith('image/')){m.type='image';m.fileData=e.target.result;m.fileName=f.name;}else{m.type='file';m.fileData=e.target.result;m.fileName=f.name;m.fileSize=formatFileSize(f.size);}appData.messages[k].push(m);await saveData();loadAdminMessages();};r.readAsDataURL(f);ev.target.value='';}
 
-function loadActivityLogs() { const c=document.getElementById('activity-logs'); const a=appData.activity_logs.slice(-10).reverse(); if(a.length===0) { c.innerHTML='<div style="color:#64748b;padding:20px;">ثبت نشده</div>'; return; } let h=''; a.forEach(l=>{h+=`<div style="padding:10px;border-bottom:1px solid #e2e8f0;font-size:12px;"><div style="font-weight:700">${l.phone}</div><div>${l.action}</div><div style="color:#94a3b8">${formatTime(l.time)}</div></div>`;}); c.innerHTML=h; }
-function logout() { localStorage.removeItem('riazi_current'); window.location.reload(); }
+function loadActivityLogs(){const c=document.getElementById('activity-logs');const a=appData.activity_logs.slice(-10).reverse();if(a.length===0){c.innerHTML='<div style="color:#64748b;padding:20px;">ثبت نشده</div>';return;}let h='';a.forEach(l=>{h+=`<div style="padding:10px;border-bottom:1px solid #e2e8f0;font-size:12px;"><div style="font-weight:700">${l.phone}</div><div>${l.action}</div><div style="color:#94a3b8">${formatTime(l.time)}</div></div>`;});c.innerHTML=h;}
+function logout(){localStorage.removeItem('riazi_current');window.location.reload();}
 
-function switchTab(tab) {
-  if(tab==='chat' && !isVipActive(currentUser.vipChat)) { showToast('ویژه چت نیاز دارید'); return; }
-  if(tab==='virtual-class' && !isVipActive(currentUser.vipClass)) { showToast('ویژه کلاس نیاز دارید'); return; }
+function switchTab(tab){
+  if(tab==='chat'&&!isVipActive(currentUser.vipChat)){showToast('ویژه چت نیاز دارید');return;}
+  if(tab==='virtual-class'&&!isVipActive(currentUser.vipClass)){showToast('ویژه کلاس نیاز دارید');return;}
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  const map={home:0,'virtual-class':1,chat:2,store:3,profile:4}; if(map[tab]!==undefined) document.querySelectorAll('.nav-item')[map[tab]].classList.add('active');
-  document.querySelectorAll('.content-section').forEach(s=>s.classList.remove('active')); document.getElementById(tab+'-section').classList.add('active');
-  if(tab==='store') loadStore(); if(tab==='chat') loadChatList();
+  const map={home:0,'virtual-class':1,chat:2,store:3,profile:4};if(map[tab]!==undefined)document.querySelectorAll('.nav-item')[map[tab]].classList.add('active');
+  document.querySelectorAll('.content-section').forEach(s=>s.classList.remove('active'));document.getElementById(tab+'-section').classList.add('active');
+  if(tab==='store')loadStore();if(tab==='chat')loadChatList();
 }
 
-function loadStore() {
-  const c=document.getElementById('vip-packages-container'); c.innerHTML='';
+function loadStore(){
+  const c=document.getElementById('vip-packages-container');c.innerHTML='';
   VIP_PACKAGES.forEach(p=>{
-    const is=isVipActive(currentUser[p.id]); let f=''; p.features.forEach(x=>f+=`<li>${x}</li>`);
+    const is=isVipActive(currentUser[p.id]);let f='';p.features.forEach(x=>f+=`<li>${x}</li>`);
     c.innerHTML+=`<div class="vip-package"><div class="vip-package-header"><div class="vip-package-icon"><img src="${p.icon}"></div><div class="vip-package-title"><h3>${p.name} - ${p.durationText}</h3><p>${p.description}</p></div></div><div class="vip-package-price"><span class="price">${formatPrice(p.price)}</span><span class="currency">تومان</span></div><ul class="vip-package-features">${f}</ul><button class="btn-buy-vip" onclick="buyVip('${p.id}')" ${is?'disabled':''}>${is?'✓ فعال':'خرید ویژه'}</button></div>`;
   });
-}async function buyVip(id) { const p=VIP_PACKAGES.find(x=>x.id===id); if(!p) return; if(confirm('خرید '+p.name+' به مبلغ '+formatPrice(p.price)+'؟')) { const d=new Date(); d.setDate(d.getDate()+p.duration); appData.users[currentUser.phone][id]=d.toISOString(); currentUser=appData.users[currentUser.phone]; await saveData(); loadUserData(); loadStore(); showToast('✅ خرید شد'); } }
-function playVideo(v) { if(!isVipActive(currentUser.vipDownload) && !isVipActive(currentUser.vipClass) && !isVipActive(currentUser.vipChat)) { showToast('نیاز به ویژه دارید'); return; } document.getElementById('video-modal-title').textContent=v.title; document.getElementById('video-info-title').textContent=v.title; document.getElementById('video-info-desc').textContent=v.description||''; document.getElementById('video-player').querySelector('source').src=v.link; document.getElementById('video-player').load(); document.getElementById('video-modal').classList.add('active'); }
-function closeVideo() { document.getElementById('video-player').pause(); document.getElementById('video-modal').classList.remove('active'); }
+}
+async function buyVip(id){const p=VIP_PACKAGES.find(x=>x.id===id);if(!p)return;if(confirm('خرید '+p.name+' به مبلغ '+formatPrice(p.price)+'؟')){const d=new Date();d.setDate(d.getDate()+p.duration);appData.users[currentUser.phone][id]=d.toISOString();currentUser=appData.users[currentUser.phone];await saveData();loadUserData();loadStore();showToast('✅ خرید شد');}}
+function playVideo(v){if(!isVipActive(currentUser.vipDownload)&&!isVipActive(currentUser.vipClass)&&!isVipActive(currentUser.vipChat)){showToast('نیاز به ویژه دارید');return;}document.getElementById('video-modal-title').textContent=v.title;document.getElementById('video-info-title').textContent=v.title;document.getElementById('video-info-desc').textContent=v.description||'';document.getElementById('video-player').querySelector('source').src=v.link;document.getElementById('video-player').load();document.getElementById('video-modal').classList.add('active');}function closeVideo(){document.getElementById('video-player').pause();document.getElementById('video-modal').classList.remove('active');}
 
-window.onload = init;
+window.onload=init;
 </script>
 </body>
 </html>
