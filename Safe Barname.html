@@ -410,16 +410,41 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 <div class="sync-indicator" id="sync-indicator">🔄 همگام‌سازی...</div>
 
 <script>
-const JSONBIN_CONFIG={MASTER_KEY:'$2a$10$G8pgSWnFz4w/.voj3lfBPuJL7luRXAXiR/fIufC3YIB4.qRkZSjSS',BIN_ID:'6a53f4c8f5f4af5e298541fe',BASE_URL:'https://api.jsonbin.io/v3/b'};
-const TEACHER_ACCOUNT={phone:'09904844001',password:'Par1617230',firstname:'احسان',lastname:'بهشتی کیا',isTeacher:true,isSupport:true,avatar:'IMG_20260712_192216_220.jpg'};
-const SUPPORT_ACCOUNTS={'09904844031':{firstname:'پشتیبان',lastname:'اصلی',isSupport:true,avatar:'316b4205-1a5b-491e-81f7-2fc93d4fbc0f.png'}};
+// ===== تنظیمات JSONBin =====
+const JSONBIN_CONFIG={
+  MASTER_KEY:'$2a$10$G8pgSWnFz4w/.voj3lfBPuJL7luRXAXiR/fIufC3YIB4.qRkZSjSS',
+  BIN_ID:'6a53f4c8f5f4af5e298541fe',
+  BASE_URL:'https://api.jsonbin.io/v3/b'
+};
+
+// ===== اکانت‌های ثابت =====
+const TEACHER_ACCOUNT={
+  phone:'09904844001',
+  password:'Par1617230',
+  firstname:'احسان',
+  lastname:'بهشتی کیا',
+  isTeacher:true,
+  isSupport:true,
+  avatar:'IMG_20260712_192216_220.jpg'
+};
+
+const SUPPORT_ACCOUNTS={
+  '09904844031':{
+    firstname:'پشتیبان',
+    lastname:'اصلی',
+    isSupport:true,
+    avatar:'316b4205-1a5b-491e-81f7-2fc93d4fbc0f.png'
+  }
+};
+
 const VIP_PACKAGES=[
   {id:'vipDownload',name:'ویژه دانلود',description:'امکان دانلود ویدیوهای آموزشی',price:25000,duration:30,durationText:'1 ماه',icon:'InShot_20260618_223059887.png',features:['دانلود نامحدود ویدیوها','دسترسی آفلاین','کیفیت Full HD','ذخیره در دستگاه']},
-  {id:'vipChat',name:'ویژه چت',description:'دسترسی به بخش چت با استاد و پشتیبانی',price:50000,duration:30,durationText:'1 ماه',icon:'InShot_20260618_223001651.png',features:['چت با استاد احسان','پشتیبانی 24 ساعته','ارسال فایل و ویس','پاسخگویی سریع']},
-  {id:'vipClass',name:'ویژه کلاس مجازی',description:'شرکت در کلاس‌های مجازی زنده',price:100000,duration:30,durationText:'1 ماه',icon:'InShot_20260618_222940843.png',features:['کلاس‌های زنده هفتگی','پرسش و پاسخ مستقیم','جزوات اختصاصی','آزمون‌های آنلاین']}
+  {id:'vipChat',name:'ویژه چت',description:'دسترسی به بخش چت با استاد و پشتیبانی',price:50000,duration:30,durationText:'1 ماه',icon:'InShot_20260618_223001651.png',features:['چت با استاد احسان','پشتیبانی 24 ساعته','ارسال فایل و ویس','پاسخگویی سریع']},  {id:'vipClass',name:'ویژه کلاس مجازی',description:'شرکت در کلاس‌های مجازی زنده',price:100000,duration:30,durationText:'1 ماه',icon:'InShot_20260618_222940843.png',features:['کلاس‌های زنده هفتگی','پرسش و پاسخ مستقیم','جزوات اختصاصی','آزمون‌های آنلاین']}
 ];
+
 const SUBJECTS={'math':{name:'ریاضی',lessons:8},'science':{name:'علوم',lessons:13},'english':{name:'انگلیسی',lessons:8},'farsi':{name:'فارسی',lessons:20}};
 
+// ===== متغیرهای سراسری =====
 let currentUser=null,currentChat=null,currentReply=null,mediaRecorder=null,audioChunks=[],recordingStartTime=null,recordedBlob=null,banTargetPhone=null,vipTargetPhone=null;
 let appData={users:{},videos:[],messages:{},activity_logs:[],liveStreams:[]};
 let isSaving=false,pendingSave=false,syncInterval=null;
@@ -427,19 +452,23 @@ let lastSyncHash='';
 let isSyncing=false;
 let lastVirtualGrade=null,lastVirtualSubject=null;
 let activeMessageActions=null;
+let syncCount=0;
 
+// ===== تابع ساخت کلید چت یکسان =====
 function getChatKey(phone1,phone2){
   const sorted=[phone1,phone2].sort();
   return sorted[0]+'-'+sorted[1];
 }
 
+// ===== دریافت تمام چت‌های کاربر =====
 function getMyConversations(){
   if(!currentUser)return [];
   const conversations={};
   
   Object.keys(appData.messages).forEach(key=>{
     const parts=key.split('-');
-    if(parts.length<2)return;    
+    if(parts.length<2)return;
+    
     if(parts.includes(currentUser.phone)){
       const otherPhone=parts.find(p=>p!==currentUser.phone);
       const msgs=appData.messages[key]||[];
@@ -459,22 +488,30 @@ function getMyConversations(){
     }
   });
   
-  return Object.values(conversations).sort((a,b)=>new Date(b.lastMsg.time)-new Date(a.lastMsg.time));
-}
+  return Object.values(conversations).sort((a,b)=>new Date(b.lastMsg.time)-new Date(a.lastMsg.time));}
 
+// ===== Sync با سرور - بهبود یافته =====
 async function syncWithServer(forceRefresh=false){
   if(isSyncing)return;
   isSyncing=true;
+  
   try{
     const timestamp=Date.now();
     const res=await fetch(`${JSONBIN_CONFIG.BASE_URL}/${JSONBIN_CONFIG.BIN_ID}/latest?t=${timestamp}`,{
       method:'GET',
-      headers:{'X-Master-Key':JSONBIN_CONFIG.MASTER_KEY,'Cache-Control':'no-cache,no-store,must-revalidate','Pragma':'no-cache'},
+      headers:{
+        'X-Master-Key':JSONBIN_CONFIG.MASTER_KEY,
+        'Cache-Control':'no-cache,no-store,must-revalidate',
+        'Pragma':'no-cache'
+      },
       cache:'no-store'
     });
+    
     if(!res.ok)throw new Error('HTTP '+res.status);
+    
     const data=await res.json();
     const serverData=data.record||{};
+    
     if(!serverData.users)serverData.users={};
     if(!serverData.videos)serverData.videos=[];
     if(!serverData.messages)serverData.messages={};
@@ -487,8 +524,10 @@ async function syncWithServer(forceRefresh=false){
       lastSyncHash=newHash;
       appData=serverData;
       saveToLocalStorage(appData);
+      
       if(currentUser&&appData.users[currentUser.phone]){
-        currentUser=appData.users[currentUser.phone];      }
+        currentUser=appData.users[currentUser.phone];
+      }
       
       const indicator=document.getElementById('sync-indicator');
       indicator.classList.add('show');
@@ -498,8 +537,7 @@ async function syncWithServer(forceRefresh=false){
     }
   }catch(e){
     console.log('Sync error:',e.message);
-  }finally{
-    isSyncing=false;
+  }finally{    isSyncing=false;
   }
 }
 
@@ -537,7 +575,8 @@ function updateChatBadge(){
     badge.style.display='flex';
   }else{
     badge.style.display='none';
-  }}
+  }
+}
 
 function markReceivedMessagesAsRead(){
   if(!currentChat||!currentUser)return;
@@ -547,8 +586,7 @@ function markReceivedMessagesAsRead(){
     appData.messages[key].forEach(m=>{
       if(m.sender===currentChat.id&&!m.read){
         m.read=true;
-        changed=true;
-      }
+        changed=true;      }
     });
   }
   if(changed){
@@ -558,19 +596,25 @@ function markReceivedMessagesAsRead(){
 
 function startSync(){
   if(syncInterval)clearInterval(syncInterval);
-  syncInterval=setInterval(()=>syncWithServer(),1500);
+  syncInterval=setInterval(()=>syncWithServer(),2000);
   syncWithServer(true);
 }
 
+// ===== ذخیره در JSONBin =====
 async function saveToJSONBin(data){
   try{
     const res=await fetch(JSONBIN_CONFIG.BASE_URL+'/'+JSONBIN_CONFIG.BIN_ID,{
       method:'PUT',
-      headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_CONFIG.MASTER_KEY,'Cache-Control':'no-cache,no-store,must-revalidate'},
+      headers:{
+        'Content-Type':'application/json',
+        'X-Master-Key':JSONBIN_CONFIG.MASTER_KEY,
+        'Cache-Control':'no-cache,no-store,must-revalidate'
+      },
       body:JSON.stringify(data)
     });
     return res.ok;
   }catch(e){
+    console.error('Save error:',e);
     saveToLocalStorage(data);
     return false;
   }
@@ -586,27 +630,36 @@ function getLocalStorageData(){
   };
 }
 
-function saveToLocalStorage(data){  localStorage.setItem('riazi_users',JSON.stringify(data.users||{}));
+function saveToLocalStorage(data){
+  localStorage.setItem('riazi_users',JSON.stringify(data.users||{}));
   localStorage.setItem('riazi_videos',JSON.stringify(data.videos||[]));
   localStorage.setItem('riazi_messages',JSON.stringify(data.messages||{}));
   localStorage.setItem('riazi_activity_logs',JSON.stringify(data.activity_logs||[]));
-  localStorage.setItem('riazi_liveStreams',JSON.stringify(data.liveStreams||[]));
-}
+  localStorage.setItem('riazi_liveStreams',JSON.stringify(data.liveStreams||[]));}
 
+// ===== ذخیره داده‌ها - بهبود یافته =====
 async function saveData(){
   saveToLocalStorage(appData);
+  
   if(isSaving){
     pendingSave=true;
     return;
   }
+  
   isSaving=true;
-  await saveToJSONBin(appData);
+  const success=await saveToJSONBin(appData);
   isSaving=false;
+  
+  if(success){
+    lastSyncHash=JSON.stringify(appData);
+  }
+  
   if(pendingSave){
     pendingSave=false;
     await saveData();
   }
-  lastSyncHash=JSON.stringify(appData);
+  
+  // Sync فوری بعد از save
   await syncWithServer(true);
 }
 
@@ -628,19 +681,23 @@ function escapeHtml(t){const d=document.createElement('div');d.textContent=t;ret
 function formatFileSize(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB';}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
+// ===== مقداردهی اولیه =====
 async function init(){
   const phone=localStorage.getItem('riazi_current');
-  if(!phone){window.location.href='index.html';return;}
+  if(!phone){window.location.href='index.html';return;}  
   appData=getLocalStorageData();
   currentUser=appData.users[phone];
+  
   if(!currentUser){
     await syncWithServer(true);
-    currentUser=appData.users[phone];    if(!currentUser){
+    currentUser=appData.users[phone];
+    if(!currentUser){
       localStorage.removeItem('riazi_current');
       window.location.href='index.html';
       return;
     }
   }
+  
   if(currentUser.banned){
     if(currentUser.banUntil==='permanent'||(currentUser.banUntil&&new Date(currentUser.banUntil)>new Date())){
       showToast('حساب مسدود شده: '+(currentUser.banReason||''));
@@ -655,9 +712,12 @@ async function init(){
       currentUser=appData.users[phone];
     }
   }
+  
+  // ایجاد اکانت استاد و پشتیبانی اگر وجود ندارند
   if(!appData.users[TEACHER_ACCOUNT.phone]){
     appData.users[TEACHER_ACCOUNT.phone]={...TEACHER_ACCOUNT,grade:'همه',age:'30',school:'آموزشگاه',province:'تهران',contact:TEACHER_ACCOUNT.phone,isTeacher:true,isSupport:true,vipDownload:'unlimited',vipChat:'unlimited',vipClass:'unlimited',registeredAt:new Date().toISOString()};
   }
+  
   for(const p in SUPPORT_ACCOUNTS){
     if(!appData.users[p]){
       appData.users[p]={...SUPPORT_ACCOUNTS[p],grade:'همه',age:'25',school:'پشتیبانی',province:'تهران',contact:p,password:'123456789',isSupport:true,vipDownload:'unlimited',vipChat:'unlimited',vipClass:'unlimited',registeredAt:new Date().toISOString()};
@@ -668,16 +728,18 @@ async function init(){
       appData.users[p].vipClass='unlimited';
     }
   }
+  
   if(!currentUser.vipDownloadGiven){
     const d=new Date();d.setDate(d.getDate()+3);
     appData.users[phone].vipDownload=d.toISOString();
     appData.users[phone].vipDownloadGiven=true;
-  }
+  }  
   if(!currentUser.vipChatGiven){
     const d=new Date();d.setDate(d.getDate()+3);
     appData.users[phone].vipChat=d.toISOString();
     appData.users[phone].vipChatGiven=true;
   }
+  
   loadUserData();
   loadChatList();
   loadStore();
@@ -685,6 +747,7 @@ async function init(){
   saveData();
   startSync();
 }
+
 function loadUserData(){
   const name=currentUser.firstname+' '+(currentUser.lastname||'');
   document.getElementById('header-user-name').textContent=currentUser.firstname;
@@ -719,7 +782,6 @@ function selectHomeGrade(g){
   });
   document.getElementById('sessions-page').classList.add('active');
 }
-
 function showLessons(g,k){
   const s=SUBJECTS[k];
   document.getElementById('sessions-page-title').textContent=s.name+' - پایه '+g;
@@ -734,6 +796,7 @@ function showLessons(g,k){
     l.appendChild(d);
   }
 }
+
 function showSessions(g,k,lessonNum){
   const s=SUBJECTS[k];
   document.getElementById('sessions-page-title').textContent=s.name+' - درس '+lessonNum;
@@ -768,8 +831,7 @@ function selectVirtualGrade(g){
     d.innerHTML=`<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253"/></svg></div><div class="card-info"><div class="card-title">${s.name}</div><div class="card-desc">کلاس‌های زنده و ضبط شده</div></div>`;
     d.onclick=()=>showVirtualSubjectOptions(g,k);
     l.appendChild(d);
-  });
-  document.getElementById('sessions-page').classList.add('active');
+  });  document.getElementById('sessions-page').classList.add('active');
 }
 
 function showVirtualSubjectOptions(g,k){
@@ -782,7 +844,8 @@ function showVirtualSubjectOptions(g,k){
   l.innerHTML='';
   const live=document.createElement('div');
   live.className='live-option-btn';
-  live.innerHTML=`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2zm0-8h2v6h-2z"/></svg><h3>پخش زنده</h3>`;  live.onclick=()=>showVirtualLiveNow(g,k);
+  live.innerHTML=`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2zm0-8h2v6h-2z"/></svg><h3>پخش زنده</h3>`;
+  live.onclick=()=>showVirtualLiveNow(g,k);
   l.appendChild(live);
   const prev=document.createElement('div');
   prev.className='live-option-btn';
@@ -817,8 +880,7 @@ function showVirtualPreviousLives(g,k){
   lastVirtualGrade=g;
   lastVirtualSubject=k;
   const s=SUBJECTS[k];
-  document.getElementById('sessions-page-title').textContent='پخش زنده قبلی';
-  document.getElementById('sessions-page-subtitle').textContent=s.name+' - پایه '+g;
+  document.getElementById('sessions-page-title').textContent='پخش زنده قبلی';  document.getElementById('sessions-page-subtitle').textContent=s.name+' - پایه '+g;
   const l=document.getElementById('sessions-list');
   l.innerHTML='';
   const vids=appData.videos.filter(v=>v.grade===g&&v.subject===k&&v.type==='live'&&!v.isLive);
@@ -831,7 +893,8 @@ function showVirtualPreviousLives(g,k){
       d.innerHTML=`<div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="card-info"><div class="card-title">${v.title}</div><div class="card-desc">${v.description||''}</div></div>`;
       d.onclick=()=>playVideo(v);
       l.appendChild(d);
-    });  }
+    });
+  }
 }
 
 function openTeachersPage(){
@@ -866,8 +929,7 @@ async function createLiveStream(){
   if(!title){showToast('موضوع را وارد کنید');return;}
   const streamId='riazi_'+Date.now();
   const newStream={id:streamId,grade:grade,subject:subject,title:title,description:description,createdBy:currentUser.phone,creatorName:currentUser.firstname+' '+(currentUser.lastname||''),createdAt:new Date().toISOString(),isActive:true,roomName:streamId};
-  appData.liveStreams.push(newStream);
-  await saveData();
+  appData.liveStreams.push(newStream);  await saveData();
   document.getElementById('live-title').value='';
   document.getElementById('live-description').value='';
   showToast('پخش زنده ایجاد شد - در همه دستگاه‌ها فعال می‌شود');
@@ -880,7 +942,8 @@ async function deleteLiveStream(streamId){
   if(!confirm('آیا مطمئن هستید که می‌خواهید این پخش زنده را حذف کنید؟'))return;
   const idx=appData.liveStreams.findIndex(ls=>ls.id===streamId);
   if(idx!==-1){
-    appData.liveStreams.splice(idx,1);    await saveData();
+    appData.liveStreams.splice(idx,1);
+    await saveData();
     showToast('پخش زنده حذف شد - در همه دستگاه‌ها');
     if(lastVirtualGrade&&lastVirtualSubject){
       showVirtualLiveNow(lastVirtualGrade,lastVirtualSubject);
@@ -888,29 +951,83 @@ async function deleteLiveStream(streamId){
   }
 }
 
+// ===== بارگذاری لیست چت - نمایش استاد و پشتیبانی =====
 function loadChatList(){
   if(!currentUser)return;
   const c=document.getElementById('chat-list-container');
   c.innerHTML='';
   
-  const conversations=getMyConversations();
+  // همیشه استاد و پشتیبانی را نمایش بده
+  const teacherUser=appData.users[TEACHER_ACCOUNT.phone];
+  const supportUser=appData.users['09904844031'];
   
-  if(conversations.length===0){
-    c.innerHTML=`<div class="empty-chat-list">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-      <div style="font-size:14px;font-weight:700;margin-bottom:6px;">هنوز پیامی ندارید</div>
-      <div style="font-size:12px;">با استاد یا پشتیبانی گفتگو کنید</div>
-    </div>`;
-    return;
-  }
-  
-  conversations.forEach(conv=>{
-    const user=appData.users[conv.phone];
-    if(!user)return;
+  if(teacherUser){
+    const teacherKey=getChatKey(currentUser.phone,TEACHER_ACCOUNT.phone);
+    const teacherMsgs=appData.messages[teacherKey]||[];
+    const teacherUnread=teacherMsgs.filter(m=>m.sender===TEACHER_ACCOUNT.phone&&!m.read).length;
+    const lastTeacherMsg=teacherMsgs.length>0?teacherMsgs[teacherMsgs.length-1]:null;
     
     const d=document.createElement('div');
     d.className='chat-item';
     
+    const lastText=lastTeacherMsg?(lastTeacherMsg.type==='text'?lastTeacherMsg.text:lastTeacherMsg.type==='voice'?'🎤 پیام صوتی':lastTeacherMsg.type==='image'?'📷 تصویر':'📎 فایل'):'برای گفتگو کلیک کنید';
+    const time=lastTeacherMsg?formatTime(lastTeacherMsg.time):'';
+    const unread=teacherUnread>0?`<span class="chat-unread">${teacherUnread}</span>`:'';
+    
+    d.innerHTML=`<div class="chat-avatar"><img src="${TEACHER_ACCOUNT.avatar}" onerror="this.src='IMG_20260712_192216_220.jpg'"></div>
+      <div class="chat-info">
+        <div class="chat-top-row">
+          <div class="chat-name">استاد احسان بهشتی کیا <span class="verified-badge" style="width:16px;height:16px;"></span></div>
+          ${time?`<div class="chat-time">${time}</div>`:''}        </div>
+        <div class="chat-bottom-row">
+          <div class="chat-last">${escapeHtml(lastText)}</div>
+          ${unread}
+        </div>
+      </div>`;
+    
+    d.onclick=()=>openPrivateChat(TEACHER_ACCOUNT.phone,'استاد احسان بهشتی کیا',TEACHER_ACCOUNT.avatar);
+    c.appendChild(d);
+  }
+  
+  if(supportUser){
+    const supportKey=getChatKey(currentUser.phone,'09904844031');
+    const supportMsgs=appData.messages[supportKey]||[];
+    const supportUnread=supportMsgs.filter(m=>m.sender==='09904844031'&&!m.read).length;
+    const lastSupportMsg=supportMsgs.length>0?supportMsgs[supportMsgs.length-1]:null;
+    
+    const d=document.createElement('div');
+    d.className='chat-item';
+    
+    const lastText=lastSupportMsg?(lastSupportMsg.type==='text'?lastSupportMsg.text:lastSupportMsg.type==='voice'?'🎤 پیام صوتی':lastSupportMsg.type==='image'?'📷 تصویر':'📎 فایل'):'پشتیبانی برنامه';
+    const time=lastSupportMsg?formatTime(lastSupportMsg.time):'';
+    const unread=supportUnread>0?`<span class="chat-unread">${supportUnread}</span>`:'';
+    
+    d.innerHTML=`<div class="chat-avatar"><img src="${SUPPORT_ACCOUNTS['09904844031'].avatar}" onerror="this.src='316b4205-1a5b-491e-81f7-2fc93d4fbc0f.png'"></div>
+      <div class="chat-info">
+        <div class="chat-top-row">
+          <div class="chat-name">پشتیبان اصلی <span class="verified-badge" style="width:16px;height:16px;"></span></div>
+          ${time?`<div class="chat-time">${time}</div>`:''}
+        </div>
+        <div class="chat-bottom-row">
+          <div class="chat-last">${escapeHtml(lastText)}</div>
+          ${unread}
+        </div>
+      </div>`;
+    
+    d.onclick=()=>openPrivateChat('09904844031','پشتیبان اصلی',SUPPORT_ACCOUNTS['09904844031'].avatar);
+    c.appendChild(d);
+  }
+  
+  // چت‌های دیگر کاربران
+  const conversations=getMyConversations();
+  conversations.forEach(conv=>{
+    if(conv.phone===TEACHER_ACCOUNT.phone||conv.phone==='09904844031')return;
+    
+    const user=appData.users[conv.phone];
+    if(!user)return;
+    
+    const d=document.createElement('div');
+    d.className='chat-item';    
     const avatar=user.avatar||'default.png';
     const name=(user.isTeacher?'استاد ':'')+user.firstname+' '+(user.lastname||'');
     const verified=(user.isTeacher||user.isSupport)?'<span class="verified-badge" style="width:16px;height:16px;"></span>':'';
@@ -929,7 +1046,8 @@ function loadChatList(){
         <div class="chat-top-row">
           <div class="chat-name">${name}${verified}</div>
           <div class="chat-time">${time}</div>
-        </div>        <div class="chat-bottom-row">
+        </div>
+        <div class="chat-bottom-row">
           <div class="chat-last">${escapeHtml(lastText)}</div>
           ${unread}
         </div>
@@ -953,12 +1071,12 @@ function openPrivateChat(id,name,av){
   cancelReply();
   deleteVoicePreview();
   
-  if(SUPPORT_ACCOUNTS[id]){
+  // پیام خوش‌آمدگویی پشتیبانی
+  if(id==='09904844031'){
     const key=getChatKey(currentUser.phone,id);
     if(!appData.messages[key])appData.messages[key]=[];
     if(!appData.messages[key].some(m=>m.text&&m.text.includes('خوش امدید'))){
-      appData.messages[key].push({
-        sender:id,
+      appData.messages[key].push({        sender:id,
         type:'text',
         text:'سلام خوش امدید به برنامه آینده نگر پشتیبانی هستم برای ارتباط تماس و یا بیشتر به شماره موبایل 09904844031 تماس بگیرید و برای ارتباط چت پیام دهید در کوتاه ترین زمان به شما پاسخ خواهیم داد ممنون متشکر از شما❤',
         time:new Date().toISOString(),
@@ -979,6 +1097,7 @@ function closePrivateChat(){
   deleteVoicePreview();
   hideMessageActions();
 }
+
 function hideMessageActions(){
   if(activeMessageActions){
     activeMessageActions.classList.remove('show');
@@ -1006,8 +1125,7 @@ function loadMessages(){
       lastDate=msgDate;
       const sep=document.createElement('div');
       sep.className='date-separator';
-      sep.textContent=msgDate;
-      c.appendChild(sep);
+      sep.textContent=msgDate;      c.appendChild(sep);
     }
     
     const wrapper=document.createElement('div');
@@ -1027,7 +1145,8 @@ function loadMessages(){
     
     if(m.type==='text'){
       h+=`<div>${escapeHtml(m.text)}</div>`;
-    }else if(m.type==='voice'){      h+=`<div class="message-voice"><button class="play-btn" onclick="event.stopPropagation();playVoice('${m.audioData}',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button><div class="voice-info"><div class="voice-wave">`;
+    }else if(m.type==='voice'){
+      h+=`<div class="message-voice"><button class="play-btn" onclick="event.stopPropagation();playVoice('${m.audioData}',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button><div class="voice-info"><div class="voice-wave">`;
       for(let i=0;i<15;i++){
         h+=`<span style="height:${Math.random()*10+6}px"></span>`;
       }
@@ -1055,8 +1174,7 @@ function loadMessages(){
       hideMessageActions();
       actions.classList.add('show');
       activeMessageActions=actions;
-    };
-    
+    };    
     msgDiv.addEventListener('touchstart',e=>{
       pressTimer=setTimeout(showActions,500);
     });
@@ -1076,7 +1194,8 @@ function loadMessages(){
   
   setTimeout(()=>{
     c.scrollTop=c.scrollHeight;
-  },50);}
+  },50);
+}
 
 function replyToMessage(msgTime){
   if(!currentChat||!currentUser)return;
@@ -1104,7 +1223,6 @@ function cancelReply(){
   currentReply=null;
   document.getElementById('reply-preview').classList.remove('active');
 }
-
 async function deleteMessage(msgTime){
   if(!currentChat||!currentUser)return;
   hideMessageActions();
@@ -1123,9 +1241,11 @@ async function deleteMessage(msgTime){
   updateChatBadge();
 }
 
+// ===== ارسال پیام - بهبود یافته =====
 async function sendMessage(){
   const i=document.getElementById('chat-message-input');
-  const t=i.value.trim();  if(!t||!currentChat||!currentUser)return;
+  const t=i.value.trim();
+  if(!t||!currentChat||!currentUser)return;
   
   const key=getChatKey(currentUser.phone,currentChat.id);
   if(!appData.messages[key])appData.messages[key]=[];
@@ -1144,12 +1264,16 @@ async function sendMessage(){
   }
   
   appData.messages[key].push(newMsg);
+  
+  // ذخیره فوری
   await saveData();
+  
   i.value='';
   cancelReply();
   loadMessages();
   loadChatList();
-  updateChatBadge();
+  updateChatBadge();  
+  showToast('پیام ارسال شد ✓');
 }
 
 async function sendFile(ev){
@@ -1174,12 +1298,13 @@ async function sendFile(ev){
       m.fileName=f.name;
     }else{
       m.type='file';
-      m.fileData=e.target.result;      m.fileName=f.name;
+      m.fileData=e.target.result;
+      m.fileName=f.name;
       m.fileSize=formatFileSize(f.size);
     }
     appData.messages[key].push(m);
     await saveData();
-    showToast('ارسال شد');
+    showToast('ارسال شد ✓');
     loadMessages();
     loadChatList();
     updateChatBadge();
@@ -1196,8 +1321,7 @@ function startRecording(){
     recordedBlob=null;
     mediaRecorder.ondataavailable=e=>{audioChunks.push(e.data);};
     mediaRecorder.onstop=()=>{
-      recordedBlob=new Blob(audioChunks,{type:'audio/webm'});
-      document.getElementById('voice-timer').textContent=((Date.now()-recordingStartTime)/1000).toFixed(1)+' ثانیه';
+      recordedBlob=new Blob(audioChunks,{type:'audio/webm'});      document.getElementById('voice-timer').textContent=((Date.now()-recordingStartTime)/1000).toFixed(1)+' ثانیه';
       document.getElementById('voice-preview').classList.add('active');
       s.getTracks().forEach(t=>t.stop());
     };
@@ -1223,7 +1347,8 @@ function playPreviewVoice(){
   previewAudio.play();
 }
 
-function deleteVoicePreview(){  if(previewAudio){previewAudio.pause();previewAudio=null;}
+function deleteVoicePreview(){
+  if(previewAudio){previewAudio.pause();previewAudio=null;}
   recordedBlob=null;
   document.getElementById('voice-preview').classList.remove('active');
 }
@@ -1245,15 +1370,14 @@ async function confirmSendVoice(){
     if(currentReply){
       newMsg.replyTo=currentReply.text;
       newMsg.replyToSender=currentReply.sender;
-    }
-    appData.messages[key].push(newMsg);
+    }    appData.messages[key].push(newMsg);
     await saveData();
     deleteVoicePreview();
     cancelReply();
     loadMessages();
     loadChatList();
     updateChatBadge();
-    showToast('ویس ارسال شد');
+    showToast('ویس ارسال شد ✓');
   };
   r.readAsDataURL(recordedBlob);
 }
@@ -1267,12 +1391,12 @@ function playVoice(d,btn){
 }
 
 function openSupportFromProfile(){
-  const s=SUPPORT_ACCOUNTS['09904844031'];
-  openPrivateChat('09904844031',s.firstname+' '+s.lastname,s.avatar);
+  openPrivateChat('09904844031','پشتیبان اصلی',SUPPORT_ACCOUNTS['09904844031'].avatar);
 }
 
 function openEditProfile(){
-  document.getElementById('edit-firstname').value=currentUser.firstname||'';  document.getElementById('edit-lastname').value=currentUser.lastname||'';
+  document.getElementById('edit-firstname').value=currentUser.firstname||'';
+  document.getElementById('edit-lastname').value=currentUser.lastname||'';
   document.getElementById('edit-school').value=currentUser.school||'';
   document.getElementById('edit-province').value=currentUser.province||'تهران';
   document.getElementById('edit-grade').value=currentUser.grade||'هفتم';
@@ -1295,7 +1419,6 @@ async function saveProfile(){
   closeEditProfile();
   showToast('پروفایل ذخیره شد');
 }
-
 function changeAvatar(){
   const i=document.createElement('input');
   i.type='file';
@@ -1322,6 +1445,7 @@ function openAdminPanel(){
 }
 
 function closeAdminPanel(){document.getElementById('admin-page').classList.remove('active');}
+
 async function addVideo(){
   const t=document.getElementById('admin-video-type').value;
   const g=document.getElementById('admin-grade').value;
@@ -1344,8 +1468,7 @@ function loadUsersList(){
   const c=document.getElementById('users-list-container');
   c.innerHTML='';
   const u=Object.values(appData.users).filter(x=>!x.isTeacher&&!x.isSupport);
-  if(u.length===0){
-    c.innerHTML='<div style="text-align:center;color:#64748b;padding:30px;">کاربری ثبت‌نام نکرده</div>';
+  if(u.length===0){    c.innerHTML='<div style="text-align:center;color:#64748b;padding:30px;">کاربری ثبت‌نام نکرده</div>';
     return;
   }
   u.forEach(user=>{
@@ -1370,7 +1493,8 @@ function openBanModal(p){
       delete u.banReason;
       saveData();
       loadUsersList();
-    }    return;
+    }
+    return;
   }
   banTargetPhone=p;
   document.getElementById('ban-modal').classList.add('active');
@@ -1393,7 +1517,6 @@ async function confirmBan(){
   }
   closeBanModal();
 }
-
 function openVipModal(p){vipTargetPhone=p;document.getElementById('vip-modal').classList.add('active');}
 function closeVipModal(){document.getElementById('vip-modal').classList.remove('active');vipTargetPhone=null;}
 
@@ -1419,7 +1542,8 @@ function switchTab(tab){
     showToast('ویژه چت نیاز دارید');
     return;
   }
-  if(tab==='virtual-class'&&!isVipActive(currentUser.vipClass)&&!(currentUser.isTeacher||currentUser.isSupport)){    showToast('ویژه کلاس مجازی نیاز دارید');
+  if(tab==='virtual-class'&&!isVipActive(currentUser.vipClass)&&!(currentUser.isTeacher||currentUser.isSupport)){
+    showToast('ویژه کلاس مجازی نیاز دارید');
     return;
   }
   document.querySelectorAll('.nav-item').forEach(n=>{n.classList.remove('active');});
@@ -1443,7 +1567,6 @@ function loadStore(){
     c.innerHTML+=`<div class="vip-package"><div class="vip-package-header"><div class="vip-package-icon"><img src="${p.icon}"></div><div class="vip-package-title"><h3>${p.name} - ${p.durationText}</h3><p>${p.description}</p></div></div><div class="vip-package-price"><span class="price">${formatPrice(p.price)}</span><span class="currency">تومان</span></div><ul class="vip-package-features">${f}</ul><button class="btn-buy-vip" onclick="buyVip('${p.id}')" ${is?'disabled':''}>${is?'✓ فعال':'خرید ویژه'}</button></div>`;
   });
 }
-
 async function buyVip(id){
   const p=VIP_PACKAGES.find(x=>x.id===id);
   if(!p)return;
@@ -1468,7 +1591,8 @@ function playVideo(v){
   document.getElementById('video-info-title').textContent=v.title;
   document.getElementById('video-info-desc').textContent=v.description||'';
   document.getElementById('video-player').querySelector('source').src=v.link;
-  document.getElementById('video-player').load();  document.getElementById('video-modal').classList.add('active');
+  document.getElementById('video-player').load();
+  document.getElementById('video-modal').classList.add('active');
 }
 
 function closeVideo(){
