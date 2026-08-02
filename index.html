@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>آینده نگر</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            color: #334155;
+            background-color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+
+        /* ================= صفحه لودینگ با ویدیو ================= */
+        .loader-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+            background: #000; /* پس‌زمینه مشکی برای زمانی که ویدیو هنوز لود نشده */
+        }
+
+        .loader-wrapper.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        /* لایه overlay اصلاح شد - بدون blur تا ویدیو واضح دیده شود */
+        .loader-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.35); /* فقط یک لایه تیره ساده */
+            z-index: 2;
+        }
+
+        .loader-content {
+            position: relative;
+            z-index: 3;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .spinner {
+            width: 70px;
+            height: 70px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #3b82f6;
+            border-right: 3px solid #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 25px auto;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-text {
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: scale(0.98); }
+            50% { opacity: 1; transform: scale(1.03); }
+        }
+
+        .loader-bar {
+            width: 250px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 5px;
+            margin: 0 auto;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .loader-progress {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+            background-size: 200% 100%;
+            border-radius: 5px;
+            /* زمان انیمیشن به ۹ ثانیه تغییر کرد */
+            animation: progressFill 9s linear, gradientMove 2s ease infinite;
+        }
+
+        @keyframes progressFill {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* ================= هدر ================= */
+        header {
+            background-color: #ffffff;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .site-logo {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .site-name {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #0f172a;
+        }
+
+        .hamburger-btn {
+            background: none;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-btn:hover {
+            border-color: #2563eb;
+            background-color: #f8fafc;
+        }
+
+        .hamburger-btn span {
+            display: block;
+            width: 24px;
+            height: 3px;
+            background-color: #0f172a;
+            border-radius: 2px;
+        }
+
+        /* منوی کشویی */
+        .sidebar-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100vh;
+            background-color: #ffffff;
+            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.1);
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2000;
+            padding: 30px 0;
+        }
+
+        .sidebar-menu.active { left: 0; }
+
+        .sidebar-header {
+            padding: 0 25px 25px 25px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-title { font-size: 1.2rem; font-weight: 700; color: #0f172a; }
+        .close-btn { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #64748b; }
+        .sidebar-menu ul { list-style: none; }
+        .sidebar-menu ul li a {
+            display: block;
+            padding: 15px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #334155;
+            transition: all 0.3s ease;
+            border-right: 3px solid transparent;
+        }
+        .sidebar-menu ul li a:hover {
+            background-color: #f1f5f9;
+            color: #2563eb;
+            border-right-color: #2563eb;
+        }
+
+        /* ================= اسلایدر ================= */
+        .slider-section {
+            width: 100%;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .slider-container {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            aspect-ratio: 16 / 9;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+            background: transparent;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide.active { opacity: 1; }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* بخش‌های دیگر سایت */
+        .about-section, .info-section, .education-section {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 30px 25px;
+            text-align: center;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .info-section, .education-section { margin-top: 60px; }
+
+        .about-section h2, .info-section h2, .education-section h2 {
+            font-size: 1.6rem;
+            color: #0f172a;
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+
+        .about-section p, .info-section > p, .education-section > p {
+            font-size: 0.95rem;
+            color: #64748b;
+            max-width: 750px;
+            margin: 0 auto;
+            line-height: 2;
+        }
+
+        .system-grid, .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .system-card, .team-member {
+            background: #f8fafc;
+            padding: 25px 20px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            text-align: right;
+        }
+
+        .team-member { text-align: center; cursor: pointer; }
+        .system-card:hover, .team-member:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border-color: #2563eb;
+        }
+
+        .system-card .icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        .system-card .icon svg { width: 24px; height: 24px; fill: white; }
+        .system-card h3, .team-member h4 { font-size: 1.1rem; color: #0f172a; margin-bottom: 8px; font-weight: 700; }
+        .system-card p { font-size: 0.9rem; color: #64748b; line-height: 1.6; }
+        
+        .team-avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px auto;
+            display: block;
+            border: 4px solid #ffffff;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+        }
+        .team-member .role { font-size: 0.85rem; color: #2563eb; font-weight: 600; }
+
+        /* پاپ‌آپ */
+        .member-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .member-modal.active { display: flex; opacity: 1; }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 35px 30px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .member-modal.active .modal-content { transform: scale(1); }
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #f1f5f9;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+        .modal-close:hover { background: #ef4444; color: white; }
+        .modal-avatar {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px auto;
+            display: block;
+            border: 5px solid #2563eb;
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+        }
+        .modal-content h3 { font-size: 1.4rem; color: #0f172a; margin-bottom: 8px; font-weight: 800; }
+        .modal-content .modal-role { color: #2563eb; font-weight: 600; margin-bottom: 20px; font-size: 0.95rem; }
+        .modal-content p { color: #64748b; line-height: 1.9; font-size: 0.95rem; }
+
+        /* فوتر */
+        .contact-footer {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+            margin-top: 60px;
+        }
+        .contact-footer h2 { font-size: 2rem; margin-bottom: 30px; font-weight: 900; }
+        .contact-info { display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto; }
+        .contact-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        .contact-item:hover { background: rgba(255, 255, 255, 0.25); transform: scale(1.02); }
+        .contact-item span { direction: ltr; }
+        .trust-badges { display: flex; justify-content: center; align-items: center; gap: 25px; margin-top: 40px; flex-wrap: wrap; }
+        .trust-badges img { width: 80px; height: 80px; object-fit: contain; background: white; border-radius: 10px; padding: 6px; }
+        .copyright { margin-top: 30px; font-size: 0.85rem; opacity: 0.8; }
+
+        @media (max-width: 768px) {
+            .slider-container { aspect-ratio: 4 / 3; }
+            .site-name { font-size: 1.2rem; }
+            .site-logo { width: 40px; height: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= صفحه لودینگ با ویدیو ================= -->
+    <div id="loader" class="loader-wrapper">
+        <!-- ویدیو با preload="auto" تا فوری شروع شود -->
+        <video id="loaderVideo" autoplay muted loop playsinline preload="auto" class="loader-video">
+            <source src="d25ea088c4f4cba95d597054dea5abc317578539-480p.mp4" type="video/mp4">
+        </video>
+        <div class="loader-overlay"></div>
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <p class="loader-text">آینده نگر</p>
+            <div class="loader-bar">
+                <div class="loader-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="header-right">
+            <img src="InShot_20260712_161951935.png" alt="لوگو" class="site-logo">
+            <span class="site-name">آینده نگر</span>
+        </div>
+        <button class="hamburger-btn" onclick="toggleMenu()">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <aside class="sidebar-menu" id="sidebarMenu">
+        <div class="sidebar-header">
+            <span class="sidebar-title">منو</span>
+            <button class="close-btn" onclick="toggleMenu()">×</button>
+        </div>
+        <ul>
+            <li><a href="#home" onclick="toggleMenu()">خانه</a></li>
+        </ul>
+    </aside>
+
+    <section id="home" class="slider-section">
+        <div class="slider-container">
+            <div class="slide active">
+                <img src="1.png" alt="تصویر 1">
+            </div>
+            <div class="slide">
+                <img src="2.png" alt="تصویر 2">
+            </div>
+            <div class="slide">
+                <img src="3.png" alt="تصویر 3">
+            </div>
+        </div>
+    </section>
+
+    <section class="about-section">
+        <h2>درباره آینده نگر</h2>
+        <p>آینده نگر یک مجموعه پیشرو و نوآور است که با تکیه بر دانش روز، تکنولوژی‌های مدرن و تیمی متخصص، در مسیر ارائه خدمات و آموزش‌های باکیفیت گام برمی‌دارد.</p>
+    </section>
+
+    <section class="info-section">
+        <h2>درباره سیستم ما</h2>
+        <p>ما یک سیستم جامع و پیشرفته هستیم که با هدف ارائه بهترین خدمات به مشتریان طراحی شده است.</p>
+        <div class="system-grid">
+            <div class="system-card">
+                <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+                <h3>سیستم مدیریت</h3>
+                <p>مدیریت یکپارچه و هوشمند تمامی فرآیندهای کاری با قابلیت دسترسی آسان و سریع.</p>
+            </div>
+            <div class="system-card">
+                <div class="icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                <h3>کیفیت تضمین شده</h3>
+                <p>تمامی خدمات ما با بالاترین استانداردهای کیفی و با ضمانت ارائه می‌شوند.</p>
+            </div>
+            <div class="system-card">
+                <div class="icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+                <h3>سرعت بالا</h3>
+                <p>پردازش سریع درخواست‌ها و ارائه نتایج در کمترین زمان ممکن.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="education-section">
+        <h2>آموزش‌های زیاد</h2>
+        <p>ما در آینده نگر، آموزش‌های جامع و متنوعی را برای شما آماده کرده‌ایم.</p>
+        <div class="team-grid">
+            <div class="team-member" onclick="openMemberModal('matin')">
+                <img src="4.jpg" alt="متین" class="team-avatar">
+                <h4>متین</h4>
+                <div class="role">نویسنده و توسعه‌دهنده</div>
+            </div>
+            <div class="team-member" onclick="openMemberModal('abolfazl')">
+                <img src="abolfazl.png" alt="ابوالفضل بشارت" class="team-avatar">
+                <h4>ابوالفضل بشارت</h4>
+                <div class="role">عضو تیم</div>
+            </div>
+            <div class="team-member" onclick="openMemberModal('amirhossein')">
+                <img src="amirhossein.png" alt="امیرحسین شکری زاده" class="team-avatar">
+                <h4>امیرحسین شکری زاده</h4>
+                <div class="role">عضو تیم</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="member-modal" id="memberModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeMemberModal()">×</button>
+            <img id="modalAvatar" src="" alt="" class="modal-avatar">
+            <h3 id="modalName"></h3>
+            <div class="modal-role" id="modalRole"></div>
+            <p id="modalDesc"></p>
+        </div>
+    </div>
+
+    <footer class="contact-footer">
+        <h2>تماس با ما</h2>
+        <div class="contact-info">
+            <div class="contact-item">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                <span>09904844031</span>
+            </div>
+            <div class="contact-item">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <span>amomiti16172@gmail.com</span>
+            </div>
+        </div>
+        <div class="trust-badges">
+            <img src="logo.png" alt="لوگو">
+            <img src="nezam_senfi.png" alt="نظام صنفی">
+            <img src="samandehi.png" alt="ساماندهی">
+        </div>
+        <p class="copyright">© 2026 آینده نگر - تمامی حقوق محفوظ است</p>
+    </footer>
+
+    <script>
+        // ================= اجرای فوری ویدیو به محض باز شدن صفحه =================
+        const loaderVideo = document.getElementById('loaderVideo');
+        
+        // تلاش برای پخش فوری ویدیو
+        function tryPlayVideo() {
+            const playPromise = loaderVideo.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(function(error) {
+                    // اگر مرورگر اجازه autoplay نداد، با تعامل کاربر پخش می‌شود
+                    console.log('Autoplay blocked, waiting for user interaction');
+                });
+            }
+        }
+
+        // اجرای فوری ویدیو در لحظه باز شدن صفحه
+        tryPlayVideo();
+
+        // اگر ویدیو به هر دلیلی پخش نشد، با اولین کلیک یا لمس کاربر پخش شود
+        document.addEventListener('click', function startVideo() {
+            tryPlayVideo();
+            document.removeEventListener('click', startVideo);
+        }, { once: true });
+
+        document.addEventListener('touchstart', function startVideo() {
+            tryPlayVideo();
+            document.removeEventListener('touchstart', startVideo);
+        }, { once: true });
+
+        // ================= لودینگ ۹ ثانیه‌ای =================
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loader').classList.add('hidden');
+                // توقف ویدیو بعد از بسته شدن لودینگ برای صرفه‌جویی در منابع
+                loaderVideo.pause();
+            }, 9000);
+        });
+
+        // منو
+        function toggleMenu() {
+            document.getElementById('sidebarMenu').classList.toggle('active');
+        }
+
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('sidebarMenu');
+            const hamburger = document.querySelector('.hamburger-btn');
+            if (!menu.contains(event.target) && !hamburger.contains(event.target) && menu.classList.contains('active')) {
+                menu.classList.remove('active');
+            }
+        });
+
+        // اسلایدر
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+        function nextSlide() {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+        setInterval(nextSlide, 3000);
+
+        // اسکرول نرم
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // پاپ‌آپ اعضا
+        const membersInfo = {
+            matin: { name: 'متین', role: 'نویسنده و توسعه‌دهنده', avatar: '4.jpg', desc: 'متین، نویسنده و توسعه‌دهنده اصلی مجموعه آینده نگر است. او با تسلط بر تکنولوژی‌های روز، مسئولیت طراحی و توسعه سیستم‌ها را بر عهده دارد.' },
+            abolfazl: { name: 'ابوالفضل بشارت', role: 'عضو تیم', avatar: 'abolfazl.png', desc: 'ابوالفضل بشارت یکی از اعضای کلیدی تیم است که در تهیه و ارائه آموزش‌ها به کاربران مشارکت فعال دارد.' },
+            amirhossein: { name: 'امیرحسین شکری زاده', role: 'عضو تیم', avatar: 'amirhossein.png', desc: 'امیرحسین شکری زاده با ایده‌های نوآورانه و انرژی مثبت خود، به رشد و توسعه مجموعه کمک می‌کند.' }
+        };
+
+        function openMemberModal(memberId) {
+            const member = membersInfo[memberId];
+            if (!member) return;
+            document.getElementById('modalAvatar').src = member.avatar;
+            document.getElementById('modalName').textContent = member.name;
+            document.getElementById('modalRole').textContent = member.role;
+            document.getElementById('modalDesc').textContent = member.desc;
+            document.getElementById('memberModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMemberModal() {
+            document.getElementById('memberModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.getElementById('memberModal').addEventListener('click', function(e) {
+            if (e.target === this) closeMemberModal();
+        });
+    </script>
+</body>
+      </html>
