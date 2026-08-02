@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="40gN4zdcwAcxmP3ibQDcn7nfBBFxUijDhbSUZ6kObvk" />
+    <meta name="description" content="آینده نگر - خدمات و آموزش‌های باکیفیت با تیمی متخصص و مجرب">
+    <meta name="keywords" content="آینده نگر, آموزش, خدمات, توسعه, تیم متخصص">
+    <meta name="author" content="آینده نگر">
+    <meta property="og:title" content="آینده نگر">
+    <meta property="og:description" content="آینده نگر - خدمات و آموزش‌های باکیفیت">
+    <meta property="og:type" content="website">
     <title>آینده نگر</title>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     
@@ -11,6 +18,10 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         body {
@@ -22,9 +33,11 @@
             overflow-x: hidden;
         }
 
-        a { text-decoration: none; color: inherit; }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
 
-        /* ================= صفحه لودینگ با ویدیو ================= */
         .loader-wrapper {
             position: fixed;
             top: 0;
@@ -36,7 +49,7 @@
             justify-content: center;
             align-items: center;
             transition: opacity 0.8s ease, visibility 0.8s ease;
-            background: #000; /* پس‌زمینه مشکی برای زمانی که ویدیو هنوز لود نشده */
+            background: #000;
         }
 
         .loader-wrapper.hidden {
@@ -55,14 +68,13 @@
             z-index: 1;
         }
 
-        /* لایه overlay اصلاح شد - بدون blur تا ویدیو واضح دیده شود */
         .loader-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.35); /* فقط یک لایه تیره ساده */
+            background: rgba(0, 0, 0, 0.35);
             z-index: 2;
         }
 
@@ -120,8 +132,7 @@
             background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
             background-size: 200% 100%;
             border-radius: 5px;
-            /* زمان انیمیشن به ۹ ثانیه تغییر کرد */
-            animation: progressFill 9s linear, gradientMove 2s ease infinite;
+            animation: progressFill 7s linear, gradientMove 2s ease infinite;
         }
 
         @keyframes progressFill {
@@ -134,7 +145,6 @@
             50% { background-position: 100% 50%; }
         }
 
-        /* ================= هدر ================= */
         header {
             background-color: #ffffff;
             box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
@@ -191,7 +201,6 @@
             border-radius: 2px;
         }
 
-        /* منوی کشویی */
         .sidebar-menu {
             position: fixed;
             top: 0;
@@ -205,7 +214,9 @@
             padding: 30px 0;
         }
 
-        .sidebar-menu.active { left: 0; }
+        .sidebar-menu.active {
+            left: 0;
+        }
 
         .sidebar-header {
             padding: 0 25px 25px 25px;
@@ -216,9 +227,24 @@
             align-items: center;
         }
 
-        .sidebar-title { font-size: 1.2rem; font-weight: 700; color: #0f172a; }
-        .close-btn { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #64748b; }
-        .sidebar-menu ul { list-style: none; }
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .sidebar-menu ul {
+            list-style: none;
+        }
+
         .sidebar-menu ul li a {
             display: block;
             padding: 15px 25px;
@@ -228,16 +254,37 @@
             transition: all 0.3s ease;
             border-right: 3px solid transparent;
         }
+
         .sidebar-menu ul li a:hover {
             background-color: #f1f5f9;
             color: #2563eb;
             border-right-color: #2563eb;
         }
 
-        /* ================= اسلایدر ================= */
+        .video-section {
+            width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
         .slider-section {
             width: 100%;
-            padding: 40px 20px;
+            padding: 20px 20px 40px 20px;
             display: flex;
             justify-content: center;
         }
@@ -266,7 +313,9 @@
             justify-content: center;
         }
 
-        .slide.active { opacity: 1; }
+        .slide.active {
+            opacity: 1;
+        }
 
         .slide img {
             width: 100%;
@@ -275,7 +324,6 @@
             display: block;
         }
 
-        /* بخش‌های دیگر سایت */
         .about-section, .info-section, .education-section {
             max-width: 1000px;
             margin: 50px auto;
@@ -286,8 +334,10 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             border: 1px solid #e2e8f0;
         }
-        
-        .info-section, .education-section { margin-top: 60px; }
+
+        .info-section, .education-section {
+            margin-top: 60px;
+        }
 
         .about-section h2, .info-section h2, .education-section h2 {
             font-size: 1.6rem;
@@ -320,7 +370,11 @@
             text-align: right;
         }
 
-        .team-member { text-align: center; cursor: pointer; }
+        .team-member {
+            text-align: center;
+            cursor: pointer;
+        }
+
         .system-card:hover, .team-member:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
@@ -337,10 +391,26 @@
             justify-content: center;
             margin-bottom: 15px;
         }
-        .system-card .icon svg { width: 24px; height: 24px; fill: white; }
-        .system-card h3, .team-member h4 { font-size: 1.1rem; color: #0f172a; margin-bottom: 8px; font-weight: 700; }
-        .system-card p { font-size: 0.9rem; color: #64748b; line-height: 1.6; }
-        
+
+        .system-card .icon svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        .system-card h3, .team-member h4 {
+            font-size: 1.1rem;
+            color: #0f172a;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .system-card p {
+            font-size: 0.9rem;
+            color: #64748b;
+            line-height: 1.6;
+        }
+
         .team-avatar {
             width: 110px;
             height: 110px;
@@ -351,9 +421,13 @@
             border: 4px solid #ffffff;
             box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
         }
-        .team-member .role { font-size: 0.85rem; color: #2563eb; font-weight: 600; }
 
-        /* پاپ‌آپ */
+        .team-member .role {
+            font-size: 0.85rem;
+            color: #2563eb;
+            font-weight: 600;
+        }
+
         .member-modal {
             position: fixed;
             top: 0;
@@ -369,7 +443,12 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         }
-        .member-modal.active { display: flex; opacity: 1; }
+
+        .member-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
         .modal-content {
             background: white;
             border-radius: 20px;
@@ -382,7 +461,11 @@
             transform: scale(0.9);
             transition: transform 0.3s ease;
         }
-        .member-modal.active .modal-content { transform: scale(1); }
+
+        .member-modal.active .modal-content {
+            transform: scale(1);
+        }
+
         .modal-close {
             position: absolute;
             top: 15px;
@@ -396,7 +479,12 @@
             cursor: pointer;
             color: #64748b;
         }
-        .modal-close:hover { background: #ef4444; color: white; }
+
+        .modal-close:hover {
+            background: #ef4444;
+            color: white;
+        }
+
         .modal-avatar {
             width: 130px;
             height: 130px;
@@ -407,11 +495,27 @@
             border: 5px solid #2563eb;
             box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
         }
-        .modal-content h3 { font-size: 1.4rem; color: #0f172a; margin-bottom: 8px; font-weight: 800; }
-        .modal-content .modal-role { color: #2563eb; font-weight: 600; margin-bottom: 20px; font-size: 0.95rem; }
-        .modal-content p { color: #64748b; line-height: 1.9; font-size: 0.95rem; }
 
-        /* فوتر */
+        .modal-content h3 {
+            font-size: 1.4rem;
+            color: #0f172a;
+            margin-bottom: 8px;
+            font-weight: 800;
+        }
+
+        .modal-content .modal-role {
+            color: #2563eb;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .modal-content p {
+            color: #64748b;
+            line-height: 1.9;
+            font-size: 0.95rem;
+        }
+
         .contact-footer {
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: white;
@@ -419,8 +523,21 @@
             text-align: center;
             margin-top: 60px;
         }
-        .contact-footer h2 { font-size: 2rem; margin-bottom: 30px; font-weight: 900; }
-        .contact-info { display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto; }
+
+        .contact-footer h2 {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            font-weight: 900;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
         .contact-item {
             display: flex;
             align-items: center;
@@ -434,24 +551,57 @@
             backdrop-filter: blur(5px);
             transition: all 0.3s ease;
         }
-        .contact-item:hover { background: rgba(255, 255, 255, 0.25); transform: scale(1.02); }
-        .contact-item span { direction: ltr; }
-        .trust-badges { display: flex; justify-content: center; align-items: center; gap: 25px; margin-top: 40px; flex-wrap: wrap; }
-        .trust-badges img { width: 80px; height: 80px; object-fit: contain; background: white; border-radius: 10px; padding: 6px; }
-        .copyright { margin-top: 30px; font-size: 0.85rem; opacity: 0.8; }
+
+        .contact-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.02);
+        }
+
+        .contact-item span {
+            direction: ltr;
+        }
+
+        .trust-badges {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .trust-badges img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            background: white;
+            border-radius: 10px;
+            padding: 6px;
+        }
+
+        .copyright {
+            margin-top: 30px;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
 
         @media (max-width: 768px) {
-            .slider-container { aspect-ratio: 4 / 3; }
-            .site-name { font-size: 1.2rem; }
-            .site-logo { width: 40px; height: 40px; }
+            .slider-container {
+                aspect-ratio: 4 / 3;
+            }
+            .site-name {
+                font-size: 1.2rem;
+            }
+            .site-logo {
+                width: 40px;
+                height: 40px;
+            }
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
-    <!-- ================= صفحه لودینگ با ویدیو ================= -->
     <div id="loader" class="loader-wrapper">
-        <!-- ویدیو با preload="auto" تا فوری شروع شود -->
         <video id="loaderVideo" autoplay muted loop playsinline preload="auto" class="loader-video">
             <source src="d25ea088c4f4cba95d597054dea5abc317578539-480p.mp4" type="video/mp4">
         </video>
@@ -471,7 +621,9 @@
             <span class="site-name">آینده نگر</span>
         </div>
         <button class="hamburger-btn" onclick="toggleMenu()">
-            <span></span><span></span><span></span>
+            <span></span>
+            <span></span>
+            <span></span>
         </button>
     </header>
 
@@ -484,6 +636,14 @@
             <li><a href="#home" onclick="toggleMenu()">خانه</a></li>
         </ul>
     </aside>
+
+    <section class="video-section">
+        <div class="video-container">
+            <video id="mainVideo" autoplay muted loop playsinline preload="auto">
+                <source src="Anim.mp4" type="video/mp4">
+            </video>
+        </div>
+    </section>
 
     <section id="home" class="slider-section">
         <div class="slider-container">
@@ -509,17 +669,23 @@
         <p>ما یک سیستم جامع و پیشرفته هستیم که با هدف ارائه بهترین خدمات به مشتریان طراحی شده است.</p>
         <div class="system-grid">
             <div class="system-card">
-                <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+                <div class="icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
                 <h3>سیستم مدیریت</h3>
                 <p>مدیریت یکپارچه و هوشمند تمامی فرآیندهای کاری با قابلیت دسترسی آسان و سریع.</p>
             </div>
             <div class="system-card">
-                <div class="icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                <div class="icon">
+                    <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                </div>
                 <h3>کیفیت تضمین شده</h3>
                 <p>تمامی خدمات ما با بالاترین استانداردهای کیفی و با ضمانت ارائه می‌شوند.</p>
             </div>
             <div class="system-card">
-                <div class="icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+                <div class="icon">
+                    <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                </div>
                 <h3>سرعت بالا</h3>
                 <p>پردازش سریع درخواست‌ها و ارائه نتایج در کمترین زمان ممکن.</p>
             </div>
@@ -541,7 +707,7 @@
                 <div class="role">عضو تیم</div>
             </div>
             <div class="team-member" onclick="openMemberModal('amirhossein')">
-                <img src="amirhossein.png" alt="امیرحسین شکری زاده" class="team-avatar">
+                <img src="5.jpg" alt="امیرحسین شکری زاده" class="team-avatar">
                 <h4>امیرحسین شکری زاده</h4>
                 <div class="role">عضو تیم</div>
             </div>
@@ -562,11 +728,15 @@
         <h2>تماس با ما</h2>
         <div class="contact-info">
             <div class="contact-item">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                </svg>
                 <span>09904844031</span>
             </div>
             <div class="contact-item">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
                 <span>amomiti16172@gmail.com</span>
             </div>
         </div>
@@ -579,42 +749,31 @@
     </footer>
 
     <script>
-        // ================= اجرای فوری ویدیو به محض باز شدن صفحه =================
-        const loaderVideo = document.getElementById('loaderVideo');
-        
-        // تلاش برای پخش فوری ویدیو
-        function tryPlayVideo() {
-            const playPromise = loaderVideo.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(function(error) {
-                    // اگر مرورگر اجازه autoplay نداد، با تعامل کاربر پخش می‌شود
-                    console.log('Autoplay blocked, waiting for user interaction');
-                });
-            }
+        // لودینگ ۷ ثانیه‌ای
+        setTimeout(function() {
+            document.getElementById('loader').classList.add('hidden');
+            var loaderVideo = document.getElementById('loaderVideo');
+            if (loaderVideo) loaderVideo.pause();
+        }, 7000);
+
+        // پخش ویدیوی اصلی
+        var mainVideo = document.getElementById('mainVideo');
+        if (mainVideo) {
+            mainVideo.play().catch(function() {
+                document.addEventListener('click', function() {
+                    mainVideo.play();
+                }, { once: true });
+            });
         }
 
-        // اجرای فوری ویدیو در لحظه باز شدن صفحه
-        tryPlayVideo();
-
-        // اگر ویدیو به هر دلیلی پخش نشد، با اولین کلیک یا لمس کاربر پخش شود
-        document.addEventListener('click', function startVideo() {
-            tryPlayVideo();
-            document.removeEventListener('click', startVideo);
-        }, { once: true });
-
-        document.addEventListener('touchstart', function startVideo() {
-            tryPlayVideo();
-            document.removeEventListener('touchstart', startVideo);
-        }, { once: true });
-
-        // ================= لودینگ ۹ ثانیه‌ای =================
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                document.getElementById('loader').classList.add('hidden');
-                // توقف ویدیو بعد از بسته شدن لودینگ برای صرفه‌جویی در منابع
-                loaderVideo.pause();
-            }, 9000);
-        });
+        // اسلایدر
+        var slides = document.querySelectorAll('.slide');
+        var currentSlide = 0;
+        setInterval(function() {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }, 3000);
 
         // منو
         function toggleMenu() {
@@ -622,41 +781,31 @@
         }
 
         document.addEventListener('click', function(event) {
-            const menu = document.getElementById('sidebarMenu');
-            const hamburger = document.querySelector('.hamburger-btn');
+            var menu = document.getElementById('sidebarMenu');
+            var hamburger = document.querySelector('.hamburger-btn');
             if (!menu.contains(event.target) && !hamburger.contains(event.target) && menu.classList.contains('active')) {
                 menu.classList.remove('active');
             }
         });
 
-        // اسلایدر
-        const slides = document.querySelectorAll('.slide');
-        let currentSlide = 0;
-        function nextSlide() {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-        }
-        setInterval(nextSlide, 3000);
-
         // اسکرول نرم
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
+        document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+            anchor.addEventListener('click', function(e) {
                 e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
+                var target = document.querySelector(this.getAttribute('href'));
                 if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         });
 
         // پاپ‌آپ اعضا
-        const membersInfo = {
+        var membersInfo = {
             matin: { name: 'متین', role: 'نویسنده و توسعه‌دهنده', avatar: '4.jpg', desc: 'متین، نویسنده و توسعه‌دهنده اصلی مجموعه آینده نگر است. او با تسلط بر تکنولوژی‌های روز، مسئولیت طراحی و توسعه سیستم‌ها را بر عهده دارد.' },
             abolfazl: { name: 'ابوالفضل بشارت', role: 'عضو تیم', avatar: 'abolfazl.png', desc: 'ابوالفضل بشارت یکی از اعضای کلیدی تیم است که در تهیه و ارائه آموزش‌ها به کاربران مشارکت فعال دارد.' },
-            amirhossein: { name: 'امیرحسین شکری زاده', role: 'عضو تیم', avatar: 'amirhossein.png', desc: 'امیرحسین شکری زاده با ایده‌های نوآورانه و انرژی مثبت خود، به رشد و توسعه مجموعه کمک می‌کند.' }
+            amirhossein: { name: 'امیرحسین شکری زاده', role: 'عضو تیم', avatar: '5.jpg', desc: 'امیرحسین شکری زاده با ایده‌های نوآورانه و انرژی مثبت خود، به رشد و توسعه مجموعه کمک می‌کند.' }
         };
 
         function openMemberModal(memberId) {
-            const member = membersInfo[memberId];
+            var member = membersInfo[memberId];
             if (!member) return;
             document.getElementById('modalAvatar').src = member.avatar;
             document.getElementById('modalName').textContent = member.name;
@@ -674,6 +823,26 @@
         document.getElementById('memberModal').addEventListener('click', function(e) {
             if (e.target === this) closeMemberModal();
         });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.keyCode === 27) closeMemberModal();
+        });
+
+        // محافظت‌ها
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
+        document.addEventListener('selectstart', function(e) { e.preventDefault(); return false; });
+        document.addEventListener('dragstart', function(e) { e.preventDefault(); return false; });
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey && (e.keyCode === 83 || e.keyCode === 85 || e.keyCode === 67 || e.keyCode === 80)) || 
+                (e.keyCode === 123) || 
+                (e.ctrlKey && e.shiftKey && e.keyCode === 73)) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        document.addEventListener('copy', function(e) { e.preventDefault(); return false; });
+        document.addEventListener('cut', function(e) { e.preventDefault(); return false; });
+        document.addEventListener('paste', function(e) { e.preventDefault(); return false; });
     </script>
 </body>
-      </html>
+</html>
