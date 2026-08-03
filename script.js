@@ -1,4 +1,3 @@
-
 const UPSTASH_URL = "https://smooth-werewolf-200782.upstash.io";
 const UPSTASH_TOKEN = "gQAAAAAAAxBOAAIgcDFjN2NiMjYxOWNlNjE0NzgyOTExM2JjMjA5ZTc0MjVjMA";
 
@@ -11,8 +10,9 @@ let generatedOTP = "";
 let currentAdminChatPhone = null;
 let banTargetPhone = null;
 let walletTargetPhone = null;
-let adminRefreshInterval = null;
-let chatRefreshInterval = null;
+
+// ✅ جلوگیری از ارسال چندباره پیام
+let isSending = false;
 
 // ✅ پر کردن نوار پیشرفت لودر با JavaScript
 document.addEventListener('DOMContentLoaded', () => {
@@ -266,8 +266,6 @@ async function handleForgot() {
 function handleLogout() {
     clearCurrentUser();
     toggleMenu();
-    if (chatRefreshInterval) clearInterval(chatRefreshInterval);
-    if (adminRefreshInterval) clearInterval(adminRefreshInterval);
     showToast('با موفقیت خارج شدید', 'info');
     updateUI();
 }
@@ -408,6 +406,10 @@ function showMember(id) {
     }
 }
 
+// ============================================================
+// 🔹 چت کاربر (بدون auto-refresh — رفرش فقط با دکمه دستی)
+// ============================================================
+
 async function handleChatClick() {
     const user = getCurrentUser();
     if (!user) {
@@ -425,18 +427,28 @@ async function handleChatClick() {
     toggleChatBox();
     await loadUserChat(user.phone);
     
-    if (chatRefreshInterval) clearInterval(chatRefreshInterval);
-    chatRefreshInterval = setInterval(() => loadUserChat(user.phone), 3000);
+    // ✅ اضافه کردن دکمه رفرش به هدر چت (فقط یکبار)
+    setTimeout(() => {
+        const chatHead = document.querySelector('#chatBox .chat-head');
+        if (chatHead && !document.getElementById('chatRefreshBtn')) {
+            const refreshBtn = document.createElement('button');
+            refreshBtn.id = 'chatRefreshBtn';
+            refreshBtn.textContent = '🔄';
+            refreshBtn.title = 'بروزرسانی پیام‌ها';
+            refreshBtn.onclick = () => {
+                const u = getCurrentUser();
+                if (u) loadUserChat(u.phone);
+            };
+            refreshBtn.style.cssText = 'background:rgba(255,255,255,0.2);color:#fff;border:none;width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-right:auto;transition:all 0.3s';
+            chatHead.appendChild(refreshBtn);
+        }
+    }, 200);
 }
 
 function toggleChatBox() { 
     const chatBox = document.getElementById('chatBox');
     if (chatBox) {
         chatBox.classList.toggle('on');
-        if (!chatBox.classList.contains('on') && chatRefreshInterval) {
-            clearInterval(chatRefreshInterval); 
-            chatRefreshInterval = null;
-        }
     }
 }
 
@@ -469,9 +481,15 @@ async function loadUserChat(phone) {
 }
 
 async function sendUserMsg() {
+    // ✅ جلوگیری از ارسال مجدد در حین ارسال
+    if (isSending) {
+        showToast('⏳ لطفاً صبر کنید، پیام در حال ارسال است...', 'info');
+        return;
+    }
+    
     const user = getCurrentUser();
     const input = document.getElementById('chatInput');
-    const text = input.value.trim();
+    const text = input ? input.value.trim() : '';
     if (!text || !user) return;
 
     const isBanned = await redisCommand('GET', `ban:${user.phone}`);
@@ -480,25 +498,55 @@ async function sendUserMsg() {
         return;
     }
 
-    const time = new Date().toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'});
-    const msg = {
-        id: Date.now(),
-        userPhone: user.phone,
-        userName: user.name,
-        userAvatar: user.avatar,
-        sender: 'user',
-        text: text,
-        time: time,
-        timestamp: Date.now(),
-        read: false
-    };
-    
-    await redisCommand('LPUSH', `chat:${user.phone}`, JSON.stringify(msg));
-    
-    input.value = '';
-    await loadUserChat(user.phone);
-    showToast('پیام ارسال شد', 'success');
+    // ✅ قفل کردن دکمه ارسال برای جلوگیری از ارسال چندباره
+    isSending = true;
+    const sendBtn = document.querySelector('.send-btn');
+    if (sendBtn) {
+        sendBtn.disabled = true;
+        sendBtn.style.opacity = '0.5';
+        sendBtn.style.cursor = 'not-allowed';
+    }
+    if (input) input.disabled = true;
+
+    try {
+        const time = new Date().toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'});
+        const msg = {
+            id: Date.now(),
+            userPhone: user.phone,
+            userName: user.name,
+            userAvatar: user.avatar,
+            sender: 'user',
+            text: text,
+            time: time,
+            timestamp: Date.now(),
+            read: false
+        };
+        
+        await redisCommand('LPUSH', `chat:${user.phone}`, JSON.stringify(msg));
+        
+        if (input) input.value = '';
+        await loadUserChat(user.phone);
+    } catch (err) {
+        console.error('خطا در ارسال پیام:', err);
+        showToast('❌ خطا در ارسال پیام. لطفاً دوباره تلاش کنید.', 'error');
+    }
+
+    // ✅ باز کردن قفل
+    isSending = false;
+    if (sendBtn) {
+        sendBtn.disabled = false;
+        sendBtn.style.opacity = '1';
+        sendBtn.style.cursor = 'pointer';
+    }
+    if (input) {
+        input.disabled = false;
+        input.focus();
+    }
 }
+
+// ============================================================
+// 🔹 پنل مدیریت (بدون auto-refresh — فقط با دکمه دستی)
+// ============================================================
 
 async function openAdminPanel() {
     const user = getCurrentUser();
@@ -507,23 +555,11 @@ async function openAdminPanel() {
     if (adminPanel) adminPanel.classList.add('on');
     await updateAdminWalletDisplay();
     await loadAdminData();
-    
-    if (adminRefreshInterval) clearInterval(adminRefreshInterval);
-    adminRefreshInterval = setInterval(async () => {
-        const panel = document.getElementById('adminPanel');
-        if (panel && panel.classList.contains('on')) {
-            await updateAdminWalletDisplay();
-            const activeTab = document.querySelector('.admin-tab.on');
-            if (activeTab && activeTab.textContent.includes('کاربران')) await loadAdminData();
-            else if (activeTab && activeTab.textContent.includes('گفتگوها')) await loadAdminChats();
-        }
-    }, 5000);
 }
 
 function closeAdminPanel() { 
     const adminPanel = document.getElementById('adminPanel');
     if (adminPanel) adminPanel.classList.remove('on');
-    if (adminRefreshInterval) { clearInterval(adminRefreshInterval); adminRefreshInterval = null; }
 }
 
 function switchAdminTab(tab, btn) {
@@ -689,6 +725,10 @@ async function confirmAdminWalletAdd() {
     showToast(`✅ ${amount.toLocaleString('fa-IR')} تومان به کیف پول پنل اضافه شد`, 'success');
 }
 
+// ============================================================
+// 🔹 گفتگوهای ادمین (بدون auto-refresh)
+// ============================================================
+
 async function loadAdminChats() {
     const phones = await redisCommand('SMEMBERS', 'users:all');
     const list = document.getElementById('adminChatList');
@@ -774,6 +814,24 @@ async function openAdminChatPage(phone) {
     renderAdminChatMsgs(updatedMsgs.reverse());
     const chatPage = document.getElementById('adminChatPage');
     if (chatPage) chatPage.classList.add('on');
+    
+    // ✅ اضافه کردن دکمه رفرش به هدر چت ادمین
+    setTimeout(() => {
+        const header = document.querySelector('.admin-chat-header');
+        if (header && !document.getElementById('adminChatRefreshBtn')) {
+            const refreshBtn = document.createElement('button');
+            refreshBtn.id = 'adminChatRefreshBtn';
+            refreshBtn.textContent = '🔄 بروزرسانی';
+            refreshBtn.title = 'بروزرسانی پیام‌ها';
+            refreshBtn.onclick = async () => {
+                const msgsStr2 = await redisCommand('LRANGE', `chat:${phone}`, 0, -1);
+                const msgs2 = msgsStr2 ? msgsStr2.map(m => JSON.parse(m)).reverse() : [];
+                renderAdminChatMsgs(msgs2);
+            };
+            refreshBtn.style.cssText = 'background:rgba(255,255,255,0.2);color:#fff;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;margin-right:auto;transition:all 0.3s';
+            header.appendChild(refreshBtn);
+        }
+    }, 200);
 }
 
 function closeAdminChatPage() {
@@ -810,28 +868,39 @@ function renderAdminChatMsgs(msgs) {
 async function sendAdminChatMsg() {
     if (!currentAdminChatPhone) return showToast('ابتدا یک گفتگو را انتخاب کنید', 'error');
     const input = document.getElementById('adminChatInput');
-    const text = input.value.trim();
+    const text = input ? input.value.trim() : '';
     if (!text) return;
 
-    const currentUser = getCurrentUser();
-    const time = new Date().toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'});
-    const msg = {
-        id: Date.now(),
-        userPhone: currentAdminChatPhone,
-        userName: currentUser ? currentUser.name : 'مدیر',
-        userAvatar: currentUser ? currentUser.avatar : '',
-        sender: 'admin',
-        text: text,
-        time: time,
-        timestamp: Date.now(),
-        read: true
-    };
-    
-    await redisCommand('LPUSH', `chat:${currentAdminChatPhone}`, JSON.stringify(msg));
-    
-    input.value = '';
-    const msgsStr = await redisCommand('LRANGE', `chat:${currentAdminChatPhone}`, 0, -1);
-    renderAdminChatMsgs(msgsStr ? msgsStr.map(m => JSON.parse(m)).reverse() : []);
+    // ✅ جلوگیری از ارسال چندباره
+    if (isSending) return;
+    isSending = true;
+
+    try {
+        const currentUser = getCurrentUser();
+        const time = new Date().toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'});
+        const msg = {
+            id: Date.now(),
+            userPhone: currentAdminChatPhone,
+            userName: currentUser ? currentUser.name : 'مدیر',
+            userAvatar: currentUser ? currentUser.avatar : '',
+            sender: 'admin',
+            text: text,
+            time: time,
+            timestamp: Date.now(),
+            read: true
+        };
+        
+        await redisCommand('LPUSH', `chat:${currentAdminChatPhone}`, JSON.stringify(msg));
+        
+        input.value = '';
+        const msgsStr = await redisCommand('LRANGE', `chat:${currentAdminChatPhone}`, 0, -1);
+        renderAdminChatMsgs(msgsStr ? msgsStr.map(m => JSON.parse(m)).reverse() : []);
+    } catch (err) {
+        console.error('خطا:', err);
+        showToast('❌ خطا در ارسال پیام', 'error');
+    }
+
+    isSending = false;
 }
 
 async function sendBroadcast() {
@@ -845,7 +914,7 @@ async function sendBroadcast() {
     const regularUsers = phones ? phones.filter(p => p !== ADMIN_PHONE) : [];
     
     if (regularUsers.length === 0) {
-        if (resultDiv) resultDiv.innerHTML = '<div style="background:#f59e0b;color:#fff;padding:15px;border-radius:10px;margin-top:15px;text-align:center">️ هیچ کاربر عادی برای ارسال پیام وجود ندارد</div>';
+        if (resultDiv) resultDiv.innerHTML = '<div style="background:#f59e0b;color:#fff;padding:15px;border-radius:10px;margin-top:15px;text-align:center"> هیچ کاربر عادی برای ارسال پیام وجود ندارد</div>';
         return;
     }
     
@@ -877,6 +946,10 @@ async function sendBroadcast() {
     showToast(`پیام به ${regularUsers.length} کاربر ارسال شد`, 'success');
     setTimeout(() => { if (resultDiv) resultDiv.innerHTML = ''; }, 5000);
 }
+
+// ============================================================
+// 🔹 ابزارهای کمکی
+// ============================================================
 
 function openModal(id) { 
     const modal = document.getElementById(id);
