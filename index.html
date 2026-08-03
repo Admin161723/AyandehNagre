@@ -36,6 +36,7 @@
         #toast.success { background: linear-gradient(135deg, #10b981, #059669); }
         #toast.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
         #toast.info { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        #toast.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
 
         .loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s; }
         .loader.hide { opacity: 0; pointer-events: none; }
@@ -194,18 +195,43 @@
         .admin-panel.on { display: block; }
         .admin-head { background: #0f172a; color: #fff; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
         .admin-body { padding: 30px; max-width: 1000px; margin: 0 auto; }
+        
+        /* کارت موجودی پنل */
+        .admin-wallet-card {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(16,185,129,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .admin-wallet-card .wallet-info h3 { font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px; }
+        .admin-wallet-card .wallet-info .balance { font-size: 1.8rem; font-weight: 900; }
+        .admin-wallet-card .wallet-info .balance-sub { font-size: 0.8rem; opacity: 0.8; margin-top: 3px; }
+        .admin-wallet-card .wallet-actions { display: flex; gap: 8px; }
+        .wallet-btn { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 0.85rem; }
+        .wallet-btn:hover { background: rgba(255,255,255,0.3); }
+        .wallet-btn.danger { background: rgba(239,68,68,0.8); }
+        .wallet-btn.danger:hover { background: rgba(239,68,68,1); }
+
         .admin-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; flex-wrap: wrap; }
-        .admin-tab { padding: 10px 20px; background: none; border: none; font-weight: 600; color: #64748b; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+        .admin-tab { padding: 10px 20px; background: none; border: none; font-weight: 600; color: #64748b; border-bottom: 3px solid transparent; margin-bottom: -2px; cursor: pointer; }
         .admin-tab.on { color: #3b82f6; border-bottom-color: #3b82f6; }
         .admin-content { background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .user-list-item { display: flex; align-items: center; gap: 15px; padding: 15px; border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: background 0.3s; }
+        .user-list-item { display: flex; align-items: center; gap: 10px; padding: 12px; border-bottom: 1px solid #e2e8f0; flex-wrap: wrap; }
         .user-list-item:hover { background: #f1f5f9; }
         .user-list-item img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
-        .user-list-item-info { flex: 1; }
+        .user-list-item-info { flex: 1; min-width: 120px; }
         .user-list-item-info h4 { font-size: 0.95rem; color: #0f172a; }
         .user-list-item-info p { font-size: 0.8rem; color: #64748b; direction: ltr; text-align: right; }
-        .unread-badge { background: #ef4444; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-right: 5px; font-weight: 700; }
+        .unread-badge { background: #ef4444; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-right: 5px; font-weight: 700; min-width: 20px; text-align: center; }
         .banned-badge { background: #f59e0b; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-right: 5px; }
+        .wallet-badge { background: #10b981; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-right: 5px; }
 
         .admin-chat-page { position: fixed; inset: 0; background: #f8fafc; z-index: 6500; display: none; flex-direction: column; }
         .admin-chat-page.on { display: flex; }
@@ -227,9 +253,16 @@
 
         .broadcast-success { background: #10b981; color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: center; font-weight: 600; }
 
+        .user-actions { display: flex; gap: 5px; flex-wrap: wrap; }
+        .btn-small { padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; border: none; cursor: pointer; color: #fff; }
+        .btn-ban { background: #f59e0b; }
+        .btn-unban { background: #10b981; }
+        .btn-wallet { background: #8b5cf6; }
+
         @media (max-width: 768px) {
             .video-sec, .slider-box { aspect-ratio: 4/3; }
             .admin-tabs { flex-direction: column; }
+            .admin-wallet-card { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
@@ -351,7 +384,7 @@
             <button class="modal-close" onclick="closeModal('registerModal')">×</button>
             <h2>ثبت‌نام</h2>
             <div class="avatar-upload">
-                <div class="avatar-preview" id="avatarPreview"><span style="font-size:2rem;color:#94a3b8"></span></div>
+                <div class="avatar-preview" id="avatarPreview"><span style="font-size:2rem;color:#94a3b8">👤</span></div>
                 <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="previewAvatar(event)">
                 <button type="button" onclick="document.getElementById('avatarInput').click()" style="background:#f1f5f9;border:2px dashed #cbd5e1;padding:8px 15px;border-radius:8px;font-size:0.85rem">انتخاب عکس از گالری</button>
             </div>
@@ -372,7 +405,7 @@
                 <div class="otp-code" id="otpCodeDisplay">----</div>
                 <div style="font-size:0.8rem;color:#92400e">کد بالا را وارد کنید</div>
             </div>
-            <div class="form-group"><label>کد تایید</label><input type="text" id="otpInput" placeholder="کد ۴ رقمی را وارد کنید" style="text-align:center;letter-spacing:5px;font-size:1.2rem;font-weight:700"></div>
+            <div class="form-group"><label>کد تایید</label><input type="text" id="otpInput" placeholder="کد  رقمی را وارد کنید" style="text-align:center;letter-spacing:5px;font-size:1.2rem;font-weight:700"></div>
             <button class="form-submit" onclick="verifyOTP()">تایید و ورود به حساب</button>
         </div>
     </div>
@@ -438,7 +471,7 @@
                 <h3>کیف پول</h3>
                 <div class="wallet-display">
                     <div class="label">موجودی کیف پول</div>
-                    <div class="amount" id="walletAmount">۰ تومان</div>
+                    <div class="amount" id="walletAmount"> تومان</div>
                     <div class="label">برای شارژ کیف پول با پشتیبانی تماس بگیرید</div>
                 </div>
             </div>
@@ -457,14 +490,27 @@
             <button onclick="closeAdminPanel()" style="background:#ef4444;color:#fff;padding:8px 15px;border-radius:8px;font-weight:600">بستن</button>
         </div>
         <div class="admin-body">
+            <!-- کارت موجودی پنل -->
+            <div class="admin-wallet-card">
+                <div class="wallet-info">
+                    <h3>💰 موجودی کیف پول پنل</h3>
+                    <div class="balance" id="adminWalletBalance">۰ تومان</div>
+                    <div class="balance-sub">موجودی قابل برداشت برای شارژ کاربران</div>
+                </div>
+                <div class="wallet-actions">
+                    <button class="wallet-btn" onclick="openAdminWalletAddModal()">➕ افزایش موجودی</button>
+                </div>
+            </div>
+
             <div class="admin-tabs">
-                <button class="admin-tab on" onclick="switchAdminTab('users',this)">کاربران</button>
-                <button class="admin-tab" onclick="switchAdminTab('chats',this)">گفتگوها</button>
+                <button class="admin-tab on" onclick="switchAdminTab('users',this)">👥 کاربران</button>
+                <button class="admin-tab" onclick="switchAdminTab('chats',this)">💬 گفتگوها</button>
                 <button class="admin-tab" onclick="switchAdminTab('broadcast',this)">📢 ارسال همگانی</button>
             </div>
             <div class="admin-content">
                 <div id="adminUsersTab">
                     <h3 style="margin-bottom:15px">لیست کاربران</h3>
+                    <button onclick="loadAdminData()" style="background:#3b82f6;color:#fff;padding:8px 15px;border-radius:8px;font-size:0.85rem;margin-bottom:15px;border:none;cursor:pointer">🔄 به‌روزرسانی لیست</button>
                     <div id="adminUserList"></div>
                 </div>
                 <div id="adminChatsTab" style="display:none">
@@ -520,8 +566,8 @@
                 <select id="banDuration">
                     <option value="1">۱ ساعت</option>
                     <option value="24">۱ روز (۲۴ ساعت)</option>
-                    <option value="168">۱ هفته (۷ روز)</option>
-                    <option value="720"> ماه (۳۰ روز)</option>
+                    <option value="168"> هفته (۷ روز)</option>
+                    <option value="720">۱ ماه (۰ روز)</option>
                     <option value="permanent">دائمی</option>
                 </select>
             </div>
@@ -530,6 +576,42 @@
                 <input type="text" id="banReason" placeholder="مثال: رفتار نامناسب">
             </div>
             <button class="form-submit" onclick="confirmBan()">اعمال محرومیت</button>
+        </div>
+    </div>
+
+    <div class="ban-modal" id="walletModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal('walletModal')">×</button>
+            <h2>💰 شارژ کیف پول کاربر</h2>
+            <p style="text-align:center;color:#64748b;margin-bottom:10px">کاربر: <strong id="walletUserName"></strong></p>
+            <p style="text-align:center;color:#10b981;margin-bottom:5px;font-size:0.9rem">موجودی فعلی کاربر: <strong id="walletCurrentBalance"></strong> تومان</p>
+            <p style="text-align:center;color:#3b82f6;margin-bottom:20px;font-size:0.85rem">موجودی پنل: <strong id="walletPanelBalance"></strong> تومان</p>
+            <div class="form-group">
+                <label>مبلغ شارژ (تومان)</label>
+                <input type="number" id="walletAmountInput" placeholder="مثال: 50000" min="0">
+            </div>
+            <div class="form-group">
+                <label>توضیحات (اختیاری)</label>
+                <input type="text" id="walletDescription" placeholder="مثال: شارژ هدیه">
+            </div>
+            <button class="form-submit" onclick="confirmWalletAdd()">✅ شارژ کیف پول</button>
+        </div>
+    </div>
+
+    <div class="ban-modal" id="adminWalletAddModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal('adminWalletAddModal')">×</button>
+            <h2> افزایش موجودی پنل</h2>
+            <p style="text-align:center;color:#64748b;margin-bottom:10px">موجودی فعلی پنل: <strong id="adminCurrentWallet"></strong> تومان</p>
+            <div class="form-group">
+                <label>مبلغ افزایش (تومان)</label>
+                <input type="number" id="adminWalletAddAmount" placeholder="مثال: 1000000" min="0">
+            </div>
+            <div class="form-group">
+                <label>توضیحات (اختیاری)</label>
+                <input type="text" id="adminWalletAddDesc" placeholder="مثال: شارژ اولیه">
+            </div>
+            <button class="form-submit" onclick="confirmAdminWalletAdd()">✅ افزایش موجودی پنل</button>
         </div>
     </div>
 
