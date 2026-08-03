@@ -501,7 +501,7 @@ function updateUI() {
 function showMember(id) {
     const members = {
         matin: { name: 'متین', role: 'نویسنده و توسعه‌دهنده', desc: 'متین، نویسنده و توسعه‌دهنده اصلی مجموعه آینده نگر است.', img: '4.jpg' },
-        abolfazl: { name: 'ابوالفضل بشارت', role: 'عضو تیم', desc: 'ابوالفضل بشارت یکی از اعضای کلیدی تیم است.', img: 'abolfazl.png' },
+        abolfazl: { name: 'ابوالفضل بشارت', role: 'عضو تیم', desc: 'ابوالفضل بشارت یکی از اعضای کلیدی تیم است.', img: '30.jpg' },
         amirhossein: { name: 'امیرحسین شکری زاده', role: 'عضو تیم', desc: 'امیرحسین شکری زاده با ایده‌های نوآورانه به رشد مجموعه کمک می‌کند.', img: '5.jpg' }
     };
     const m = members[id];
@@ -545,8 +545,13 @@ async function loadUserChat(phone) {
     } else {
         userMsgs.forEach(m => {
             const div = document.createElement('div');
-            div.className = `msg ${m.sender === 'user' ? 'user' : 'admin'}`;
-            div.innerHTML = `${m.text}<span class="time">${m.time}</span>`;
+            if (m.sender === 'broadcast') {
+                div.className = 'msg system-broadcast';
+                div.innerHTML = `📢 <strong>${m.broadcastTitle || 'اطلاعیه'}</strong><br>${m.text}<span class="time">${m.time}</span>`;
+            } else {
+                div.className = `msg ${m.sender === 'user' ? 'user' : 'admin'}`;
+                div.innerHTML = `${m.text}<span class="time">${m.time}</span>`;
+            }
             container.appendChild(div);
         });
     }
@@ -599,6 +604,7 @@ function switchAdminTab(tab, btn) {
     btn.classList.add('on');
     document.getElementById('adminUsersTab').style.display = tab === 'users' ? 'block' : 'none';
     document.getElementById('adminChatsTab').style.display = tab === 'chats' ? 'block' : 'none';
+    document.getElementById('adminBroadcastTab').style.display = tab === 'broadcast' ? 'block' : 'none';
     if (tab === 'chats') loadAdminChats();
     if (tab === 'users') loadAdminData();
 }
@@ -706,7 +712,7 @@ async function loadAdminChats() {
     
     phones.forEach(phone => {
         const u = userChats[phone];
-        const unreadBadge = u.unread > 0 ? `<span class="unread-badge">${u.unread} جدید</span>` : '';
+        const unreadBadge = u.unread > 0 ? `<span class="unread-badge">${u.unread}</span>` : '';
         list.innerHTML += `
             <div class="user-list-item" onclick="openAdminChatPage('${phone}')">
                 <img src="${u.avatar}" alt="${u.name}">
@@ -759,8 +765,13 @@ async function loadAdminChatMsgs() {
     
     chatMsgs.forEach(m => {
         const div = document.createElement('div');
-        div.className = `msg ${m.sender === 'user' ? 'user' : 'admin'}`;
-        div.innerHTML = `${m.text}<span class="time">${m.time}</span>`;
+        if (m.sender === 'broadcast') {
+            div.className = 'msg system-broadcast';
+            div.innerHTML = `📢 <strong>${m.broadcastTitle || 'اطلاعیه'}</strong><br>${m.text}<span class="time">${m.time}</span>`;
+        } else {
+            div.className = `msg ${m.sender === 'user' ? 'user' : 'admin'}`;
+            div.innerHTML = `${m.text}<span class="time">${m.time}</span>`;
+        }
         container.appendChild(div);
     });
     container.scrollTop = container.scrollHeight;
@@ -790,6 +801,55 @@ async function sendAdminChatMsg() {
     await saveMessages(msgs);
     input.value = '';
     loadAdminChatMsgs();
+}
+
+// ارسال پیام همگانی به همه کاربران
+async function sendBroadcast() {
+    const title = document.getElementById('broadcastTitle').value.trim();
+    const message = document.getElementById('broadcastMessage').value.trim();
+    const resultDiv = document.getElementById('broadcastResult');
+    
+    if (!message) return showToast('لطفاً متن پیام را وارد کنید', 'error');
+    
+    const users = getUsers();
+    const regularUsers = users.filter(u => u.phone !== ADMIN_PHONE);
+    
+    if (regularUsers.length === 0) {
+        resultDiv.innerHTML = '<div class="broadcast-success" style="background:#f59e0b">️ هیچ کاربر عادی برای ارسال پیام وجود ندارد</div>';
+        return;
+    }
+    
+    const msgs = await getMessages();
+    const time = new Date().toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'});
+    const currentUser = getCurrentUser();
+    const broadcastId = Date.now();
+    
+    regularUsers.forEach(user => {
+        msgs.push({
+            id: broadcastId + Math.random(),
+            userPhone: user.phone,
+            userName: currentUser ? currentUser.name : 'مدیر',
+            userAvatar: currentUser ? currentUser.avatar : '',
+            sender: 'broadcast',
+            broadcastTitle: title || 'اطلاعیه سیستم',
+            text: message,
+            time: time,
+            timestamp: new Date().toISOString(),
+            read: false
+        });
+    });
+    
+    await saveMessages(msgs);
+    
+    resultDiv.innerHTML = `<div class="broadcast-success">✅ پیام با موفقیت به ${regularUsers.length} کاربر ارسال شد</div>`;
+    document.getElementById('broadcastTitle').value = '';
+    document.getElementById('broadcastMessage').value = '';
+    
+    showToast(`پیام به ${regularUsers.length} کاربر ارسال شد`, 'success');
+    
+    setTimeout(() => {
+        resultDiv.innerHTML = '';
+    }, 5000);
 }
 
 function openModal(id) { document.getElementById(id).classList.add('on'); }
