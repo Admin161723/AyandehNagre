@@ -12,10 +12,15 @@ const JSONBIN_MASTER_KEY = atob(_0x1a2b._0x7g8h);
 const JSONBIN_BIN_ID = atob(_0x1a2b._0x9i0j);
 const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 
+// موجودی اولیه پنل مدیریت (۵ میلیون تومان)
+const INITIAL_ADMIN_WALLET = 5000000;
+
 let tempUserData = {};
 let generatedOTP = "";
 let currentAdminChatPhone = null;
 let banTargetPhone = null;
+let walletTargetPhone = null;
+let adminRefreshInterval = null;
 
 function simpleHash(str) {
     let hash = 0;
@@ -31,7 +36,7 @@ function showToast(message, type = 'info') {
     const toast = document.getElementById('toast');
     toast.textContent = message;
     toast.className = `show ${type}`;
-    setTimeout(() => { toast.classList.remove('show'); }, 2000);
+    setTimeout(() => { toast.classList.remove('show'); }, 2500);
 }
 
 function getUsers() { 
@@ -58,6 +63,15 @@ function getAdminProfile() {
 }
 function saveAdminProfile(profile) {
     localStorage.setItem('an_admin_profile', JSON.stringify(profile));
+}
+
+// به‌روزرسانی نمایش موجودی پنل در بالای پنل مدیریت
+function updateAdminWalletDisplay() {
+    const adminProfile = getAdminProfile();
+    const balanceEl = document.getElementById('adminWalletBalance');
+    if (balanceEl && adminProfile) {
+        balanceEl.textContent = (adminProfile.wallet || 0).toLocaleString('fa-IR') + ' تومان';
+    }
 }
 
 async function getMessages() { 
@@ -220,7 +234,7 @@ function requestOTP() {
 
     if (!name || !phone || !password) return showToast('لطفاً تمام فیلدها را پر کنید', 'error');
     if (!/^09\d{9}$/.test(phone)) return showToast('شماره موبایل نامعتبر است', 'error');
-    if (password.length < 6) return showToast('رمز عبور باید حداقل  کاراکتر باشد', 'error');
+    if (password.length < 6) return showToast('رمز عبور باید حداقل ۶ کاراکتر باشد', 'error');
 
     const users = getUsers();
     if (users.find(u => u.phone === phone)) return showToast('این شماره قبلاً ثبت‌نام کرده است', 'error');
@@ -282,6 +296,7 @@ function handleLogin() {
     if (phone === ADMIN_PHONE && simpleHash(password) === simpleHash(ADMIN_PASS)) {
         let adminProfile = getAdminProfile();
         if (!adminProfile) {
+            // ساخت پروفایل مدیر با موجودی اولیه ۵ میلیون تومان
             adminProfile = {
                 id: 1,
                 name: 'مدیر سیستم',
@@ -289,10 +304,11 @@ function handleLogin() {
                 password: simpleHash(ADMIN_PASS),
                 isAdmin: true,
                 avatar: 'https://ui-avatars.com/api/?name=Admin&background=ef4444&color=fff',
-                wallet: 0,
+                wallet: INITIAL_ADMIN_WALLET,
                 joinDate: new Date().toLocaleDateString('fa-IR')
             };
             saveAdminProfile(adminProfile);
+            showToast('پروفایل مدیر ساخته شد با موجودی ۵,۰۰۰,۰۰۰ تومان', 'success');
         }
         setCurrentUser(adminProfile);
         closeModal('loginModal');
@@ -529,14 +545,14 @@ async function handleChatClick() {
     }
     
     toggleChatBox();
-    loadUserChat(user.phone);
+    await loadUserChat(user.phone);
 }
 
 function toggleChatBox() { document.getElementById('chatBox').classList.toggle('on'); }
 
 async function loadUserChat(phone) {
     const msgs = await getMessages();
-    const userMsgs = msgs.filter(m => m.userPhone === phone).sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+    const userMsgs = msgs.filter(m => m.userPhone === phone || m.isBroadcast).sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
     const container = document.getElementById('chatMsgs');
     container.innerHTML = '';
 
@@ -545,11 +561,14 @@ async function loadUserChat(phone) {
     } else {
         userMsgs.forEach(m => {
             const div = document.createElement('div');
-            if (m.sender === 'broadcast') {
+            if (m.isBroadcast) {
                 div.className = 'msg system-broadcast';
                 div.innerHTML = `📢 <strong>${m.broadcastTitle || 'اطلاعیه'}</strong><br>${m.text}<span class="time">${m.time}</span>`;
+            } else if (m.sender === 'user') {
+                div.className = 'msg user';
+                div.innerHTML = `${m.text}<span class="time">${m.time}</span>`;
             } else {
-                div.className = `msg ${m.sender === 'user' ? 'user' : 'admin'}`;
+                div.className = 'msg admin';
                 div.innerHTML = `${m.text}<span class="time">${m.time}</span>`;
             }
             container.appendChild(div);
@@ -587,17 +606,38 @@ async function sendUserMsg() {
     
     await saveMessages(msgs);
     input.value = '';
-    loadUserChat(user.phone);
+    await loadUserChat(user.phone);
+    showToast('پیام ارسال شد', 'success');
 }
 
 function openAdminPanel() {
     const user = getCurrentUser();
     if (!user || !user.isAdmin) return showToast('دسترسی غیرمجاز', 'error');
     document.getElementById('adminPanel').classList.add('on');
+    updateAdminWalletDisplay();
     loadAdminData();
+    
+    if (adminRefreshInterval) clearInterval(adminRefreshInterval);
+    adminRefreshInterval = setInterval(() => {
+        if (document.getElementById('adminPanel').classList.contains('on')) {
+            updateAdminWalletDisplay();
+            const activeTab = document.querySelector('.admin-tab.on');
+            if (activeTab && activeTab.textContent.includes('کاربران')) {
+                loadAdminData();
+            } else if (activeTab && activeTab.textContent.includes('گفتگوها')) {
+                loadAdminChats();
+            }
+        }
+    }, 5000);
 }
 
-function closeAdminPanel() { document.getElementById('adminPanel').classList.remove('on'); }
+function closeAdminPanel() { 
+    document.getElementById('adminPanel').classList.remove('on');
+    if (adminRefreshInterval) {
+        clearInterval(adminRefreshInterval);
+        adminRefreshInterval = null;
+    }
+}
 
 function switchAdminTab(tab, btn) {
     document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('on'));
@@ -618,11 +658,11 @@ async function loadAdminData() {
     const adminProfile = getAdminProfile();
     if (adminProfile) {
         list.innerHTML += `
-            <div class="user-list-item">
+            <div class="user-list-item" style="background:#f0fdf4;border:1px solid #10b981;border-radius:10px">
                 <img src="${adminProfile.avatar}" alt="${adminProfile.name}">
                 <div class="user-list-item-info">
                     <h4>${adminProfile.name} <span style="background:#ef4444;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.7rem;margin-right:5px">مدیر</span></h4>
-                    <p>${adminProfile.phone}</p>
+                    <p>${adminProfile.phone} | موجودی: ${(adminProfile.wallet || 0).toLocaleString('fa-IR')} تومان</p>
                 </div>
             </div>`;
     }
@@ -631,15 +671,21 @@ async function loadAdminData() {
         if (u.phone !== ADMIN_PHONE) {
             const isBanned = bans.find(b => b.phone === u.phone);
             const bannedBadge = isBanned ? `<span class="banned-badge">بن</span>` : '';
+            const walletBadge = `<span class="wallet-badge">${(u.wallet || 0).toLocaleString('fa-IR')} ت</span>`;
             list.innerHTML += `
                 <div class="user-list-item">
                     <img src="${u.avatar}" alt="${u.name}">
                     <div class="user-list-item-info">
-                        <h4>${u.name} ${bannedBadge}</h4>
+                        <h4>${u.name} ${bannedBadge} ${walletBadge}</h4>
                         <p>${u.phone}</p>
                     </div>
-                    <button onclick="openBanModal('${u.phone}', '${u.name}')" style="background:#f59e0b;color:#fff;padding:6px 12px;border-radius:6px;font-size:0.8rem;font-weight:600">بن</button>
-                    ${isBanned ? `<button onclick="unbanUser('${u.phone}')" style="background:#10b981;color:#fff;padding:6px 12px;border-radius:6px;font-size:0.8rem;font-weight:600">رفع بن</button>` : ''}
+                    <div class="user-actions">
+                        <button class="btn-small btn-wallet" onclick="openWalletModal('${u.phone}', '${u.name}', ${u.wallet || 0})">💰 شارژ</button>
+                        ${isBanned 
+                            ? `<button class="btn-small btn-unban" onclick="unbanUser('${u.phone}')">رفع بن</button>` 
+                            : `<button class="btn-small btn-ban" onclick="openBanModal('${u.phone}', '${u.name}')">بن</button>`
+                        }
+                    </div>
                 </div>`;
         }
     });
@@ -683,6 +729,104 @@ async function unbanUser(phone) {
     loadAdminData();
 }
 
+// باز کردن مودال شارژ کیف پول کاربر
+function openWalletModal(phone, name, currentBalance) {
+    walletTargetPhone = phone;
+    const adminProfile = getAdminProfile();
+    const adminBalance = adminProfile ? (adminProfile.wallet || 0) : 0;
+    
+    document.getElementById('walletUserName').textContent = name;
+    document.getElementById('walletCurrentBalance').textContent = currentBalance.toLocaleString('fa-IR');
+    document.getElementById('walletPanelBalance').textContent = adminBalance.toLocaleString('fa-IR');
+    document.getElementById('walletAmountInput').value = '';
+    document.getElementById('walletDescription').value = '';
+    openModal('walletModal');
+}
+
+// تایید شارژ کیف پول کاربر (با کسر از موجودی پنل)
+async function confirmWalletAdd() {
+    if (!walletTargetPhone) return;
+    
+    const amount = parseInt(document.getElementById('walletAmountInput').value);
+    const description = document.getElementById('walletDescription').value.trim();
+    
+    if (!amount || amount <= 0) return showToast('لطفاً مبلغ معتبر وارد کنید', 'error');
+    
+    // گرفتن موجودی پنل
+    const adminProfile = getAdminProfile();
+    const adminBalance = adminProfile ? (adminProfile.wallet || 0) : 0;
+    
+    // بررسی موجودی پنل
+    if (adminBalance < amount) {
+        showToast(`❌ موجودی پنل کافی نیست! موجودی فعلی: ${adminBalance.toLocaleString('fa-IR')} تومان`, 'error');
+        return;
+    }
+    
+    // کسر از موجودی پنل
+    adminProfile.wallet = adminBalance - amount;
+    saveAdminProfile(adminProfile);
+    
+    // اضافه کردن به کیف پول کاربر
+    const users = getUsers();
+    const idx = users.findIndex(u => u.phone === walletTargetPhone);
+    
+    if (idx !== -1) {
+        users[idx].wallet = (users[idx].wallet || 0) + amount;
+        saveUsers(users);
+        
+        // به‌روزرسانی کاربر فعلی اگر همین کاربر است
+        const currentUser = getCurrentUser();
+        if (currentUser && currentUser.phone === walletTargetPhone) {
+            currentUser.wallet = users[idx].wallet;
+            setCurrentUser(currentUser);
+        }
+        
+        closeModal('walletModal');
+        showToast(`✅ ${amount.toLocaleString('fa-IR')} تومان به کیف پول ${users[idx].name} شارژ شد`, 'success');
+        
+        // به‌روزرسانی نمایش موجودی پنل
+        updateAdminWalletDisplay();
+        loadAdminData();
+    } else {
+        showToast('کاربر پیدا نشد', 'error');
+    }
+}
+
+// باز کردن مودال افزایش موجودی پنل
+function openAdminWalletAddModal() {
+    const adminProfile = getAdminProfile();
+    const currentBalance = adminProfile ? (adminProfile.wallet || 0) : 0;
+    document.getElementById('adminCurrentWallet').textContent = currentBalance.toLocaleString('fa-IR');
+    document.getElementById('adminWalletAddAmount').value = '';
+    document.getElementById('adminWalletAddDesc').value = '';
+    openModal('adminWalletAddModal');
+}
+
+// تایید افزایش موجودی پنل
+function confirmAdminWalletAdd() {
+    const amount = parseInt(document.getElementById('adminWalletAddAmount').value);
+    const description = document.getElementById('adminWalletAddDesc').value.trim();
+    
+    if (!amount || amount <= 0) return showToast('لطفاً مبلغ معتبر وارد کنید', 'error');
+    
+    const adminProfile = getAdminProfile();
+    if (!adminProfile) return showToast('پروفایل مدیر پیدا نشد', 'error');
+    
+    adminProfile.wallet = (adminProfile.wallet || 0) + amount;
+    saveAdminProfile(adminProfile);
+    
+    // به‌روزرسانی کاربر فعلی
+    const currentUser = getCurrentUser();
+    if (currentUser && currentUser.isAdmin) {
+        currentUser.wallet = adminProfile.wallet;
+        setCurrentUser(currentUser);
+    }
+    
+    closeModal('adminWalletAddModal');
+    updateAdminWalletDisplay();
+    showToast(`✅ ${amount.toLocaleString('fa-IR')} تومان به کیف پول پنل اضافه شد`, 'success');
+}
+
 async function loadAdminChats() {
     const msgs = await getMessages();
     const list = document.getElementById('adminChatList');
@@ -690,7 +834,7 @@ async function loadAdminChats() {
     
     const userChats = {};
     msgs.forEach(m => {
-        if (!userChats[m.userPhone]) {
+        if (m.sender !== 'broadcast' && !userChats[m.userPhone]) {
             userChats[m.userPhone] = { 
                 name: m.userName, 
                 avatar: m.userAvatar || 'https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff',
@@ -700,7 +844,9 @@ async function loadAdminChats() {
             };
         }
         if (m.sender === 'user' && !m.read) {
-            userChats[m.userPhone].unread++;
+            if (userChats[m.userPhone]) {
+                userChats[m.userPhone].unread++;
+            }
         }
     });
     
@@ -727,7 +873,7 @@ async function loadAdminChats() {
 async function openAdminChatPage(phone) {
     currentAdminChatPhone = phone;
     const msgs = await getMessages();
-    const userMsg = msgs.find(m => m.userPhone === phone);
+    const userMsg = msgs.find(m => m.userPhone === phone && m.sender !== 'broadcast');
     const userName = userMsg ? userMsg.userName : 'کاربر';
     const userAvatar = userMsg && userMsg.userAvatar ? userMsg.userAvatar : 'https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff';
     
@@ -765,11 +911,14 @@ async function loadAdminChatMsgs() {
     
     chatMsgs.forEach(m => {
         const div = document.createElement('div');
-        if (m.sender === 'broadcast') {
+        if (m.isBroadcast) {
             div.className = 'msg system-broadcast';
-            div.innerHTML = `📢 <strong>${m.broadcastTitle || 'اطلاعیه'}</strong><br>${m.text}<span class="time">${m.time}</span>`;
+            div.innerHTML = ` <strong>${m.broadcastTitle || 'اطلاعیه'}</strong><br>${m.text}<span class="time">${m.time}</span>`;
+        } else if (m.sender === 'user') {
+            div.className = 'msg user';
+            div.innerHTML = `${m.text}<span class="time">${m.time}</span>`;
         } else {
-            div.className = `msg ${m.sender === 'user' ? 'user' : 'admin'}`;
+            div.className = 'msg admin';
             div.innerHTML = `${m.text}<span class="time">${m.time}</span>`;
         }
         container.appendChild(div);
@@ -803,7 +952,6 @@ async function sendAdminChatMsg() {
     loadAdminChatMsgs();
 }
 
-// ارسال پیام همگانی به همه کاربران
 async function sendBroadcast() {
     const title = document.getElementById('broadcastTitle').value.trim();
     const message = document.getElementById('broadcastMessage').value.trim();
@@ -815,22 +963,22 @@ async function sendBroadcast() {
     const regularUsers = users.filter(u => u.phone !== ADMIN_PHONE);
     
     if (regularUsers.length === 0) {
-        resultDiv.innerHTML = '<div class="broadcast-success" style="background:#f59e0b">️ هیچ کاربر عادی برای ارسال پیام وجود ندارد</div>';
+        resultDiv.innerHTML = '<div class="broadcast-success" style="background:#f59e0b">⚠️ هیچ کاربر عادی برای ارسال پیام وجود ندارد</div>';
         return;
     }
     
     const msgs = await getMessages();
     const time = new Date().toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'});
     const currentUser = getCurrentUser();
-    const broadcastId = Date.now();
     
     regularUsers.forEach(user => {
         msgs.push({
-            id: broadcastId + Math.random(),
+            id: Date.now() + Math.random(),
             userPhone: user.phone,
             userName: currentUser ? currentUser.name : 'مدیر',
             userAvatar: currentUser ? currentUser.avatar : '',
             sender: 'broadcast',
+            isBroadcast: true,
             broadcastTitle: title || 'اطلاعیه سیستم',
             text: message,
             time: time,
