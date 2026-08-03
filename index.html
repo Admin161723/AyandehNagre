@@ -145,6 +145,7 @@
         @keyframes msgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .msg.user { background: #3b82f6; color: #fff; align-self: flex-end; border-bottom-left-radius: 5px; }
         .msg.admin { background: #10b981; color: #fff; align-self: flex-start; border-bottom-right-radius: 5px; }
+        .msg.system-broadcast { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; align-self: center; border-radius: 12px; text-align: center; max-width: 90%; }
         .msg .time { font-size: 0.65rem; opacity: 0.7; margin-top: 4px; display: block; text-align: left; }
         .chat-input { padding: 12px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; gap: 8px; }
         .chat-input textarea { flex: 1; padding: 10px; border: 2px solid #e2e8f0; border-radius: 20px; font-size: 0.85rem; resize: none; height: 42px; }
@@ -160,8 +161,9 @@
         .modal-box h2 { text-align: center; margin-bottom: 20px; color: #0f172a; font-size: 1.4rem; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-size: 0.85rem; font-weight: 600; color: #334155; }
-        .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 0.9rem; transition: border 0.3s; }
-        .form-group input:focus, .form-group select:focus { border-color: #3b82f6; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 0.9rem; transition: border 0.3s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #3b82f6; }
+        .form-group textarea { resize: vertical; min-height: 80px; }
         .form-submit { width: 100%; background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 0.95rem; margin-top: 10px; transition: all 0.3s; }
         .form-submit:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
         .form-link { text-align: center; margin-top: 15px; font-size: 0.85rem; color: #64748b; }
@@ -173,72 +175,18 @@
         .otp-display { background: #fef3c7; border: 2px solid #f59e0b; padding: 15px; border-radius: 12px; text-align: center; margin: 15px 0; }
         .otp-code { font-size: 2rem; font-weight: 900; color: #d97706; letter-spacing: 5px; margin: 10px 0; }
 
-        .settings-page {
-            position: fixed;
-            inset: 0;
-            background: #f8fafc;
-            z-index: 4000;
-            display: none;
-            overflow-y: auto;
-        }
+        .settings-page { position: fixed; inset: 0; background: #f8fafc; z-index: 4000; display: none; overflow-y: auto; }
         .settings-page.on { display: block; }
-        .settings-header {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: #fff;
-            padding: 20px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(59,130,246,0.3);
-        }
+        .settings-header { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; padding: 20px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(59,130,246,0.3); }
         .settings-header h2 { font-size: 1.3rem; font-weight: 800; }
-        .settings-back {
-            background: rgba(255,255,255,0.2);
-            color: #fff;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
+        .settings-back { background: rgba(255,255,255,0.2); color: #fff; padding: 8px 15px; border-radius: 8px; font-weight: 600; transition: all 0.3s; }
         .settings-back:hover { background: rgba(255,255,255,0.3); }
         .settings-body { padding: 30px 25px; max-width: 600px; margin: 0 auto; }
-        .settings-card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        .settings-card h3 {
-            font-size: 1.1rem;
-            color: #0f172a;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        .settings-avatar {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .settings-avatar img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #fff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .wallet-display {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 15px;
-        }
+        .settings-card { background: #fff; border-radius: 16px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .settings-card h3 { font-size: 1.1rem; color: #0f172a; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e2e8f0; }
+        .settings-avatar { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .settings-avatar img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .wallet-display { background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 15px; }
         .wallet-display .amount { font-size: 2rem; font-weight: 900; margin: 10px 0; }
         .wallet-display .label { font-size: 0.9rem; opacity: 0.9; }
 
@@ -246,7 +194,7 @@
         .admin-panel.on { display: block; }
         .admin-head { background: #0f172a; color: #fff; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
         .admin-body { padding: 30px; max-width: 1000px; margin: 0 auto; }
-        .admin-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; }
+        .admin-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; flex-wrap: wrap; }
         .admin-tab { padding: 10px 20px; background: none; border: none; font-weight: 600; color: #64748b; border-bottom: 3px solid transparent; margin-bottom: -2px; }
         .admin-tab.on { color: #3b82f6; border-bottom-color: #3b82f6; }
         .admin-content { background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
@@ -256,27 +204,12 @@
         .user-list-item-info { flex: 1; }
         .user-list-item-info h4 { font-size: 0.95rem; color: #0f172a; }
         .user-list-item-info p { font-size: 0.8rem; color: #64748b; direction: ltr; text-align: right; }
-        .unread-badge { background: #ef4444; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-right: 5px; }
+        .unread-badge { background: #ef4444; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-right: 5px; font-weight: 700; }
         .banned-badge { background: #f59e0b; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-right: 5px; }
 
-        .admin-chat-page {
-            position: fixed;
-            inset: 0;
-            background: #f8fafc;
-            z-index: 6500;
-            display: none;
-            flex-direction: column;
-        }
+        .admin-chat-page { position: fixed; inset: 0; background: #f8fafc; z-index: 6500; display: none; flex-direction: column; }
         .admin-chat-page.on { display: flex; }
-        .admin-chat-header {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: #fff;
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(59,130,246,0.3);
-        }
+        .admin-chat-header { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(59,130,246,0.3); }
         .admin-chat-user-info { display: flex; align-items: center; gap: 12px; }
         .admin-chat-user-info img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; }
         .admin-chat-user-info h3 { font-size: 1.1rem; font-weight: 700; }
@@ -292,8 +225,11 @@
         .ban-modal { position: fixed; inset: 0; background: rgba(15,23,42,0.8); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 7000; padding: 20px; }
         .ban-modal.on { display: flex; }
 
+        .broadcast-success { background: #10b981; color: #fff; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: center; font-weight: 600; }
+
         @media (max-width: 768px) {
             .video-sec, .slider-box { aspect-ratio: 4/3; }
+            .admin-tabs { flex-direction: column; }
         }
     </style>
 </head>
@@ -333,9 +269,9 @@
         </div>
         <ul>
             <li><a href="#home" onclick="toggleMenu()">🏠 خانه</a></li>
-            <li class="menu-item" id="menuLogin" onclick="openModal('loginModal'); toggleMenu()"><a href="#">🔐 ورود / ثبت‌نام</a></li>
+            <li class="menu-item" id="menuLogin" onclick="openModal('loginModal'); toggleMenu()"><a href="#"> ورود / ثبت‌نام</a></li>
             <li class="menu-item" id="menuSettings" onclick="openSettingsPage(); toggleMenu()"><a href="#">⚙️ تنظیمات اکانت</a></li>
-            <li class="menu-item" id="menuAdmin" onclick="openAdminPanel(); toggleMenu()"><a href="#" style="color:#ef4444">️ پنل مدیریت</a></li>
+            <li class="menu-item" id="menuAdmin" onclick="openAdminPanel(); toggleMenu()"><a href="#" style="color:#ef4444">🛡️ پنل مدیریت</a></li>
         </ul>
         <button class="logout-sidebar" id="sidebarLogout" onclick="handleLogout()">خروج از حساب</button>
     </aside>
@@ -368,7 +304,7 @@
                 <div class="role">توسعه‌دهنده</div>
             </div>
             <div class="team-member" onclick="showMember('abolfazl')">
-                <img src="abolfazl.png" alt="ابوالفضل">
+                <img src="30.jpg" alt="ابوالفضل">
                 <h4>ابوالفضل بشارت</h4>
                 <div class="role">عضو تیم</div>
             </div>
@@ -415,7 +351,7 @@
             <button class="modal-close" onclick="closeModal('registerModal')">×</button>
             <h2>ثبت‌نام</h2>
             <div class="avatar-upload">
-                <div class="avatar-preview" id="avatarPreview"><span style="font-size:2rem;color:#94a3b8">👤</span></div>
+                <div class="avatar-preview" id="avatarPreview"><span style="font-size:2rem;color:#94a3b8"></span></div>
                 <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="previewAvatar(event)">
                 <button type="button" onclick="document.getElementById('avatarInput').click()" style="background:#f1f5f9;border:2px dashed #cbd5e1;padding:8px 15px;border-radius:8px;font-size:0.85rem">انتخاب عکس از گالری</button>
             </div>
@@ -486,33 +422,18 @@
                     <button onclick="document.getElementById('settingsAvatarInput').click()" style="background:#3b82f6;color:#fff;padding:10px 20px;border-radius:8px;font-weight:600">تغییر عکس پروفایل</button>
                 </div>
             </div>
-
             <div class="settings-card">
                 <h3>تغییر نام</h3>
-                <div class="form-group">
-                    <label>نام و نام خانوادگی</label>
-                    <input type="text" id="settingsName" placeholder="نام جدید">
-                </div>
+                <div class="form-group"><label>نام و نام خانوادگی</label><input type="text" id="settingsName" placeholder="نام جدید"></div>
                 <button class="form-submit" onclick="changeName()">ذخیره نام</button>
             </div>
-
             <div class="settings-card">
                 <h3>تغییر رمز عبور</h3>
-                <div class="form-group">
-                    <label>رمز عبور فعلی</label>
-                    <input type="password" id="currentPassword" placeholder="رمز فعلی">
-                </div>
-                <div class="form-group">
-                    <label>رمز عبور جدید</label>
-                    <input type="password" id="newPassword" placeholder="رمز جدید (حداقل ۶ کاراکتر)">
-                </div>
-                <div class="form-group">
-                    <label>تکرار رمز عبور جدید</label>
-                    <input type="password" id="confirmPassword" placeholder="تکرار رمز جدید">
-                </div>
+                <div class="form-group"><label>رمز عبور فعلی</label><input type="password" id="currentPassword" placeholder="رمز فعلی"></div>
+                <div class="form-group"><label>رمز عبور جدید</label><input type="password" id="newPassword" placeholder="رمز جدید (حداقل ۶ کاراکتر)"></div>
+                <div class="form-group"><label>تکرار رمز عبور جدید</label><input type="password" id="confirmPassword" placeholder="تکرار رمز جدید"></div>
                 <button class="form-submit" onclick="changePassword()">تغییر رمز عبور</button>
             </div>
-
             <div class="settings-card">
                 <h3>کیف پول</h3>
                 <div class="wallet-display">
@@ -521,19 +442,11 @@
                     <div class="label">برای شارژ کیف پول با پشتیبانی تماس بگیرید</div>
                 </div>
             </div>
-
             <div class="settings-card">
                 <h3>اطلاعات حساب</h3>
-                <div class="form-group">
-                    <label>شماره موبایل</label>
-                    <input type="text" id="settingsPhone" disabled style="background:#f1f5f9">
-                </div>
-                <div class="form-group">
-                    <label>تاریخ عضویت</label>
-                    <input type="text" id="settingsJoinDate" disabled style="background:#f1f5f9">
-                </div>
+                <div class="form-group"><label>شماره موبایل</label><input type="text" id="settingsPhone" disabled style="background:#f1f5f9"></div>
+                <div class="form-group"><label>تاریخ عضویت</label><input type="text" id="settingsJoinDate" disabled style="background:#f1f5f9"></div>
             </div>
-
             <button class="form-submit" style="background:#ef4444;margin-top:20px" onclick="handleLogout()">خروج از حساب</button>
         </div>
     </div>
@@ -547,6 +460,7 @@
             <div class="admin-tabs">
                 <button class="admin-tab on" onclick="switchAdminTab('users',this)">کاربران</button>
                 <button class="admin-tab" onclick="switchAdminTab('chats',this)">گفتگوها</button>
+                <button class="admin-tab" onclick="switchAdminTab('broadcast',this)">📢 ارسال همگانی</button>
             </div>
             <div class="admin-content">
                 <div id="adminUsersTab">
@@ -557,6 +471,20 @@
                     <h3 style="margin-bottom:15px">گفتگوهای کاربران</h3>
                     <p style="color:#64748b;font-size:0.9rem;margin-bottom:15px">روی هر کاربر کلیک کنید تا پیام‌های او را ببینید و پاسخ دهید</p>
                     <div id="adminChatList"></div>
+                </div>
+                <div id="adminBroadcastTab" style="display:none">
+                    <h3 style="margin-bottom:15px">📢 ارسال پیام به همه کاربران</h3>
+                    <p style="color:#64748b;font-size:0.9rem;margin-bottom:20px">این پیام به تمام کاربران ثبت‌نام شده ارسال خواهد شد</p>
+                    <div class="form-group">
+                        <label>عنوان پیام (اختیاری)</label>
+                        <input type="text" id="broadcastTitle" placeholder="مثال: اطلاعیه مهم">
+                    </div>
+                    <div class="form-group">
+                        <label>متن پیام</label>
+                        <textarea id="broadcastMessage" placeholder="پیام خود را بنویسید..." style="min-height:120px"></textarea>
+                    </div>
+                    <button class="form-submit" onclick="sendBroadcast()">📤 ارسال به همه کاربران</button>
+                    <div id="broadcastResult"></div>
                 </div>
             </div>
         </div>
@@ -593,7 +521,7 @@
                     <option value="1">۱ ساعت</option>
                     <option value="24">۱ روز (۲۴ ساعت)</option>
                     <option value="168">۱ هفته (۷ روز)</option>
-                    <option value="720">۱ ماه (۳ روز)</option>
+                    <option value="720"> ماه (۳۰ روز)</option>
                     <option value="permanent">دائمی</option>
                 </select>
             </div>
