@@ -1,3 +1,4 @@
+
 const UPSTASH_URL = "https://smooth-werewolf-200782.upstash.io";
 const UPSTASH_TOKEN = "gQAAAAAAAxBOAAIgcDFjN2NiMjYxOWNlNjE0NzgyOTExM2JjMjA5ZTc0MjVjMA";
 
@@ -12,9 +13,51 @@ let banTargetPhone = null;
 let walletTargetPhone = null;
 let adminRefreshInterval = null;
 let chatRefreshInterval = null;
-let onlineInterval = null;
 
-// تابع اصلی ارتباط با Upstash Redis
+// ✅ پر کردن نوار پیشرفت لودر با JavaScript
+document.addEventListener('DOMContentLoaded', () => {
+    const loaderFill = document.getElementById('loaderFill');
+    if (loaderFill) {
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 2;
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(interval);
+            }
+            loaderFill.style.width = progress + '%';
+        }, 140);
+    }
+    
+    const slides = document.querySelectorAll('.slide');
+    let cur = 0;
+    if (slides.length > 0) {
+        setInterval(() => {
+            slides[cur].classList.remove('on');
+            cur = (cur + 1) % slides.length;
+            slides[cur].classList.add('on');
+        }, 3000);
+    }
+    
+    const loaderVideo = document.getElementById('loaderVideo');
+    if (loaderVideo) {
+        loaderVideo.play().catch(() => {});
+    }
+    
+    updateUI();
+});
+
+// ✅ تایمر اجباری برای حذف لودر بعد از ۸ ثانیه
+setTimeout(() => {
+    const loader = document.getElementById('loader');
+    if (loader) {
+        loader.style.opacity = '0';
+        loader.style.visibility = 'hidden';
+        loader.style.pointerEvents = 'none';
+        setTimeout(() => { if (loader.parentNode) loader.parentNode.removeChild(loader); }, 500);
+    }
+}, 8000);
+
 async function redisCommand(command, ...args) {
     try {
         const response = await fetch(`${UPSTASH_URL}`, {
@@ -26,6 +69,7 @@ async function redisCommand(command, ...args) {
             body: JSON.stringify([command, ...args])
         });
         const data = await response.json();
+        if (data.error) return null;
         return data.result;
     } catch (e) {
         console.error("Redis Error:", e);
@@ -45,6 +89,7 @@ function simpleHash(str) {
 
 function showToast(message, type = 'info') {
     const toast = document.getElementById('toast');
+    if (!toast) return;
     toast.textContent = message;
     toast.className = `show ${type}`;
     setTimeout(() => { toast.classList.remove('show'); }, 2500);
@@ -65,44 +110,17 @@ async function updateAdminWalletDisplay() {
     }
 }
 
-window.addEventListener('load', () => {
-    const loaderFill = document.getElementById('loaderFill');
-    const loaderVideo = document.getElementById('loaderVideo');
-    let progress = 0;
-    const progressInterval = setInterval(() => {
-        progress += (100 / 70);
-        if (progress >= 100) { progress = 100; clearInterval(progressInterval); }
-        loaderFill.style.width = progress + '%';
-    }, 100);
-    
-    if (loaderVideo) {
-        loaderVideo.play().catch(() => { document.addEventListener('click', () => loaderVideo.play(), { once: true }); });
-    }
-    
-    setTimeout(() => {
-        document.getElementById('loader').classList.add('hide');
-        if (loaderVideo) loaderVideo.pause();
-        const v = document.getElementById('mainVideo');
-        if (v) v.play().catch(() => document.addEventListener('click', () => v.play(), { once: true }));
-        
-        updateUI();
-        startOnlinePing();
-    }, 7000);
-});
+function toggleMenu() { 
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.toggle('open'); 
+}
 
-const slides = document.querySelectorAll('.slide');
-let cur = 0;
-setInterval(() => {
-    slides[cur].classList.remove('on');
-    cur = (cur + 1) % slides.length;
-    slides[cur].classList.add('on');
-}, 3000);
-
-function toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); }
 document.addEventListener('click', e => {
     const m = document.getElementById('sidebar');
     const b = document.querySelector('.menu-btn');
-    if (!m.contains(e.target) && !b.contains(e.target) && m.classList.contains('open')) m.classList.remove('open');
+    if (m && b && !m.contains(e.target) && !b.contains(e.target) && m.classList.contains('open')) {
+        m.classList.remove('open');
+    }
 });
 
 let tempAvatar = '';
@@ -112,7 +130,8 @@ function previewAvatar(e) {
     const r = new FileReader();
     r.onload = ev => {
         tempAvatar = ev.target.result;
-        document.getElementById('avatarPreview').innerHTML = `<img src="${tempAvatar}">`;
+        const preview = document.getElementById('avatarPreview');
+        if (preview) preview.innerHTML = `<img src="${tempAvatar}">`;
     };
     r.readAsDataURL(f);
 }
@@ -130,8 +149,10 @@ async function requestOTP() {
     if (exists) return showToast('این شماره قبلاً ثبت‌نام کرده است', 'error');
 
     generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
-    document.getElementById('otpCodeDisplay').textContent = generatedOTP;
-    document.getElementById('otpInput').value = '';
+    const otpDisplay = document.getElementById('otpCodeDisplay');
+    const otpInput = document.getElementById('otpInput');
+    if (otpDisplay) otpDisplay.textContent = generatedOTP;
+    if (otpInput) otpInput.value = '';
     
     tempUserData = { 
         name: name, 
@@ -172,7 +193,8 @@ async function verifyOTP() {
     
     setTimeout(() => {
         updateUI();
-        document.getElementById('sidebar').classList.add('open');
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) sidebar.classList.add('open');
         if (newUser.isAdmin) setTimeout(() => openAdminPanel(), 1500);
     }, 300);
 }
@@ -196,7 +218,7 @@ async function handleLogin() {
             await redisCommand('SET', `user:${ADMIN_PHONE}`, JSON.stringify(adminProfile));
             await redisCommand('SADD', 'users:all', ADMIN_PHONE);
             await redisCommand('SET', 'admin:wallet', INITIAL_ADMIN_WALLET);
-            showToast('پروفایل مدیر ساخته شد با موجودی ۵,۰۰۰,۰۰۰ تومان', 'success');
+            showToast('پروفایل مدیر ساخته شد با موجودی ,۰۰۰,۰۰ تومان', 'success');
         }
         setCurrentUser(adminProfile);
         closeModal('loginModal');
@@ -234,7 +256,7 @@ async function handleForgot() {
     const user = userStr ? JSON.parse(userStr) : null;
 
     if (user) {
-        showToast('رمز عبور شما: ' + user.password, 'info'); // در واقعیت هش است، اما برای سادگی نمایش داده می‌شود
+        showToast('رمز عبور شما: ' + user.password, 'info');
         closeModal('forgotModal');
     } else {
         showToast('این شماره ثبت‌نام نشده است', 'error');
@@ -243,9 +265,9 @@ async function handleForgot() {
 
 function handleLogout() {
     clearCurrentUser();
-    closeSettingsPage();
     toggleMenu();
-    if (onlineInterval) clearInterval(onlineInterval);
+    if (chatRefreshInterval) clearInterval(chatRefreshInterval);
+    if (adminRefreshInterval) clearInterval(adminRefreshInterval);
     showToast('با موفقیت خارج شدید', 'info');
     updateUI();
 }
@@ -254,16 +276,21 @@ function openSettingsPage() {
     const user = getCurrentUser();
     if (!user) return showToast('لطفاً ابتدا وارد شوید', 'error');
     
-    document.getElementById('settingsAvatar').src = user.avatar;
-    document.getElementById('settingsName').value = user.name;
-    document.getElementById('settingsPhone').value = user.phone;
-    document.getElementById('settingsJoinDate').value = user.joinDate || 'نامشخص';
-    document.getElementById('walletAmount').textContent = (user.wallet || 0).toLocaleString('fa-IR') + ' تومان';
-    
-    document.getElementById('settingsPage').classList.add('on');
+    const settingsPage = document.getElementById('settingsPage');
+    if (settingsPage) {
+        document.getElementById('settingsAvatar').src = user.avatar;
+        document.getElementById('settingsName').value = user.name;
+        document.getElementById('settingsPhone').value = user.phone;
+        document.getElementById('settingsJoinDate').value = user.joinDate || 'نامشخص';
+        document.getElementById('walletAmount').textContent = (user.wallet || 0).toLocaleString('fa-IR') + ' تومان';
+        settingsPage.classList.add('on');
+    }
 }
 
-function closeSettingsPage() { document.getElementById('settingsPage').classList.remove('on'); }
+function closeSettingsPage() { 
+    const settingsPage = document.getElementById('settingsPage');
+    if (settingsPage) settingsPage.classList.remove('on'); 
+}
 
 async function changeAvatar(e) {
     const f = e.target.files[0];
@@ -278,8 +305,6 @@ async function changeAvatar(e) {
         userData.avatar = newAvatar;
         await redisCommand('SET', `user:${user.phone}`, JSON.stringify(userData));
         setCurrentUser(userData);
-        
-        document.getElementById('settingsAvatar').src = newAvatar;
         updateUI();
         showToast('عکس پروفایل با موفقیت تغییر کرد', 'success');
     };
@@ -299,9 +324,6 @@ async function changeName() {
     
     await redisCommand('SET', `user:${user.phone}`, JSON.stringify(userData));
     setCurrentUser(userData);
-    
-    document.getElementById('settingsAvatar').src = userData.avatar;
-    document.getElementById('settingsName').value = userData.name;
     updateUI();
     showToast('نام با موفقیت تغییر کرد', 'success');
 }
@@ -342,25 +364,31 @@ function updateUI() {
     const chatFab = document.getElementById('chatFab');
 
     if (user) {
-        document.getElementById('sidebarAvatar').src = user.avatar;
-        document.getElementById('sidebarName').textContent = user.name;
-        document.getElementById('sidebarPhone').textContent = user.phone;
+        const avatarEl = document.getElementById('sidebarAvatar');
+        const nameEl = document.getElementById('sidebarName');
+        const phoneEl = document.getElementById('sidebarPhone');
+        if (avatarEl) avatarEl.src = user.avatar;
+        if (nameEl) nameEl.textContent = user.name;
+        if (phoneEl) phoneEl.textContent = user.phone;
         
-        sidebarProfile.classList.add('visible');
-        sidebarLogout.classList.add('visible');
-        menuLogin.classList.remove('visible');
-        menuSettings.classList.add('visible');
-        chatFab.classList.remove('hidden');
+        if (sidebarProfile) sidebarProfile.classList.add('visible');
+        if (sidebarLogout) sidebarLogout.classList.add('visible');
+        if (menuLogin) menuLogin.classList.remove('visible');
+        if (menuSettings) menuSettings.classList.add('visible');
+        if (chatFab) chatFab.classList.add('visible');
         
-        if (user.isAdmin) menuAdmin.classList.add('visible');
-        else menuAdmin.classList.remove('visible');
+        if (user.isAdmin) {
+            if (menuAdmin) menuAdmin.classList.add('visible');
+        } else {
+            if (menuAdmin) menuAdmin.classList.remove('visible');
+        }
     } else {
-        sidebarProfile.classList.remove('visible');
-        sidebarLogout.classList.remove('visible');
-        menuLogin.classList.add('visible');
-        menuSettings.classList.remove('visible');
-        menuAdmin.classList.remove('visible');
-        chatFab.classList.add('hidden');
+        if (sidebarProfile) sidebarProfile.classList.remove('visible');
+        if (sidebarLogout) sidebarLogout.classList.remove('visible');
+        if (menuLogin) menuLogin.classList.add('visible');
+        if (menuSettings) menuSettings.classList.remove('visible');
+        if (menuAdmin) menuAdmin.classList.remove('visible');
+        if (chatFab) chatFab.classList.remove('visible');
     }
 }
 
@@ -378,19 +406,6 @@ function showMember(id) {
         document.getElementById('teamModalDesc').textContent = m.desc;
         openModal('teamModal');
     }
-}
-
-function startOnlinePing() {
-    const user = getCurrentUser();
-    if (!user) return;
-    
-    const ping = async () => {
-        await redisCommand('SETEX', `online:${user.phone}`, 60, '1');
-    };
-    
-    ping();
-    if (onlineInterval) clearInterval(onlineInterval);
-    onlineInterval = setInterval(ping, 30000);
 }
 
 async function handleChatClick() {
@@ -415,10 +430,13 @@ async function handleChatClick() {
 }
 
 function toggleChatBox() { 
-    document.getElementById('chatBox').classList.toggle('on');
-    if (!document.getElementById('chatBox').classList.contains('on') && chatRefreshInterval) {
-        clearInterval(chatRefreshInterval); 
-        chatRefreshInterval = null;
+    const chatBox = document.getElementById('chatBox');
+    if (chatBox) {
+        chatBox.classList.toggle('on');
+        if (!chatBox.classList.contains('on') && chatRefreshInterval) {
+            clearInterval(chatRefreshInterval); 
+            chatRefreshInterval = null;
+        }
     }
 }
 
@@ -426,30 +444,28 @@ async function loadUserChat(phone) {
     const msgsStr = await redisCommand('LRANGE', `chat:${phone}`, 0, -1);
     const msgs = msgsStr ? msgsStr.map(m => JSON.parse(m)).reverse() : [];
     const container = document.getElementById('chatMsgs');
+    if (!container) return;
     
-    // فقط اگر پیام جدیدی اضافه شده بود رندر کن تا اسکرول به هم نریزد
-    if (container.children.length !== msgs.length) {
-        container.innerHTML = '';
-        if (msgs.length === 0) {
-            container.innerHTML = `<div class="msg admin">سلام! چطور می‌توانم کمکتان کنم؟<span class="time">سیستم</span></div>`;
-        } else {
-            msgs.forEach(m => {
-                const div = document.createElement('div');
-                if (m.isBroadcast) {
-                    div.className = 'msg system-broadcast';
-                    div.innerHTML = `📢 <strong>${m.broadcastTitle || 'اطلاعیه'}</strong><br>${m.text}<span class="time">${m.time}</span>`;
-                } else if (m.sender === 'user') {
-                    div.className = 'msg user';
-                    div.innerHTML = `${m.text}<span class="time">${m.time}</span>`;
-                } else {
-                    div.className = 'msg admin';
-                    div.innerHTML = `${m.text}<span class="time">${m.time}</span>`;
-                }
-                container.appendChild(div);
-            });
-        }
-        container.scrollTop = container.scrollHeight;
+    container.innerHTML = '';
+    if (msgs.length === 0) {
+        container.innerHTML = `<div class="msg admin">سلام! چطور می‌توانم کمکتان کنم؟<span class="time">سیستم</span></div>`;
+    } else {
+        msgs.forEach(m => {
+            const div = document.createElement('div');
+            if (m.isBroadcast) {
+                div.className = 'msg system-broadcast';
+                div.innerHTML = `📢 <strong>${m.broadcastTitle || 'اطلاعیه'}</strong><br>${m.text}<span class="time">${m.time}</span>`;
+            } else if (m.sender === 'user') {
+                div.className = 'msg user';
+                div.innerHTML = `${m.text}<span class="time">${m.time}</span>`;
+            } else {
+                div.className = 'msg admin';
+                div.innerHTML = `${m.text}<span class="time">${m.time}</span>`;
+            }
+            container.appendChild(div);
+        });
     }
+    container.scrollTop = container.scrollHeight;
 }
 
 async function sendUserMsg() {
@@ -478,8 +494,6 @@ async function sendUserMsg() {
     };
     
     await redisCommand('LPUSH', `chat:${user.phone}`, JSON.stringify(msg));
-    // محدود کردن تاریخچه به 100 پیام آخر
-    await redisCommand('LTRIM', `chat:${user.phone}`, 0, 99);
     
     input.value = '';
     await loadUserChat(user.phone);
@@ -489,13 +503,15 @@ async function sendUserMsg() {
 async function openAdminPanel() {
     const user = getCurrentUser();
     if (!user || !user.isAdmin) return showToast('دسترسی غیرمجاز', 'error');
-    document.getElementById('adminPanel').classList.add('on');
+    const adminPanel = document.getElementById('adminPanel');
+    if (adminPanel) adminPanel.classList.add('on');
     await updateAdminWalletDisplay();
     await loadAdminData();
     
     if (adminRefreshInterval) clearInterval(adminRefreshInterval);
     adminRefreshInterval = setInterval(async () => {
-        if (document.getElementById('adminPanel').classList.contains('on')) {
+        const panel = document.getElementById('adminPanel');
+        if (panel && panel.classList.contains('on')) {
             await updateAdminWalletDisplay();
             const activeTab = document.querySelector('.admin-tab.on');
             if (activeTab && activeTab.textContent.includes('کاربران')) await loadAdminData();
@@ -505,16 +521,20 @@ async function openAdminPanel() {
 }
 
 function closeAdminPanel() { 
-    document.getElementById('adminPanel').classList.remove('on');
+    const adminPanel = document.getElementById('adminPanel');
+    if (adminPanel) adminPanel.classList.remove('on');
     if (adminRefreshInterval) { clearInterval(adminRefreshInterval); adminRefreshInterval = null; }
 }
 
 function switchAdminTab(tab, btn) {
     document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('on'));
     btn.classList.add('on');
-    document.getElementById('adminUsersTab').style.display = tab === 'users' ? 'block' : 'none';
-    document.getElementById('adminChatsTab').style.display = tab === 'chats' ? 'block' : 'none';
-    document.getElementById('adminBroadcastTab').style.display = tab === 'broadcast' ? 'block' : 'none';
+    const usersTab = document.getElementById('adminUsersTab');
+    const chatsTab = document.getElementById('adminChatsTab');
+    const broadcastTab = document.getElementById('adminBroadcastTab');
+    if (usersTab) usersTab.style.display = tab === 'users' ? 'block' : 'none';
+    if (chatsTab) chatsTab.style.display = tab === 'chats' ? 'block' : 'none';
+    if (broadcastTab) broadcastTab.style.display = tab === 'broadcast' ? 'block' : 'none';
     if (tab === 'chats') loadAdminChats();
     if (tab === 'users') loadAdminData();
 }
@@ -522,6 +542,7 @@ function switchAdminTab(tab, btn) {
 async function loadAdminData() {
     const phones = await redisCommand('SMEMBERS', 'users:all');
     const list = document.getElementById('adminUserList');
+    if (!list) return;
     list.innerHTML = '';
     
     if (!phones || phones.length === 0) {
@@ -558,7 +579,7 @@ async function loadAdminData() {
                     <p>${u.phone}</p>
                 </div>
                 <div class="user-actions">
-                    <button class="btn-small btn-wallet" onclick="openWalletModal('${u.phone}', '${u.name}', ${u.wallet || 0})">💰 شارژ</button>
+                    <button class="btn-small btn-wallet" onclick="openWalletModal('${u.phone}', '${u.name}', ${u.wallet || 0})"> شارژ</button>
                     ${isBanned 
                         ? `<button class="btn-small btn-unban" onclick="unbanUser('${u.phone}')">رفع بن</button>` 
                         : `<button class="btn-small btn-ban" onclick="openBanModal('${u.phone}', '${u.name}')">بن</button>`
@@ -570,9 +591,12 @@ async function loadAdminData() {
 
 function openBanModal(phone, name) { 
     banTargetPhone = phone; 
-    document.getElementById('banUserName').textContent = name; 
-    document.getElementById('banDuration').value = '24'; 
-    document.getElementById('banReason').value = ''; 
+    const nameEl = document.getElementById('banUserName');
+    const durationEl = document.getElementById('banDuration');
+    const reasonEl = document.getElementById('banReason');
+    if (nameEl) nameEl.textContent = name;
+    if (durationEl) durationEl.value = '24';
+    if (reasonEl) reasonEl.value = '';
     openModal('banModal'); 
 }
 
@@ -596,11 +620,14 @@ async function unbanUser(phone) {
 function openWalletModal(phone, name, currentBalance) {
     walletTargetPhone = phone;
     redisCommand('GET', 'admin:wallet').then(adminBal => {
-        document.getElementById('walletUserName').textContent = name;
-        document.getElementById('walletCurrentBalance').textContent = currentBalance.toLocaleString('fa-IR');
-        document.getElementById('walletPanelBalance').textContent = (adminBal ? parseInt(adminBal) : INITIAL_ADMIN_WALLET).toLocaleString('fa-IR');
-        document.getElementById('walletAmountInput').value = '';
-        document.getElementById('walletDescription').value = '';
+        const nameEl = document.getElementById('walletUserName');
+        const balEl = document.getElementById('walletCurrentBalance');
+        const panelBalEl = document.getElementById('walletPanelBalance');
+        const amountEl = document.getElementById('walletAmountInput');
+        if (nameEl) nameEl.textContent = name;
+        if (balEl) balEl.textContent = currentBalance.toLocaleString('fa-IR');
+        if (panelBalEl) panelBalEl.textContent = (adminBal ? parseInt(adminBal) : INITIAL_ADMIN_WALLET).toLocaleString('fa-IR');
+        if (amountEl) amountEl.value = '';
         openModal('walletModal');
     });
 }
@@ -614,14 +641,12 @@ async function confirmWalletAdd() {
     const adminBalance = adminBalStr ? parseInt(adminBalStr) : INITIAL_ADMIN_WALLET;
     
     if (adminBalance < amount) {
-        showToast(`❌ موجودی پنل کافی نیست! موجودی فعلی: ${adminBalance.toLocaleString('fa-IR')} تومان`, 'error');
+        showToast(` موجودی پنل کافی نیست! موجودی فعلی: ${adminBalance.toLocaleString('fa-IR')} تومان`, 'error');
         return;
     }
     
-    // کسر از پنل
     await redisCommand('SET', 'admin:wallet', adminBalance - amount);
     
-    // اضافه کردن به کاربر
     const userStr = await redisCommand('GET', `user:${walletTargetPhone}`);
     const userData = userStr ? JSON.parse(userStr) : null;
     if (userData) {
@@ -643,9 +668,10 @@ async function confirmWalletAdd() {
 
 function openAdminWalletAddModal() {
     redisCommand('GET', 'admin:wallet').then(bal => {
-        document.getElementById('adminCurrentWallet').textContent = (bal ? parseInt(bal) : INITIAL_ADMIN_WALLET).toLocaleString('fa-IR');
-        document.getElementById('adminWalletAddAmount').value = '';
-        document.getElementById('adminWalletAddDesc').value = '';
+        const walletEl = document.getElementById('adminCurrentWallet');
+        const amountEl = document.getElementById('adminWalletAddAmount');
+        if (walletEl) walletEl.textContent = (bal ? parseInt(bal) : INITIAL_ADMIN_WALLET).toLocaleString('fa-IR');
+        if (amountEl) amountEl.value = '';
         openModal('adminWalletAddModal');
     });
 }
@@ -666,6 +692,7 @@ async function confirmAdminWalletAdd() {
 async function loadAdminChats() {
     const phones = await redisCommand('SMEMBERS', 'users:all');
     const list = document.getElementById('adminChatList');
+    if (!list) return;
     list.innerHTML = '';
     
     if (!phones) return;
@@ -674,25 +701,40 @@ async function loadAdminChats() {
     for (const phone of phones) {
         if (phone === ADMIN_PHONE) continue;
         
-        const msgsStr = await redisCommand('LRANGE', `chat:${phone}`, 0, 0); // فقط آخرین پیام را بگیر
-        if (!msgsStr || msgsStr.length === 0) continue;
+        const msgCount = await redisCommand('LLEN', `chat:${phone}`);
+        if (!msgCount || parseInt(msgCount) === 0) continue;
         
         hasChats = true;
-        const lastMsg = JSON.parse(msgsStr[0]);
         
-        // شمارش پیام‌های خوانده نشده
-        const allMsgsStr = await redisCommand('LRANGE', `chat:${phone}`, 0, -1);
-        const allMsgs = allMsgsStr ? allMsgsStr.map(m => JSON.parse(m)) : [];
-        const unreadCount = allMsgs.filter(m => m.sender === 'user' && !m.read).length;
+        const userStr = await redisCommand('GET', `user:${phone}`);
+        const userData = userStr ? JSON.parse(userStr) : null;
+        const userName = userData ? userData.name : 'کاربر ناشناس';
+        const userAvatar = userData ? userData.avatar : 'https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff';
+        
+        const lastMsgStr = await redisCommand('LRANGE', `chat:${phone}`, 0, 0);
+        let lastText = '';
+        let unreadCount = 0;
+        
+        if (lastMsgStr && lastMsgStr.length > 0) {
+            const lastMsg = JSON.parse(lastMsgStr[0]);
+            lastText = lastMsg.text;
+            
+            const allMsgsStr = await redisCommand('LRANGE', `chat:${phone}`, 0, -1);
+            if (allMsgsStr) {
+                const allMsgs = allMsgsStr.map(m => JSON.parse(m));
+                unreadCount = allMsgs.filter(m => m.sender === 'user' && !m.read).length;
+            }
+        }
         
         const unreadBadge = unreadCount > 0 ? `<span class="unread-badge">${unreadCount}</span>` : '';
+        const previewText = lastText ? (lastText.substring(0, 40) + (lastText.length > 40 ? '...' : '')) : 'بدون پیام';
         
         list.innerHTML += `
-            <div class="user-list-item" onclick="openAdminChatPage('${phone}')">
-                <img src="${lastMsg.userAvatar || 'https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff'}" alt="${lastMsg.userName}">
+            <div class="user-list-item" onclick="openAdminChatPage('${phone}')" style="cursor:pointer">
+                <img src="${userAvatar}" alt="${userName}">
                 <div class="user-list-item-info">
-                    <h4>${lastMsg.userName} ${unreadBadge}</h4>
-                    <p>${lastMsg.text.substring(0, 40)}${lastMsg.text.length > 40 ? '...' : ''}</p>
+                    <h4>${userName} ${unreadBadge}</h4>
+                    <p>${previewText}</p>
                 </div>
             </div>`;
     }
@@ -707,38 +749,42 @@ async function openAdminChatPage(phone) {
     const msgsStr = await redisCommand('LRANGE', `chat:${phone}`, 0, -1);
     const msgs = msgsStr ? msgsStr.map(m => JSON.parse(m)).reverse() : [];
     
-    const firstUserMsg = msgs.find(m => m.sender === 'user');
-    const userName = firstUserMsg ? firstUserMsg.userName : 'کاربر';
-    const userAvatar = firstUserMsg && firstUserMsg.userAvatar ? firstUserMsg.userAvatar : 'https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff';
+    const userStr = await redisCommand('GET', `user:${phone}`);
+    const userData = userStr ? JSON.parse(userStr) : null;
+    const userName = userData ? userData.name : 'کاربر';
+    const userAvatar = userData ? userData.avatar : 'https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff';
     
-    document.getElementById('adminChatUserName').textContent = userName;
-    document.getElementById('adminChatUserPhone').textContent = phone;
-    document.getElementById('adminChatUserAvatar').src = userAvatar;
+    const nameEl = document.getElementById('adminChatUserName');
+    const phoneEl = document.getElementById('adminChatUserPhone');
+    const avatarEl = document.getElementById('adminChatUserAvatar');
+    if (nameEl) nameEl.textContent = userName;
+    if (phoneEl) phoneEl.textContent = phone;
+    if (avatarEl) avatarEl.src = userAvatar;
     
-    // علامت‌گذاری پیام‌ها به عنوان خوانده شده
     const updatedMsgs = msgs.map(m => {
         if (m.sender === 'user') m.read = true;
         return m;
     });
     
-    // ذخیره مجدد با ترتیب صحیح (برعکس کنیم تا LPUSH درست کار کند)
     await redisCommand('DEL', `chat:${phone}`);
     for (let i = updatedMsgs.length - 1; i >= 0; i--) {
         await redisCommand('LPUSH', `chat:${phone}`, JSON.stringify(updatedMsgs[i]));
     }
-    await redisCommand('LTRIM', `chat:${phone}`, 0, 99);
     
     renderAdminChatMsgs(updatedMsgs.reverse());
-    document.getElementById('adminChatPage').classList.add('on');
+    const chatPage = document.getElementById('adminChatPage');
+    if (chatPage) chatPage.classList.add('on');
 }
 
 function closeAdminChatPage() {
-    document.getElementById('adminChatPage').classList.remove('on');
+    const chatPage = document.getElementById('adminChatPage');
+    if (chatPage) chatPage.classList.remove('on');
     currentAdminChatPhone = null;
 }
 
 function renderAdminChatMsgs(msgs) {
     const container = document.getElementById('adminChatMsgs');
+    if (!container) return;
     container.innerHTML = '';
     if (msgs.length === 0) {
         container.innerHTML = '<p style="text-align:center;color:#64748b;padding:20px">هنوز پیامی ارسال نشده است</p>';
@@ -782,7 +828,6 @@ async function sendAdminChatMsg() {
     };
     
     await redisCommand('LPUSH', `chat:${currentAdminChatPhone}`, JSON.stringify(msg));
-    await redisCommand('LTRIM', `chat:${currentAdminChatPhone}`, 0, 99);
     
     input.value = '';
     const msgsStr = await redisCommand('LRANGE', `chat:${currentAdminChatPhone}`, 0, -1);
@@ -800,7 +845,7 @@ async function sendBroadcast() {
     const regularUsers = phones ? phones.filter(p => p !== ADMIN_PHONE) : [];
     
     if (regularUsers.length === 0) {
-        resultDiv.innerHTML = '<div class="broadcast-success" style="background:#f59e0b">⚠️ هیچ کاربر عادی برای ارسال پیام وجود ندارد</div>';
+        if (resultDiv) resultDiv.innerHTML = '<div style="background:#f59e0b;color:#fff;padding:15px;border-radius:10px;margin-top:15px;text-align:center">️ هیچ کاربر عادی برای ارسال پیام وجود ندارد</div>';
         return;
     }
     
@@ -822,19 +867,29 @@ async function sendBroadcast() {
             read: false
         };
         await redisCommand('LPUSH', `chat:${phone}`, JSON.stringify(msg));
-        await redisCommand('LTRIM', `chat:${phone}`, 0, 99);
     }
     
-    resultDiv.innerHTML = `<div class="broadcast-success">✅ پیام با موفقیت به ${regularUsers.length} کاربر ارسال شد</div>`;
-    document.getElementById('broadcastTitle').value = '';
-    document.getElementById('broadcastMessage').value = '';
+    if (resultDiv) resultDiv.innerHTML = `<div style="background:#10b981;color:#fff;padding:15px;border-radius:10px;margin-top:15px;text-align:center">✅ پیام با موفقیت به ${regularUsers.length} کاربر ارسال شد</div>`;
+    const titleEl = document.getElementById('broadcastTitle');
+    const msgEl = document.getElementById('broadcastMessage');
+    if (titleEl) titleEl.value = '';
+    if (msgEl) msgEl.value = '';
     showToast(`پیام به ${regularUsers.length} کاربر ارسال شد`, 'success');
-    setTimeout(() => { resultDiv.innerHTML = ''; }, 5000);
+    setTimeout(() => { if (resultDiv) resultDiv.innerHTML = ''; }, 5000);
 }
 
-function openModal(id) { document.getElementById(id).classList.add('on'); }
-function closeModal(id) { document.getElementById(id).classList.remove('on'); }
-function switchModal(from, to) { closeModal(from); setTimeout(() => openModal(to), 200); }
+function openModal(id) { 
+    const modal = document.getElementById(id);
+    if (modal) modal.classList.add('on'); 
+}
+function closeModal(id) { 
+    const modal = document.getElementById(id);
+    if (modal) modal.classList.remove('on'); 
+}
+function switchModal(from, to) { 
+    closeModal(from); 
+    setTimeout(() => openModal(to), 200); 
+}
 
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('keydown', e => {
