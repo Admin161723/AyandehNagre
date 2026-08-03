@@ -3,846 +3,608 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google-site-verification" content="_L-S_qVviQ_-pEdFqaOnSvOTlK0_pUPs6BO_2-ATN34" />
-    <meta name="description" content="آینده نگر - خدمات و آموزش‌های باکیفیت با تیمی متخصص و مجرب">
-    <meta name="keywords" content="آینده نگر, آموزش, خدمات, توسعه, تیم متخصص">
-    <meta name="author" content="آینده نگر">
-    <meta property="og:title" content="آینده نگر">
-    <meta property="og:description" content="آینده نگر - خدمات و آموزش‌های باکیفیت">
-    <meta property="og:type" content="website">
+    <meta name="google-site-verification" content="40gN4zdcwAcxmP3ibQDcn7nfBBFxUijDhbSUZ6kObvk" />
     <title>آینده نگر</title>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-user-select: none; user-select: none; font-family: 'Vazirmatn', sans-serif; }
+        body { background: #f8fafc; color: #334155; line-height: 1.8; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; font-family: inherit; border: none; outline: none; }
+        input, textarea, select { font-family: inherit; outline: none; }
 
-        body {
-            font-family: 'Vazirmatn', sans-serif;
-            font-size: 0.9rem;
-            line-height: 1.8;
-            color: #334155;
-            background-color: #f8fafc;
-            overflow-x: hidden;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .loader-wrapper {
+        #toast {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
-            background: #000;
-        }
-
-        .loader-wrapper.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        .loader-video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 1;
-        }
-
-        .loader-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.35);
-            z-index: 2;
-        }
-
-        .loader-content {
-            position: relative;
-            z-index: 3;
-            text-align: center;
-            color: #ffffff;
-        }
-
-        .spinner {
-            width: 70px;
-            height: 70px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top: 3px solid #3b82f6;
-            border-right: 3px solid #8b5cf6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 25px auto;
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loader-text {
-            font-size: 2rem;
-            font-weight: 900;
-            letter-spacing: 3px;
-            margin-bottom: 20px;
-            animation: pulse 2s ease-in-out infinite;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.6; transform: scale(0.98); }
-            50% { opacity: 1; transform: scale(1.03); }
-        }
-
-        .loader-bar {
-            width: 250px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 5px;
-            margin: 0 auto;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .loader-progress {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
-            background-size: 200% 100%;
-            border-radius: 5px;
-            animation: progressFill 7s linear, gradientMove 2s ease infinite;
-        }
-
-        @keyframes progressFill {
-            0% { width: 0%; }
-            100% { width: 100%; }
-        }
-
-        @keyframes gradientMove {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        header {
-            background-color: #ffffff;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .site-logo {
-            width: 50px;
-            height: 50px;
-            object-fit: contain;
-            border-radius: 8px;
-        }
-
-        .site-name {
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: #0f172a;
-        }
-
-        .hamburger-btn {
-            background: none;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 8px 12px;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            transition: all 0.3s ease;
-        }
-
-        .hamburger-btn:hover {
-            border-color: #2563eb;
-            background-color: #f8fafc;
-        }
-
-        .hamburger-btn span {
-            display: block;
-            width: 24px;
-            height: 3px;
-            background-color: #0f172a;
-            border-radius: 2px;
-        }
-
-        .sidebar-menu {
-            position: fixed;
-            top: 0;
-            left: -300px;
-            width: 280px;
-            height: 100vh;
-            background-color: #ffffff;
-            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.1);
-            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 2000;
-            padding: 30px 0;
-        }
-
-        .sidebar-menu.active {
-            left: 0;
-        }
-
-        .sidebar-header {
-            padding: 0 25px 25px 25px;
-            border-bottom: 1px solid #e2e8f0;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .sidebar-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 1.8rem;
-            cursor: pointer;
-            color: #64748b;
-        }
-
-        .sidebar-menu ul {
-            list-style: none;
-        }
-
-        .sidebar-menu ul li a {
-            display: block;
-            padding: 15px 25px;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #334155;
-            transition: all 0.3s ease;
-            border-right: 3px solid transparent;
-        }
-
-        .sidebar-menu ul li a:hover {
-            background-color: #f1f5f9;
-            color: #2563eb;
-            border-right-color: #2563eb;
-        }
-
-        .video-section {
-            width: 100%;
-            padding: 0;
-            margin: 0;
-        }
-
-        .video-container {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            overflow: hidden;
-            background: #000;
-        }
-
-        .video-container video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .slider-section {
-            width: 100%;
-            padding: 20px 20px 40px 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .slider-container {
-            position: relative;
-            width: 100%;
-            max-width: 1200px;
-            aspect-ratio: 16 / 9;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
-            background: transparent;
-        }
-
-        .slide {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 1.2s ease-in-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .slide.active {
-            opacity: 1;
-        }
-
-        .slide img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-        }
-
-        .about-section, .info-section, .education-section {
-            max-width: 1000px;
-            margin: 50px auto;
-            padding: 30px 25px;
-            text-align: center;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
-        }
-
-        .info-section, .education-section {
-            margin-top: 60px;
-        }
-
-        .about-section h2, .info-section h2, .education-section h2 {
-            font-size: 1.6rem;
-            color: #0f172a;
-            margin-bottom: 15px;
-            font-weight: 800;
-        }
-
-        .about-section p, .info-section > p, .education-section > p {
-            font-size: 0.95rem;
-            color: #64748b;
-            max-width: 750px;
-            margin: 0 auto;
-            line-height: 2;
-        }
-
-        .system-grid, .team-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-
-        .system-card, .team-member {
-            background: #f8fafc;
-            padding: 25px 20px;
-            border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s ease;
-            text-align: right;
-        }
-
-        .team-member {
-            text-align: center;
-            cursor: pointer;
-        }
-
-        .system-card:hover, .team-member:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            border-color: #2563eb;
-        }
-
-        .system-card .icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            top: -150px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: #fff;
+            padding: 12px 24px;
             border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 99999;
+            transition: top 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-weight: 600;
+            font-size: 0.9rem;
+            max-width: 90vw;
+            min-width: 250px;
+            text-align: center;
+        }
+        #toast.show { top: 30px; }
+        #toast.success { background: linear-gradient(135deg, #10b981, #059669); }
+        #toast.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        #toast.info { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+
+        .loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s; }
+        .loader.hide { opacity: 0; pointer-events: none; }
+        .loader-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+        .loader-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2; }
+        .loader-content { position: relative; z-index: 3; text-align: center; color: #fff; }
+        .loader-spin { width: 60px; height: 60px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #3b82f6; border-radius: 50%; animation: sp 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes sp { to { transform: rotate(360deg); } }
+        .loader-bar { width: 200px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; margin: 15px auto 0; }
+        .loader-fill { width: 0%; height: 100%; background: linear-gradient(90deg,#3b82f6,#8b5cf6); border-radius: 4px; transition: width 0.1s linear; }
+
+        header { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); box-shadow: 0 2px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; }
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-area img { width: 45px; height: 45px; border-radius: 8px; object-fit: contain; }
+        .logo-area span { font-size: 1.4rem; font-weight: 900; color: #0f172a; }
+        .menu-btn { background: none; border: 2px solid #e2e8f0; border-radius: 8px; padding: 6px 10px; display: flex; flex-direction: column; gap: 4px; transition: all 0.3s; }
+        .menu-btn:hover { border-color: #2563eb; background: #f8fafc; }
+        .menu-btn span { width: 22px; height: 2.5px; background: #0f172a; border-radius: 2px; }
+
+        .sidebar { position: fixed; top: 0; right: -320px; width: 300px; height: 100vh; background: #fff; box-shadow: -5px 0 30px rgba(0,0,0,0.1); transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 200; padding: 0; display: flex; flex-direction: column; }
+        .sidebar.open { right: 0; }
+        .sidebar-profile { padding: 30px 20px; background: linear-gradient(135deg, #f8fafc, #e2e8f0); text-align: center; border-bottom: 1px solid #e2e8f0; display: none; }
+        .sidebar-profile.visible { display: block; }
+        .sidebar-profile img { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 10px; }
+        .sidebar-profile h3 { font-size: 1.1rem; color: #0f172a; margin-bottom: 5px; }
+        .sidebar-profile p { font-size: 0.8rem; color: #64748b; direction: ltr; }
+        .sidebar-head { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
+        .sidebar-head span { font-size: 1.1rem; font-weight: 800; color: #0f172a; }
+        .close-btn { background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 8px; font-size: 1.2rem; color: #64748b; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+        .close-btn:hover { background: #ef4444; color: #fff; transform: rotate(90deg); }
+        .sidebar ul { list-style: none; padding: 15px; flex: 1; }
+        .sidebar ul li { margin-bottom: 8px; }
+        .sidebar ul li a { display: flex; align-items: center; gap: 10px; padding: 12px 15px; color: #334155; font-weight: 600; border-radius: 10px; transition: all 0.3s; }
+        .sidebar ul li a:hover { background: #f1f5f9; color: #2563eb; transform: translateX(-5px); }
+        .menu-item { display: none; }
+        .menu-item.visible { display: block; }
+        .logout-sidebar { margin: 15px; padding: 12px; background: #ef4444; color: #fff; border-radius: 10px; text-align: center; font-weight: 700; display: none; }
+        .logout-sidebar.visible { display: block; }
+
+        .video-sec { width: 100%; aspect-ratio: 16/9; overflow: hidden; background: #000; }
+        .video-sec video { width: 100%; height: 100%; object-fit: cover; }
+        .slider-sec { padding: 20px; display: flex; justify-content: center; }
+        .slider-box { position: relative; width: 100%; max-width: 1200px; aspect-ratio: 16/9; border-radius: 16px; overflow: hidden; box-shadow: 0 15px 50px rgba(0,0,0,0.1); }
+        .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.2s; display: flex; align-items: center; justify-content: center; }
+        .slide.on { opacity: 1; }
+        .slide img { width: 100%; height: 100%; object-fit: contain; }
+        .content { max-width: 1000px; margin: 40px auto; padding: 30px; background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); text-align: center; }
+        .content h2 { font-size: 1.6rem; color: #0f172a; margin-bottom: 15px; font-weight: 800; }
+        .content p { color: #64748b; max-width: 750px; margin: 0 auto; line-height: 1.9; }
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 25px; }
+        .team-member { background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.3s; text-align: center; }
+        .team-member:hover { transform: translateY(-5px); border-color: #2563eb; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        .team-member img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin: 0 auto 12px; border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .team-member h4 { font-size: 1rem; color: #0f172a; margin-bottom: 5px; }
+        .team-member .role { font-size: 0.8rem; color: #2563eb; font-weight: 600; }
+
+        footer { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; padding: 40px 20px; text-align: center; margin-top: 50px; }
+        .contact-item { display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.15); padding: 12px 20px; border-radius: 10px; margin: 5px; font-weight: 600; }
+        .contact-item span { direction: ltr; }
+        .trust { display: flex; justify-content: center; gap: 20px; margin-top: 30px; flex-wrap: wrap; }
+        .trust img { width: 70px; height: 70px; background: #fff; border-radius: 10px; padding: 5px; object-fit: contain; }
+
+        .chat-fab {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 15px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(16,185,129,0.4);
+            z-index: 900;
+            transition: all 0.3s;
+            border: 3px solid #fff;
+            animation: pulse 2s infinite;
         }
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.7); } 50% { box-shadow: 0 0 0 15px rgba(16,185,129,0); } }
+        .chat-fab:hover { transform: scale(1.1); animation: none; }
+        .chat-fab svg { width: 32px; height: 32px; fill: #fff; }
 
-        .system-card .icon svg {
-            width: 24px;
-            height: 24px;
-            fill: white;
+        .chat-box {
+            position: fixed;
+            bottom: 100px;
+            right: 25px;
+            width: 360px;
+            max-width: calc(100vw - 50px);
+            height: 480px;
+            max-height: calc(100vh - 150px);
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            z-index: 900;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
         }
+        .chat-box.on { display: flex; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .chat-head { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .chat-msgs { flex: 1; padding: 15px; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 85%; padding: 10px 14px; border-radius: 15px; font-size: 0.9rem; line-height: 1.6; animation: msgIn 0.3s ease; word-wrap: break-word; }
+        @keyframes msgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .msg.user { background: #3b82f6; color: #fff; align-self: flex-end; border-bottom-left-radius: 5px; }
+        .msg.admin { background: #10b981; color: #fff; align-self: flex-start; border-bottom-right-radius: 5px; }
+        .msg .time { font-size: 0.65rem; opacity: 0.7; margin-top: 4px; display: block; text-align: left; }
+        .chat-input { padding: 12px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; gap: 8px; }
+        .chat-input textarea { flex: 1; padding: 10px; border: 2px solid #e2e8f0; border-radius: 20px; font-size: 0.85rem; resize: none; height: 42px; }
+        .chat-input textarea:focus { border-color: #3b82f6; }
+        .send-btn { background: #3b82f6; color: #fff; border: none; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
-        .system-card h3, .team-member h4 {
+        .modal { position: fixed; inset: 0; background: rgba(15,23,42,0.8); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 5000; padding: 20px; }
+        .modal.on { display: flex; }
+        .modal-box { background: #fff; border-radius: 20px; padding: 30px; max-width: 450px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; animation: pop 0.3s ease; }
+        @keyframes pop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-close { position: absolute; top: 15px; left: 15px; background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; color: #64748b; transition: all 0.3s; }
+        .modal-close:hover { background: #ef4444; color: #fff; transform: rotate(90deg); }
+        .modal-box h2 { text-align: center; margin-bottom: 20px; color: #0f172a; font-size: 1.4rem; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.85rem; font-weight: 600; color: #334155; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 0.9rem; transition: border 0.3s; }
+        .form-group input:focus, .form-group select:focus { border-color: #3b82f6; }
+        .form-submit { width: 100%; background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 0.95rem; margin-top: 10px; transition: all 0.3s; }
+        .form-submit:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+        .form-link { text-align: center; margin-top: 15px; font-size: 0.85rem; color: #64748b; }
+        .form-link a { color: #3b82f6; font-weight: 600; cursor: pointer; }
+        
+        .avatar-upload { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .avatar-preview { width: 80px; height: 80px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid #e2e8f0; }
+        .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .otp-display { background: #fef3c7; border: 2px solid #f59e0b; padding: 15px; border-radius: 12px; text-align: center; margin: 15px 0; }
+        .otp-code { font-size: 2rem; font-weight: 900; color: #d97706; letter-spacing: 5px; margin: 10px 0; }
+
+        .settings-page {
+            position: fixed;
+            inset: 0;
+            background: #f8fafc;
+            z-index: 4000;
+            display: none;
+            overflow-y: auto;
+        }
+        .settings-page.on { display: block; }
+        .settings-header {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: #fff;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(59,130,246,0.3);
+        }
+        .settings-header h2 { font-size: 1.3rem; font-weight: 800; }
+        .settings-back {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .settings-back:hover { background: rgba(255,255,255,0.3); }
+        .settings-body { padding: 30px 25px; max-width: 600px; margin: 0 auto; }
+        .settings-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .settings-card h3 {
             font-size: 1.1rem;
             color: #0f172a;
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
-
-        .system-card p {
-            font-size: 0.9rem;
-            color: #64748b;
-            line-height: 1.6;
-        }
-
-        .team-avatar {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin: 0 auto 15px auto;
-            display: block;
-            border: 4px solid #ffffff;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
-        }
-
-        .team-member .role {
-            font-size: 0.85rem;
-            color: #2563eb;
-            font-weight: 600;
-        }
-
-        .member-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 3000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .member-modal.active {
-            display: flex;
-            opacity: 1;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 35px 30px;
-            max-width: 450px;
-            width: 90%;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-        }
-
-        .member-modal.active .modal-content {
-            transform: scale(1);
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: #f1f5f9;
-            border: none;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: #64748b;
-        }
-
-        .modal-close:hover {
-            background: #ef4444;
-            color: white;
-        }
-
-        .modal-avatar {
-            width: 130px;
-            height: 130px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin: 0 auto 15px auto;
-            display: block;
-            border: 5px solid #2563eb;
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
-        }
-
-        .modal-content h3 {
-            font-size: 1.4rem;
-            color: #0f172a;
-            margin-bottom: 8px;
-            font-weight: 800;
-        }
-
-        .modal-content .modal-role {
-            color: #2563eb;
-            font-weight: 600;
             margin-bottom: 20px;
-            font-size: 0.95rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
         }
-
-        .modal-content p {
-            color: #64748b;
-            line-height: 1.9;
-            font-size: 0.95rem;
-        }
-
-        .contact-footer {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: white;
-            padding: 50px 20px;
-            text-align: center;
-            margin-top: 60px;
-        }
-
-        .contact-footer h2 {
-            font-size: 2rem;
-            margin-bottom: 30px;
-            font-weight: 900;
-        }
-
-        .contact-info {
+        .settings-avatar {
             display: flex;
             flex-direction: column;
+            align-items: center;
             gap: 15px;
-            max-width: 500px;
-            margin: 0 auto;
+            margin-bottom: 20px;
         }
+        .settings-avatar img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .wallet-display {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .wallet-display .amount { font-size: 2rem; font-weight: 900; margin: 10px 0; }
+        .wallet-display .label { font-size: 0.9rem; opacity: 0.9; }
 
-        .contact-item {
+        .admin-panel { position: fixed; inset: 0; background: #f8fafc; z-index: 6000; display: none; overflow-y: auto; }
+        .admin-panel.on { display: block; }
+        .admin-head { background: #0f172a; color: #fff; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .admin-body { padding: 30px; max-width: 1000px; margin: 0 auto; }
+        .admin-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; }
+        .admin-tab { padding: 10px 20px; background: none; border: none; font-weight: 600; color: #64748b; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+        .admin-tab.on { color: #3b82f6; border-bottom-color: #3b82f6; }
+        .admin-content { background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .user-list-item { display: flex; align-items: center; gap: 15px; padding: 15px; border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: background 0.3s; }
+        .user-list-item:hover { background: #f1f5f9; }
+        .user-list-item img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+        .user-list-item-info { flex: 1; }
+        .user-list-item-info h4 { font-size: 0.95rem; color: #0f172a; }
+        .user-list-item-info p { font-size: 0.8rem; color: #64748b; direction: ltr; text-align: right; }
+        .unread-badge { background: #ef4444; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-right: 5px; }
+        .banned-badge { background: #f59e0b; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-right: 5px; }
+
+        .admin-chat-page {
+            position: fixed;
+            inset: 0;
+            background: #f8fafc;
+            z-index: 6500;
+            display: none;
+            flex-direction: column;
+        }
+        .admin-chat-page.on { display: flex; }
+        .admin-chat-header {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: #fff;
+            padding: 15px 25px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
-            backdrop-filter: blur(5px);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59,130,246,0.3);
         }
+        .admin-chat-user-info { display: flex; align-items: center; gap: 12px; }
+        .admin-chat-user-info img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; }
+        .admin-chat-user-info h3 { font-size: 1.1rem; font-weight: 700; }
+        .admin-chat-user-info p { font-size: 0.8rem; opacity: 0.9; direction: ltr; }
+        .admin-chat-back { background: rgba(255,255,255,0.2); color: #fff; padding: 8px 15px; border-radius: 8px; font-weight: 600; }
+        .admin-chat-body { flex: 1; display: flex; flex-direction: column; max-width: 800px; margin: 0 auto; width: 100%; }
+        .admin-chat-msgs { flex: 1; padding: 20px; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column; gap: 10px; }
+        .admin-chat-input { padding: 15px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; }
+        .admin-chat-input input { flex: 1; padding: 12px; border: 2px solid #e2e8f0; border-radius: 25px; font-size: 0.9rem; }
+        .admin-chat-input input:focus { border-color: #3b82f6; }
+        .admin-chat-send { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border: none; padding: 0 25px; border-radius: 25px; font-weight: 700; }
 
-        .contact-item:hover {
-            background: rgba(255, 255, 255, 0.25);
-            transform: scale(1.02);
-        }
-
-        .contact-item span {
-            direction: ltr;
-        }
-
-        .trust-badges {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 25px;
-            margin-top: 40px;
-            flex-wrap: wrap;
-        }
-
-        .trust-badges img {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            background: white;
-            border-radius: 10px;
-            padding: 6px;
-        }
-
-        .copyright {
-            margin-top: 30px;
-            font-size: 0.85rem;
-            opacity: 0.8;
-        }
+        .ban-modal { position: fixed; inset: 0; background: rgba(15,23,42,0.8); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 7000; padding: 20px; }
+        .ban-modal.on { display: flex; }
 
         @media (max-width: 768px) {
-            .slider-container {
-                aspect-ratio: 4 / 3;
-            }
-            .site-name {
-                font-size: 1.2rem;
-            }
-            .site-logo {
-                width: 40px;
-                height: 40px;
-            }
+            .video-sec, .slider-box { aspect-ratio: 4/3; }
         }
     </style>
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
-    <div id="loader" class="loader-wrapper">
-        <video id="loaderVideo" autoplay muted loop playsinline preload="auto" class="loader-video">
+    <div id="toast"></div>
+
+    <div class="loader" id="loader">
+        <video id="loaderVideo" autoplay muted loop playsinline class="loader-video">
             <source src="d25ea088c4f4cba95d597054dea5abc317578539-480p.mp4" type="video/mp4">
         </video>
         <div class="loader-overlay"></div>
         <div class="loader-content">
-            <div class="spinner"></div>
-            <p class="loader-text">آینده نگر</p>
-            <div class="loader-bar">
-                <div class="loader-progress"></div>
-            </div>
+            <div class="loader-spin"></div>
+            <div style="font-size:1.5rem;font-weight:900;margin-bottom:15px">آینده نگر</div>
+            <div class="loader-bar"><div class="loader-fill" id="loaderFill"></div></div>
         </div>
     </div>
 
     <header>
-        <div class="header-right">
-            <img src="InShot_20260712_161951935.png" alt="لوگو" class="site-logo">
-            <span class="site-name">آینده نگر</span>
+        <div class="logo-area">
+            <img src="InShot_20260712_161951935.png" alt="لوگو">
+            <span>آینده نگر</span>
         </div>
-        <button class="hamburger-btn" onclick="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
+        <button class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></button>
     </header>
 
-    <aside class="sidebar-menu" id="sidebarMenu">
-        <div class="sidebar-header">
-            <span class="sidebar-title">منو</span>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-profile" id="sidebarProfile">
+            <img id="sidebarAvatar" src="" alt="پروفایل">
+            <h3 id="sidebarName">کاربر</h3>
+            <p id="sidebarPhone">09xxxxxxxxx</p>
+        </div>
+        <div class="sidebar-head">
+            <span>منو</span>
             <button class="close-btn" onclick="toggleMenu()">×</button>
         </div>
         <ul>
-            <li><a href="#home" onclick="toggleMenu()">خانه</a></li>
+            <li><a href="#home" onclick="toggleMenu()">🏠 خانه</a></li>
+            <li class="menu-item" id="menuLogin" onclick="openModal('loginModal'); toggleMenu()"><a href="#">🔐 ورود / ثبت‌نام</a></li>
+            <li class="menu-item" id="menuSettings" onclick="openSettingsPage(); toggleMenu()"><a href="#">⚙️ تنظیمات اکانت</a></li>
+            <li class="menu-item" id="menuAdmin" onclick="openAdminPanel(); toggleMenu()"><a href="#" style="color:#ef4444">️ پنل مدیریت</a></li>
         </ul>
+        <button class="logout-sidebar" id="sidebarLogout" onclick="handleLogout()">خروج از حساب</button>
     </aside>
 
-    <section class="video-section">
-        <div class="video-container">
-            <video id="mainVideo" autoplay muted loop playsinline preload="auto">
-                <source src="Anim.mp4" type="video/mp4">
-            </video>
+    <section class="video-sec">
+        <video id="mainVideo" autoplay muted loop playsinline>
+            <source src="Anim.mp4" type="video/mp4">
+        </video>
+    </section>
+
+    <section id="home" class="slider-sec">
+        <div class="slider-box">
+            <div class="slide on"><img src="1.png" alt="1"></div>
+            <div class="slide"><img src="2.png" alt="2"></div>
+            <div class="slide"><img src="3.png" alt="3"></div>
         </div>
     </section>
 
-    <section id="home" class="slider-section">
-        <div class="slider-container">
-            <div class="slide active">
-                <img src="1.png" alt="تصویر 1">
-            </div>
-            <div class="slide">
-                <img src="2.png" alt="تصویر 2">
-            </div>
-            <div class="slide">
-                <img src="3.png" alt="تصویر 3">
-            </div>
-        </div>
-    </section>
-
-    <section class="about-section">
+    <section class="content">
         <h2>درباره آینده نگر</h2>
-        <p>آینده نگر یک مجموعه پیشرو و نوآور است که با تکیه بر دانش روز، تکنولوژی‌های مدرن و تیمی متخصص، در مسیر ارائه خدمات و آموزش‌های باکیفیت گام برمی‌دارد.</p>
+        <p>آینده نگر یک مجموعه پیشرو و نوآور است که با تکیه بر دانش روز و تیمی متخصص، در مسیر ارائه خدمات و آموزش‌های باکیفیت گام برمی‌دارد.</p>
     </section>
 
-    <section class="info-section">
-        <h2>درباره سیستم ما</h2>
-        <p>ما یک سیستم جامع و پیشرفته هستیم که با هدف ارائه بهترین خدمات به مشتریان طراحی شده است.</p>
-        <div class="system-grid">
-            <div class="system-card">
-                <div class="icon">
-                    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                </div>
-                <h3>سیستم مدیریت</h3>
-                <p>مدیریت یکپارچه و هوشمند تمامی فرآیندهای کاری با قابلیت دسترسی آسان و سریع.</p>
-            </div>
-            <div class="system-card">
-                <div class="icon">
-                    <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-                </div>
-                <h3>کیفیت تضمین شده</h3>
-                <p>تمامی خدمات ما با بالاترین استانداردهای کیفی و با ضمانت ارائه می‌شوند.</p>
-            </div>
-            <div class="system-card">
-                <div class="icon">
-                    <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                </div>
-                <h3>سرعت بالا</h3>
-                <p>پردازش سریع درخواست‌ها و ارائه نتایج در کمترین زمان ممکن.</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="education-section">
-        <h2>آموزش‌های زیاد</h2>
-        <p>ما در آینده نگر، آموزش‌های جامع و متنوعی را برای شما آماده کرده‌ایم.</p>
+    <section class="content">
+        <h2>تیم ما</h2>
         <div class="team-grid">
-            <div class="team-member" onclick="openMemberModal('matin')">
-                <img src="4.jpg" alt="متین" class="team-avatar">
+            <div class="team-member" onclick="showMember('matin')">
+                <img src="4.jpg" alt="متین">
                 <h4>متین</h4>
-                <div class="role">نویسنده و توسعه‌دهنده</div>
+                <div class="role">توسعه‌دهنده</div>
             </div>
-            <div class="team-member" onclick="openMemberModal('abolfazl')">
-                <img src="abolfazl.png" alt="ابوالفضل بشارت" class="team-avatar">
+            <div class="team-member" onclick="showMember('abolfazl')">
+                <img src="abolfazl.png" alt="ابوالفضل">
                 <h4>ابوالفضل بشارت</h4>
                 <div class="role">عضو تیم</div>
             </div>
-            <div class="team-member" onclick="openMemberModal('amirhossein')">
-                <img src="5.jpg" alt="امیرحسین شکری زاده" class="team-avatar">
+            <div class="team-member" onclick="showMember('amirhossein')">
+                <img src="5.jpg" alt="امیرحسین">
                 <h4>امیرحسین شکری زاده</h4>
                 <div class="role">عضو تیم</div>
             </div>
         </div>
     </section>
 
-    <div class="member-modal" id="memberModal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeMemberModal()">×</button>
-            <img id="modalAvatar" src="" alt="" class="modal-avatar">
-            <h3 id="modalName"></h3>
-            <div class="modal-role" id="modalRole"></div>
-            <p id="modalDesc"></p>
-        </div>
-    </div>
-
-    <footer class="contact-footer">
+    <footer>
         <h2>تماس با ما</h2>
-        <div class="contact-info">
-            <div class="contact-item">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                </svg>
-                <span>09904844031</span>
-            </div>
-            <div class="contact-item">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                </svg>
-                <span>amomiti16172@gmail.com</span>
-            </div>
+        <div>
+            <div class="contact-item"><span>09904844031</span></div>
+            <div class="contact-item"><span>st16172365@gmail.com</span></div>
         </div>
-        <div class="trust-badges">
+        <div class="trust">
             <img src="logo.png" alt="لوگو">
             <img src="nezam_senfi.png" alt="نظام صنفی">
             <img src="samandehi.png" alt="ساماندهی">
         </div>
-        <p class="copyright">© 2026 آینده نگر - تمامی حقوق محفوظ است</p>
+        <p style="margin-top:20px;opacity:0.8;font-size:0.8rem">© 2026 آینده نگر - تمامی حقوق محفوظ است</p>
     </footer>
 
-    <script>
-        // لودینگ ۷ ثانیه‌ای
-        setTimeout(function() {
-            document.getElementById('loader').classList.add('hidden');
-            var loaderVideo = document.getElementById('loaderVideo');
-            if (loaderVideo) loaderVideo.pause();
-        }, 7000);
+    <button class="chat-fab" onclick="handleChatClick()">
+        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+    </button>
 
-        // پخش ویدیوی اصلی
-        var mainVideo = document.getElementById('mainVideo');
-        if (mainVideo) {
-            mainVideo.play().catch(function() {
-                document.addEventListener('click', function() {
-                    mainVideo.play();
-                }, { once: true });
-            });
-        }
+    <div class="chat-box" id="chatBox">
+        <div class="chat-head">
+            <span>پشتیبانی آینده نگر</span>
+            <button class="close-btn" style="background:rgba(255,255,255,0.2);color:#fff;width:28px;height:28px;font-size:1rem" onclick="toggleChatBox()">×</button>
+        </div>
+        <div class="chat-msgs" id="chatMsgs"></div>
+        <div class="chat-input">
+            <textarea id="chatInput" placeholder="پیام خود را بنویسید..." onkeypress="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendUserMsg()}"></textarea>
+            <button class="send-btn" onclick="sendUserMsg()">➤</button>
+        </div>
+    </div>
 
-        // اسلایدر
-        var slides = document.querySelectorAll('.slide');
-        var currentSlide = 0;
-        setInterval(function() {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-        }, 3000);
+    <div class="modal" id="registerModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal('registerModal')">×</button>
+            <h2>ثبت‌نام</h2>
+            <div class="avatar-upload">
+                <div class="avatar-preview" id="avatarPreview"><span style="font-size:2rem;color:#94a3b8">👤</span></div>
+                <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="previewAvatar(event)">
+                <button type="button" onclick="document.getElementById('avatarInput').click()" style="background:#f1f5f9;border:2px dashed #cbd5e1;padding:8px 15px;border-radius:8px;font-size:0.85rem">انتخاب عکس از گالری</button>
+            </div>
+            <div class="form-group"><label>نام و نام خانوادگی</label><input type="text" id="regName" placeholder="مثال: علی احمدی"></div>
+            <div class="form-group"><label>شماره موبایل</label><input type="tel" id="regPhone" placeholder="09xxxxxxxxx" style="direction:ltr;text-align:right"></div>
+            <div class="form-group"><label>رمز عبور</label><input type="password" id="regPassword" placeholder="حداقل ۶ کاراکتر"></div>
+            <button class="form-submit" onclick="requestOTP()">دریافت کد تایید</button>
+            <div class="form-link"><a onclick="switchModal('registerModal','loginModal')">قبلاً ثبت‌نام کرده‌اید؟</a></div>
+        </div>
+    </div>
 
-        // منو
-        function toggleMenu() {
-            document.getElementById('sidebarMenu').classList.toggle('active');
-        }
+    <div class="modal" id="otpModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal('otpModal')">×</button>
+            <h2>تایید شماره موبایل</h2>
+            <div class="otp-display">
+                <div style="font-size:0.9rem;font-weight:600;color:#92400e">کد تایید شما:</div>
+                <div class="otp-code" id="otpCodeDisplay">----</div>
+                <div style="font-size:0.8rem;color:#92400e">کد بالا را وارد کنید</div>
+            </div>
+            <div class="form-group"><label>کد تایید</label><input type="text" id="otpInput" placeholder="کد ۴ رقمی را وارد کنید" style="text-align:center;letter-spacing:5px;font-size:1.2rem;font-weight:700"></div>
+            <button class="form-submit" onclick="verifyOTP()">تایید و ورود به حساب</button>
+        </div>
+    </div>
 
-        document.addEventListener('click', function(event) {
-            var menu = document.getElementById('sidebarMenu');
-            var hamburger = document.querySelector('.hamburger-btn');
-            if (!menu.contains(event.target) && !hamburger.contains(event.target) && menu.classList.contains('active')) {
-                menu.classList.remove('active');
-            }
-        });
+    <div class="modal" id="loginModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal('loginModal')">×</button>
+            <h2>ورود به حساب</h2>
+            <div class="form-group"><label>شماره موبایل</label><input type="tel" id="loginPhone" placeholder="09xxxxxxxxx" style="direction:ltr;text-align:right"></div>
+            <div class="form-group"><label>رمز عبور</label><input type="password" id="loginPassword" placeholder="رمز عبور"></div>
+            <button class="form-submit" onclick="handleLogin()">ورود</button>
+            <div class="form-link"><a onclick="switchModal('loginModal','forgotModal')">فراموشی رمز عبور</a> | <a onclick="switchModal('loginModal','registerModal')">ثبت‌نام نکرده‌اید؟</a></div>
+        </div>
+    </div>
 
-        // اسکرول نرم
-        document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                var target = document.querySelector(this.getAttribute('href'));
-                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            });
-        });
+    <div class="modal" id="forgotModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal('forgotModal')">×</button>
+            <h2>بازیابی رمز عبور</h2>
+            <div class="form-group"><label>شماره موبایل</label><input type="tel" id="forgotPhone" placeholder="09xxxxxxxxx" style="direction:ltr;text-align:right"></div>
+            <button class="form-submit" onclick="handleForgot()">بازیابی رمز</button>
+            <div class="form-link"><a onclick="switchModal('forgotModal','loginModal')">بازگشت به ورود</a></div>
+        </div>
+    </div>
 
-        // پاپ‌آپ اعضا
-        var membersInfo = {
-            matin: { name: 'متین', role: 'نویسنده و توسعه‌دهنده', avatar: '4.jpg', desc: 'متین، نویسنده و توسعه‌دهنده اصلی مجموعه آینده نگر است. او با تسلط بر تکنولوژی‌های روز، مسئولیت طراحی و توسعه سیستم‌ها را بر عهده دارد.' },
-            abolfazl: { name: 'ابوالفضل بشارت', role: 'عضو تیم', avatar: 'abolfazl.png', desc: 'ابوالفضل بشارت یکی از اعضای کلیدی تیم است که در تهیه و ارائه آموزش‌ها به کاربران مشارکت فعال دارد.' },
-            amirhossein: { name: 'امیرحسین شکری زاده', role: 'عضو تیم', avatar: '5.jpg', desc: 'امیرحسین شکری زاده با ایده‌های نوآورانه و انرژی مثبت خود، به رشد و توسعه مجموعه کمک می‌کند.' }
-        };
+    <div class="modal" id="teamModal">
+        <div class="modal-box" style="text-align:center">
+            <button class="modal-close" onclick="closeModal('teamModal')">×</button>
+            <img id="teamModalImg" src="" style="width:100px;height:100px;border-radius:50%;object-fit:cover;margin:0 auto 15px;border:4px solid #fff;box-shadow:0 4px 15px rgba(0,0,0,0.1)">
+            <h2 id="teamModalName" style="margin-bottom:5px"></h2>
+            <p id="teamModalRole" style="color:#2563eb;font-weight:600;margin-bottom:15px"></p>
+            <p id="teamModalDesc" style="color:#64748b;line-height:1.8;font-size:0.9rem"></p>
+        </div>
+    </div>
 
-        function openMemberModal(memberId) {
-            var member = membersInfo[memberId];
-            if (!member) return;
-            document.getElementById('modalAvatar').src = member.avatar;
-            document.getElementById('modalName').textContent = member.name;
-            document.getElementById('modalRole').textContent = member.role;
-            document.getElementById('modalDesc').textContent = member.desc;
-            document.getElementById('memberModal').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
+    <div class="settings-page" id="settingsPage">
+        <div class="settings-header">
+            <h2>⚙️ تنظیمات اکانت</h2>
+            <button class="settings-back" onclick="closeSettingsPage()">بازگشت</button>
+        </div>
+        <div class="settings-body">
+            <div class="settings-card">
+                <h3>تغییر پروفایل</h3>
+                <div class="settings-avatar">
+                    <img id="settingsAvatar" src="" alt="پروفایل">
+                    <input type="file" id="settingsAvatarInput" accept="image/*" style="display:none" onchange="changeAvatar(event)">
+                    <button onclick="document.getElementById('settingsAvatarInput').click()" style="background:#3b82f6;color:#fff;padding:10px 20px;border-radius:8px;font-weight:600">تغییر عکس پروفایل</button>
+                </div>
+            </div>
 
-        function closeMemberModal() {
-            document.getElementById('memberModal').classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
+            <div class="settings-card">
+                <h3>تغییر نام</h3>
+                <div class="form-group">
+                    <label>نام و نام خانوادگی</label>
+                    <input type="text" id="settingsName" placeholder="نام جدید">
+                </div>
+                <button class="form-submit" onclick="changeName()">ذخیره نام</button>
+            </div>
 
-        document.getElementById('memberModal').addEventListener('click', function(e) {
-            if (e.target === this) closeMemberModal();
-        });
+            <div class="settings-card">
+                <h3>تغییر رمز عبور</h3>
+                <div class="form-group">
+                    <label>رمز عبور فعلی</label>
+                    <input type="password" id="currentPassword" placeholder="رمز فعلی">
+                </div>
+                <div class="form-group">
+                    <label>رمز عبور جدید</label>
+                    <input type="password" id="newPassword" placeholder="رمز جدید (حداقل ۶ کاراکتر)">
+                </div>
+                <div class="form-group">
+                    <label>تکرار رمز عبور جدید</label>
+                    <input type="password" id="confirmPassword" placeholder="تکرار رمز جدید">
+                </div>
+                <button class="form-submit" onclick="changePassword()">تغییر رمز عبور</button>
+            </div>
 
-        document.addEventListener('keydown', function(e) {
-            if (e.keyCode === 27) closeMemberModal();
-        });
+            <div class="settings-card">
+                <h3>کیف پول</h3>
+                <div class="wallet-display">
+                    <div class="label">موجودی کیف پول</div>
+                    <div class="amount" id="walletAmount">۰ تومان</div>
+                    <div class="label">برای شارژ کیف پول با پشتیبانی تماس بگیرید</div>
+                </div>
+            </div>
 
-        // محافظت‌ها
-        document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
-        document.addEventListener('selectstart', function(e) { e.preventDefault(); return false; });
-        document.addEventListener('dragstart', function(e) { e.preventDefault(); return false; });
-        document.addEventListener('keydown', function(e) {
-            if ((e.ctrlKey && (e.keyCode === 83 || e.keyCode === 85 || e.keyCode === 67 || e.keyCode === 80)) || 
-                (e.keyCode === 123) || 
-                (e.ctrlKey && e.shiftKey && e.keyCode === 73)) {
-                e.preventDefault();
-                return false;
-            }
-        });
-        document.addEventListener('copy', function(e) { e.preventDefault(); return false; });
-        document.addEventListener('cut', function(e) { e.preventDefault(); return false; });
-        document.addEventListener('paste', function(e) { e.preventDefault(); return false; });
-    </script>
+            <div class="settings-card">
+                <h3>اطلاعات حساب</h3>
+                <div class="form-group">
+                    <label>شماره موبایل</label>
+                    <input type="text" id="settingsPhone" disabled style="background:#f1f5f9">
+                </div>
+                <div class="form-group">
+                    <label>تاریخ عضویت</label>
+                    <input type="text" id="settingsJoinDate" disabled style="background:#f1f5f9">
+                </div>
+            </div>
+
+            <button class="form-submit" style="background:#ef4444;margin-top:20px" onclick="handleLogout()">خروج از حساب</button>
+        </div>
+    </div>
+
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-head">
+            <h2>🛡️ پنل مدیریت</h2>
+            <button onclick="closeAdminPanel()" style="background:#ef4444;color:#fff;padding:8px 15px;border-radius:8px;font-weight:600">بستن</button>
+        </div>
+        <div class="admin-body">
+            <div class="admin-tabs">
+                <button class="admin-tab on" onclick="switchAdminTab('users',this)">کاربران</button>
+                <button class="admin-tab" onclick="switchAdminTab('chats',this)">گفتگوها</button>
+            </div>
+            <div class="admin-content">
+                <div id="adminUsersTab">
+                    <h3 style="margin-bottom:15px">لیست کاربران</h3>
+                    <div id="adminUserList"></div>
+                </div>
+                <div id="adminChatsTab" style="display:none">
+                    <h3 style="margin-bottom:15px">گفتگوهای کاربران</h3>
+                    <p style="color:#64748b;font-size:0.9rem;margin-bottom:15px">روی هر کاربر کلیک کنید تا پیام‌های او را ببینید و پاسخ دهید</p>
+                    <div id="adminChatList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-chat-page" id="adminChatPage">
+        <div class="admin-chat-header">
+            <div class="admin-chat-user-info">
+                <img id="adminChatUserAvatar" src="" alt="کاربر">
+                <div>
+                    <h3 id="adminChatUserName">کاربر</h3>
+                    <p id="adminChatUserPhone">09xxxxxxxxx</p>
+                </div>
+            </div>
+            <button class="admin-chat-back" onclick="closeAdminChatPage()">بازگشت</button>
+        </div>
+        <div class="admin-chat-body">
+            <div class="admin-chat-msgs" id="adminChatMsgs"></div>
+            <div class="admin-chat-input">
+                <input type="text" id="adminChatInput" placeholder="پیام خود را بنویسید..." onkeypress="if(event.key==='Enter'){sendAdminChatMsg()}">
+                <button class="admin-chat-send" onclick="sendAdminChatMsg()">ارسال</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="ban-modal" id="banModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal('banModal')">×</button>
+            <h2>محروم کردن کاربر</h2>
+            <p style="text-align:center;color:#64748b;margin-bottom:20px">کاربر: <strong id="banUserName"></strong></p>
+            <div class="form-group">
+                <label>مدت محرومیت</label>
+                <select id="banDuration">
+                    <option value="1">۱ ساعت</option>
+                    <option value="24">۱ روز (۲۴ ساعت)</option>
+                    <option value="168">۱ هفته (۷ روز)</option>
+                    <option value="720">۱ ماه (۳ روز)</option>
+                    <option value="permanent">دائمی</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>دلیل محرومیت (اختیاری)</label>
+                <input type="text" id="banReason" placeholder="مثال: رفتار نامناسب">
+            </div>
+            <button class="form-submit" onclick="confirmBan()">اعمال محرومیت</button>
+        </div>
+    </div>
+
+    <script src="script.js" defer></script>
 </body>
 </html>
