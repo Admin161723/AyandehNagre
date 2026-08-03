@@ -14,24 +14,7 @@
         button { cursor: pointer; font-family: inherit; border: none; outline: none; }
         input, textarea, select { font-family: inherit; outline: none; }
 
-        #toast {
-            position: fixed;
-            top: -150px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1e293b;
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            z-index: 99999;
-            transition: top 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            font-weight: 600;
-            font-size: 0.9rem;
-            max-width: 90vw;
-            min-width: 250px;
-            text-align: center;
-        }
+        #toast { position: fixed; top: -150px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; padding: 12px 24px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 99999; transition: top 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); font-weight: 600; font-size: 0.9rem; max-width: 90vw; min-width: 250px; text-align: center; }
         #toast.show { top: 30px; }
         #toast.success { background: linear-gradient(135deg, #10b981, #059669); }
         #toast.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
@@ -99,45 +82,12 @@
         .trust { display: flex; justify-content: center; gap: 20px; margin-top: 30px; flex-wrap: wrap; }
         .trust img { width: 70px; height: 70px; background: #fff; border-radius: 10px; padding: 5px; object-fit: contain; }
 
-        .chat-fab {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            width: 65px;
-            height: 65px;
-            background: linear-gradient(135deg, #10b981, #059669);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 8px 25px rgba(16,185,129,0.4);
-            z-index: 900;
-            transition: all 0.3s;
-            border: 3px solid #fff;
-            animation: pulse 2s infinite;
-        }
+        .chat-fab { position: fixed; bottom: 25px; right: 25px; width: 65px; height: 65px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 25px rgba(16,185,129,0.4); z-index: 900; transition: all 0.3s; border: 3px solid #fff; animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.7); } 50% { box-shadow: 0 0 0 15px rgba(16,185,129,0); } }
         .chat-fab:hover { transform: scale(1.1); animation: none; }
         .chat-fab svg { width: 32px; height: 32px; fill: #fff; }
 
-        .chat-box {
-            position: fixed;
-            bottom: 100px;
-            right: 25px;
-            width: 360px;
-            max-width: calc(100vw - 50px);
-            height: 480px;
-            max-height: calc(100vh - 150px);
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-            display: none;
-            flex-direction: column;
-            z-index: 900;
-            overflow: hidden;
-            border: 1px solid #e2e8f0;
-        }
+        .chat-box { position: fixed; bottom: 100px; right: 25px; width: 360px; max-width: calc(100vw - 50px); height: 480px; max-height: calc(100vh - 150px); background: #fff; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); display: none; flex-direction: column; z-index: 900; overflow: hidden; border: 1px solid #e2e8f0; }
         .chat-box.on { display: flex; animation: slideUp 0.3s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .chat-head { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
@@ -196,28 +146,13 @@
         .admin-head { background: #0f172a; color: #fff; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
         .admin-body { padding: 30px; max-width: 1000px; margin: 0 auto; }
         
-        /* کارت موجودی پنل */
-        .admin-wallet-card {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: #fff;
-            padding: 20px;
-            border-radius: 16px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(16,185,129,0.3);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
+        .admin-wallet-card { background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 20px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(16,185,129,0.3); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
         .admin-wallet-card .wallet-info h3 { font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px; }
         .admin-wallet-card .wallet-info .balance { font-size: 1.8rem; font-weight: 900; }
         .admin-wallet-card .wallet-info .balance-sub { font-size: 0.8rem; opacity: 0.8; margin-top: 3px; }
         .admin-wallet-card .wallet-actions { display: flex; gap: 8px; }
         .wallet-btn { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 0.85rem; }
         .wallet-btn:hover { background: rgba(255,255,255,0.3); }
-        .wallet-btn.danger { background: rgba(239,68,68,0.8); }
-        .wallet-btn.danger:hover { background: rgba(239,68,68,1); }
 
         .admin-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; flex-wrap: wrap; }
         .admin-tab { padding: 10px 20px; background: none; border: none; font-weight: 600; color: #64748b; border-bottom: 3px solid transparent; margin-bottom: -2px; cursor: pointer; }
@@ -302,7 +237,7 @@
         </div>
         <ul>
             <li><a href="#home" onclick="toggleMenu()">🏠 خانه</a></li>
-            <li class="menu-item" id="menuLogin" onclick="openModal('loginModal'); toggleMenu()"><a href="#"> ورود / ثبت‌نام</a></li>
+            <li class="menu-item" id="menuLogin" onclick="openModal('loginModal'); toggleMenu()"><a href="#">🔐 ورود / ثبت‌نام</a></li>
             <li class="menu-item" id="menuSettings" onclick="openSettingsPage(); toggleMenu()"><a href="#">⚙️ تنظیمات اکانت</a></li>
             <li class="menu-item" id="menuAdmin" onclick="openAdminPanel(); toggleMenu()"><a href="#" style="color:#ef4444">🛡️ پنل مدیریت</a></li>
         </ul>
@@ -363,7 +298,7 @@
         <p style="margin-top:20px;opacity:0.8;font-size:0.8rem">© 2026 آینده نگر - تمامی حقوق محفوظ است</p>
     </footer>
 
-    <button class="chat-fab" onclick="handleChatClick()">
+    <button class="chat-fab" id="chatFab" onclick="handleChatClick()">
         <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
     </button>
 
@@ -379,6 +314,7 @@
         </div>
     </div>
 
+    <!-- Modals -->
     <div class="modal" id="registerModal">
         <div class="modal-box">
             <button class="modal-close" onclick="closeModal('registerModal')">×</button>
@@ -405,7 +341,7 @@
                 <div class="otp-code" id="otpCodeDisplay">----</div>
                 <div style="font-size:0.8rem;color:#92400e">کد بالا را وارد کنید</div>
             </div>
-            <div class="form-group"><label>کد تایید</label><input type="text" id="otpInput" placeholder="کد  رقمی را وارد کنید" style="text-align:center;letter-spacing:5px;font-size:1.2rem;font-weight:700"></div>
+            <div class="form-group"><label>کد تایید</label><input type="text" id="otpInput" placeholder="کد ۴ رقمی" style="text-align:center;letter-spacing:5px;font-size:1.2rem;font-weight:700"></div>
             <button class="form-submit" onclick="verifyOTP()">تایید و ورود به حساب</button>
         </div>
     </div>
@@ -471,7 +407,7 @@
                 <h3>کیف پول</h3>
                 <div class="wallet-display">
                     <div class="label">موجودی کیف پول</div>
-                    <div class="amount" id="walletAmount"> تومان</div>
+                    <div class="amount" id="walletAmount">۰ تومان</div>
                     <div class="label">برای شارژ کیف پول با پشتیبانی تماس بگیرید</div>
                 </div>
             </div>
@@ -490,7 +426,6 @@
             <button onclick="closeAdminPanel()" style="background:#ef4444;color:#fff;padding:8px 15px;border-radius:8px;font-weight:600">بستن</button>
         </div>
         <div class="admin-body">
-            <!-- کارت موجودی پنل -->
             <div class="admin-wallet-card">
                 <div class="wallet-info">
                     <h3>💰 موجودی کیف پول پنل</h3>
@@ -566,8 +501,8 @@
                 <select id="banDuration">
                     <option value="1">۱ ساعت</option>
                     <option value="24">۱ روز (۲۴ ساعت)</option>
-                    <option value="168"> هفته (۷ روز)</option>
-                    <option value="720">۱ ماه (۰ روز)</option>
+                    <option value="168">۱ هفته (۷ روز)</option>
+                    <option value="720">۱ ماه (۳۰ روز)</option>
                     <option value="permanent">دائمی</option>
                 </select>
             </div>
@@ -601,7 +536,7 @@
     <div class="ban-modal" id="adminWalletAddModal">
         <div class="modal-box">
             <button class="modal-close" onclick="closeModal('adminWalletAddModal')">×</button>
-            <h2> افزایش موجودی پنل</h2>
+            <h2>💵 افزایش موجودی پنل</h2>
             <p style="text-align:center;color:#64748b;margin-bottom:10px">موجودی فعلی پنل: <strong id="adminCurrentWallet"></strong> تومان</p>
             <div class="form-group">
                 <label>مبلغ افزایش (تومان)</label>
