@@ -12,17 +12,13 @@ let banTargetPhone = null;
 let walletTargetPhone = null;
 let isSending = false;
 
-// ✅ پر کردن نوار پیشرفت لودر
 document.addEventListener('DOMContentLoaded', () => {
     const loaderFill = document.getElementById('loaderFill');
     if (loaderFill) {
         let progress = 0;
         const interval = setInterval(() => {
             progress += 2;
-            if (progress >= 100) {
-                progress = 100;
-                clearInterval(interval);
-            }
+            if (progress >= 100) { progress = 100; clearInterval(interval); }
             loaderFill.style.width = progress + '%';
         }, 140);
     }
@@ -43,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateUI();
 });
 
-// ✅ حذف اجباری لودر بعد از ۸ ثانیه
 setTimeout(() => {
     const loader = document.getElementById('loader');
     if (loader) {
@@ -58,10 +53,7 @@ async function redisCommand(command, ...args) {
     try {
         const response = await fetch(`${UPSTASH_URL}`, {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${UPSTASH_TOKEN}`,
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Authorization': `Bearer ${UPSTASH_TOKEN}`, 'Content-Type': 'application/json' },
             body: JSON.stringify([command, ...args])
         });
         const data = await response.json();
@@ -120,9 +112,15 @@ document.addEventListener('click', e => {
 });
 
 let tempAvatar = '';
+// ✅ محدودیت حجم عکس برای جلوگیری از کندی دیتابیس (حداکثر 500 کیلوبایت)
 function previewAvatar(e) {
     const f = e.target.files[0];
     if (!f) return;
+    if (f.size > 500000) {
+        showToast('حجم عکس باید کمتر از 500 کیلوبایت باشد تا سرعت سایت حفظ شود', 'error');
+        e.target.value = '';
+        return;
+    }
     const r = new FileReader();
     r.onload = ev => {
         tempAvatar = ev.target.result;
@@ -175,9 +173,7 @@ async function verifyOTP() {
 
     if (newUser.isAdmin) {
         const currentAdminWallet = await redisCommand('GET', 'admin:wallet');
-        if (!currentAdminWallet) {
-            await redisCommand('SET', 'admin:wallet', INITIAL_ADMIN_WALLET);
-        }
+        if (!currentAdminWallet) await redisCommand('SET', 'admin:wallet', INITIAL_ADMIN_WALLET);
     }
 
     setCurrentUser(newUser);
@@ -241,16 +237,13 @@ async function handleLogin() {
 async function handleForgot() {
     const phone = document.getElementById('forgotPhone').value.trim();
     if (!phone) return showToast('لطفاً شماره موبایل را وارد کنید', 'error');
-
     if (phone === ADMIN_PHONE) {
         showToast('رمز عبور مدیر: ' + ADMIN_PASS, 'info');
         closeModal('forgotModal');
         return;
     }
-
     const userStr = await redisCommand('GET', `user:${phone}`);
     const user = userStr ? JSON.parse(userStr) : null;
-
     if (user) {
         showToast('رمز عبور شما: ' + user.password, 'info');
         closeModal('forgotModal');
@@ -269,7 +262,6 @@ function handleLogout() {
 function openSettingsPage() {
     const user = getCurrentUser();
     if (!user) return showToast('لطفاً ابتدا وارد شوید', 'error');
-
     const settingsPage = document.getElementById('settingsPage');
     if (settingsPage) {
         document.getElementById('settingsAvatar').src = user.avatar;
@@ -289,13 +281,16 @@ function closeSettingsPage() {
 async function changeAvatar(e) {
     const f = e.target.files[0];
     if (!f) return;
+    if (f.size > 500000) {
+        showToast('حجم عکس باید کمتر از 500 کیلوبایت باشد', 'error');
+        return;
+    }
     const r = new FileReader();
     r.onload = async ev => {
         const newAvatar = ev.target.result;
         const user = getCurrentUser();
         const userStr = await redisCommand('GET', `user:${user.phone}`);
         const userData = userStr ? JSON.parse(userStr) : user;
-
         userData.avatar = newAvatar;
         await redisCommand('SET', `user:${user.phone}`, JSON.stringify(userData));
         setCurrentUser(userData);
@@ -308,14 +303,11 @@ async function changeAvatar(e) {
 async function changeName() {
     const newName = document.getElementById('settingsName').value.trim();
     if (!newName) return showToast('نام نمی‌تواند خالی باشد', 'error');
-
     const user = getCurrentUser();
     const userStr = await redisCommand('GET', `user:${user.phone}`);
     const userData = userStr ? JSON.parse(userStr) : user;
-
     userData.name = newName;
     userData.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(newName)}&background=${user.isAdmin ? 'ef4444' : '3b82f6'}&color=fff`;
-
     await redisCommand('SET', `user:${user.phone}`, JSON.stringify(userData));
     setCurrentUser(userData);
     updateUI();
@@ -326,25 +318,19 @@ async function changePassword() {
     const currentPass = document.getElementById('currentPassword').value.trim();
     const newPass = document.getElementById('newPassword').value.trim();
     const confirmPass = document.getElementById('confirmPassword').value.trim();
-
     if (!currentPass || !newPass || !confirmPass) return showToast('لطفاً تمام فیلدها را پر کنید', 'error');
     if (newPass.length < 6) return showToast('رمز عبور جدید باید حداقل ۶ کاراکتر باشد', 'error');
     if (newPass !== confirmPass) return showToast('رمز عبور جدید و تکرار آن مطابقت ندارند', 'error');
-
     const user = getCurrentUser();
     const userStr = await redisCommand('GET', `user:${user.phone}`);
     const userData = userStr ? JSON.parse(userStr) : user;
-
     if (userData.password !== simpleHash(currentPass)) return showToast('رمز عبور فعلی اشتباه است', 'error');
-
     userData.password = simpleHash(newPass);
     await redisCommand('SET', `user:${user.phone}`, JSON.stringify(userData));
     setCurrentUser(userData);
-
     document.getElementById('currentPassword').value = '';
     document.getElementById('newPassword').value = '';
     document.getElementById('confirmPassword').value = '';
-
     showToast('رمز عبور با موفقیت تغییر کرد', 'success');
 }
 
@@ -364,18 +350,13 @@ function updateUI() {
         if (avatarEl) avatarEl.src = user.avatar;
         if (nameEl) nameEl.textContent = user.name;
         if (phoneEl) phoneEl.textContent = user.phone;
-
         if (sidebarProfile) sidebarProfile.classList.add('visible');
         if (sidebarLogout) sidebarLogout.classList.add('visible');
         if (menuLogin) menuLogin.classList.remove('visible');
         if (menuSettings) menuSettings.classList.add('visible');
         if (chatFab) chatFab.classList.add('visible');
-
-        if (user.isAdmin) {
-            if (menuAdmin) menuAdmin.classList.add('visible');
-        } else {
-            if (menuAdmin) menuAdmin.classList.remove('visible');
-        }
+        if (user.isAdmin) { if (menuAdmin) menuAdmin.classList.add('visible'); } 
+        else { if (menuAdmin) menuAdmin.classList.remove('visible'); }
     } else {
         if (sidebarProfile) sidebarProfile.classList.remove('visible');
         if (sidebarLogout) sidebarLogout.classList.remove('visible');
@@ -402,10 +383,6 @@ function showMember(id) {
     }
 }
 
-// ============================================================
-// 🔹 چت کاربر
-// ============================================================
-
 async function handleChatClick() {
     const user = getCurrentUser();
     if (!user) {
@@ -413,13 +390,11 @@ async function handleChatClick() {
         openModal('loginModal');
         return;
     }
-
     const isBanned = await redisCommand('GET', `ban:${user.phone}`);
     if (isBanned) {
         showToast('⛔ حساب شما از چت محروم شده است. با پشتیبانی تماس بگیرید.', 'error');
         return;
     }
-
     toggleChatBox();
     await loadUserChat(user.phone);
 }
@@ -430,7 +405,6 @@ function toggleChatBox() {
 }
 
 async function loadUserChat(phone) {
-    // دریافت تمام پیام‌ها برای نمایش کامل مثل پیام‌رسان
     const msgsStr = await redisCommand('LRANGE', `chat:${phone}`, 0, -1);
     const msgs = msgsStr ? msgsStr.map(m => JSON.parse(m)).reverse() : [];
     const container = document.getElementById('chatMsgs');
@@ -440,7 +414,6 @@ async function loadUserChat(phone) {
     if (msgs.length === 0) {
         container.innerHTML = `<div class="msg admin">سلام! چطور می‌توانم کمکتان کنم؟<span class="time">سیستم</span></div>`;
     } else {
-        // استفاده از DocumentFragment برای سرعت بالا در رندر هزاران پیام
         const fragment = document.createDocumentFragment();
         msgs.forEach(m => {
             const div = document.createElement('div');
@@ -463,7 +436,6 @@ async function loadUserChat(phone) {
 
 async function sendUserMsg() {
     if (isSending) return;
-
     const user = getCurrentUser();
     const input = document.getElementById('chatInput');
     const text = input ? input.value.trim() : '';
@@ -477,28 +449,16 @@ async function sendUserMsg() {
 
     isSending = true;
     const sendBtn = document.querySelector('.send-btn');
-    if (sendBtn) {
-        sendBtn.disabled = true;
-        sendBtn.style.opacity = '0.5';
-    }
+    if (sendBtn) { sendBtn.disabled = true; sendBtn.style.opacity = '0.5'; }
     if (input) input.disabled = true;
 
     try {
         const time = new Date().toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'});
         const msg = {
-            id: Date.now(),
-            userPhone: user.phone,
-            userName: user.name,
-            userAvatar: user.avatar,
-            sender: 'user',
-            text: text,
-            time: time,
-            timestamp: Date.now(),
-            read: false
+            id: Date.now(), userPhone: user.phone, userName: user.name, userAvatar: user.avatar,
+            sender: 'user', text: text, time: time, timestamp: Date.now(), read: false
         };
-
         await redisCommand('LPUSH', `chat:${user.phone}`, JSON.stringify(msg));
-
         if (input) input.value = '';
         await loadUserChat(user.phone);
     } catch (err) {
@@ -507,19 +467,9 @@ async function sendUserMsg() {
     }
 
     isSending = false;
-    if (sendBtn) {
-        sendBtn.disabled = false;
-        sendBtn.style.opacity = '1';
-    }
-    if (input) {
-        input.disabled = false;
-        input.focus();
-    }
+    if (sendBtn) { sendBtn.disabled = false; sendBtn.style.opacity = '1'; }
+    if (input) { input.disabled = false; input.focus(); }
 }
-
-// ============================================================
-// 🔹 پنل مدیریت
-// ============================================================
 
 async function openAdminPanel() {
     const user = getCurrentUser();
@@ -553,59 +503,30 @@ async function loadAdminData() {
     const list = document.getElementById('adminUserList');
     if (!list) return;
     list.innerHTML = '';
-
     if (!phones || phones.length === 0) {
         list.innerHTML = '<p style="text-align:center;padding:20px;color:#64748b">هنوز کاربری ثبت‌نام نکرده است</p>';
         return;
     }
-
     for (const phone of phones) {
         const userStr = await redisCommand('GET', `user:${phone}`);
         if (!userStr) continue;
         const u = JSON.parse(userStr);
-
         if (u.phone === ADMIN_PHONE) {
-            list.innerHTML += `
-                <div class="user-list-item" style="background:#f0fdf4;border:1px solid #10b981;border-radius:10px">
-                    <img src="${u.avatar}" alt="${u.name}">
-                    <div class="user-list-item-info">
-                        <h4>${u.name} <span style="background:#ef4444;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.7rem;margin-right:5px">مدیر</span></h4>
-                        <p>${u.phone} | موجودی: ${(u.wallet || 0).toLocaleString('fa-IR')} تومان</p>
-                    </div>
-                </div>`;
+            list.innerHTML += `<div class="user-list-item" style="background:#f0fdf4;border:1px solid #10b981;border-radius:10px"><img src="${u.avatar}" alt="${u.name}"><div class="user-list-item-info"><h4>${u.name} <span style="background:#ef4444;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.7rem;margin-right:5px">مدیر</span></h4><p>${u.phone} | موجودی: ${(u.wallet || 0).toLocaleString('fa-IR')} تومان</p></div></div>`;
             continue;
         }
-
         const isBanned = await redisCommand('GET', `ban:${u.phone}`);
         const bannedBadge = isBanned ? `<span class="banned-badge">بن</span>` : '';
         const walletBadge = `<span class="wallet-badge">${(u.wallet || 0).toLocaleString('fa-IR')} ت</span>`;
-
-        list.innerHTML += `
-            <div class="user-list-item">
-                <img src="${u.avatar}" alt="${u.name}">
-                <div class="user-list-item-info">
-                    <h4>${u.name} ${bannedBadge} ${walletBadge}</h4>
-                    <p>${u.phone}</p>
-                </div>
-                <div class="user-actions">
-                    <button class="btn-small btn-wallet" onclick="openWalletModal('${u.phone}', '${u.name}', ${u.wallet || 0})">💰 شارژ</button>
-                    ${isBanned 
-                        ? `<button class="btn-small btn-unban" onclick="unbanUser('${u.phone}')">رفع بن</button>` 
-                        : `<button class="btn-small btn-ban" onclick="openBanModal('${u.phone}', '${u.name}')">بن</button>`
-                    }
-                </div>
-            </div>`;
+        list.innerHTML += `<div class="user-list-item"><img src="${u.avatar}" alt="${u.name}"><div class="user-list-item-info"><h4>${u.name} ${bannedBadge} ${walletBadge}</h4><p>${u.phone}</p></div><div class="user-actions"><button class="btn-small btn-wallet" onclick="openWalletModal('${u.phone}', '${u.name}', ${u.wallet || 0})">💰 شارژ</button>${isBanned ? `<button class="btn-small btn-unban" onclick="unbanUser('${u.phone}')">رفع بن</button>` : `<button class="btn-small btn-ban" onclick="openBanModal('${u.phone}', '${u.name}')">بن</button>`}</div></div>`;
     }
 }
 
 function openBanModal(phone, name) { 
     banTargetPhone = phone; 
-    const nameEl = document.getElementById('banUserName');
-    const durationEl = document.getElementById('banDuration');
-    const reasonEl = document.getElementById('banReason');
-    if (nameEl) nameEl.textContent = name;
-    if (durationEl) durationEl.value = '24';
-    if (reasonEl) reasonEl.value = '';
+    if (document.getElementById('banUserName')) document.getElementById('banUserName').textContent = name;
+    if (document.getElementById('banDuration')) document.getElementById('banDuration').value = '24';
+    if (document.getElementById('banReason')) document.getElementById('banReason').value = '';
     openModal('banModal'); 
 }
 
@@ -613,7 +534,6 @@ async function confirmBan() {
     if (!banTargetPhone) return;
     const duration = document.getElementById('banDuration').value;
     const reason = document.getElementById('banReason').value.trim();
-
     await redisCommand('SETEX', `ban:${banTargetPhone}`, duration === 'permanent' ? 31536000 : duration * 3600, reason || 'بدون دلیل');
     closeModal('banModal');
     showToast('کاربر با موفقیت محروم شد', 'success');
@@ -629,50 +549,35 @@ async function unbanUser(phone) {
 function openWalletModal(phone, name, currentBalance) {
     walletTargetPhone = phone;
     redisCommand('GET', 'admin:wallet').then(adminBal => {
-        const nameEl = document.getElementById('walletUserName');
-        const balEl = document.getElementById('walletCurrentBalance');
-        const panelBalEl = document.getElementById('walletPanelBalance');
-        const amountEl = document.getElementById('walletAmountInput');
-        if (nameEl) nameEl.textContent = name;
-        if (balEl) balEl.textContent = currentBalance.toLocaleString('fa-IR');
-        if (panelBalEl) panelBalEl.textContent = (adminBal ? parseInt(adminBal) : INITIAL_ADMIN_WALLET).toLocaleString('fa-IR');
-        if (amountEl) amountEl.value = '';
+        if (document.getElementById('walletUserName')) document.getElementById('walletUserName').textContent = name;
+        if (document.getElementById('walletCurrentBalance')) document.getElementById('walletCurrentBalance').textContent = currentBalance.toLocaleString('fa-IR');
+        if (document.getElementById('walletPanelBalance')) document.getElementById('walletPanelBalance').textContent = (adminBal ? parseInt(adminBal) : INITIAL_ADMIN_WALLET).toLocaleString('fa-IR');
+        if (document.getElementById('walletAmountInput')) document.getElementById('walletAmountInput').value = '';
         openModal('walletModal');
     });
 }
 
-// ✅ اصلاح شده: اعمال دقیق پول به کاربر مورد نظر
 async function confirmWalletAdd() {
     if (!walletTargetPhone) return;
     const amount = parseInt(document.getElementById('walletAmountInput').value);
     if (!amount || amount <= 0) return showToast('لطفاً مبلغ معتبر وارد کنید', 'error');
-
     const adminBalStr = await redisCommand('GET', 'admin:wallet');
     const adminBalance = adminBalStr ? parseInt(adminBalStr) : INITIAL_ADMIN_WALLET;
-
     if (adminBalance < amount) {
         showToast(`موجودی پنل کافی نیست! موجودی فعلی: ${adminBalance.toLocaleString('fa-IR')} تومان`, 'error');
         return;
     }
-
-    // ۱. کسر از پنل
     await redisCommand('SET', 'admin:wallet', adminBalance - amount);
-
-    // ۲. افزودن به کاربر خاص
     const userStr = await redisCommand('GET', `user:${walletTargetPhone}`);
     const userData = userStr ? JSON.parse(userStr) : null;
-    
     if (userData) {
         userData.wallet = (userData.wallet || 0) + amount;
         await redisCommand('SET', `user:${walletTargetPhone}`, JSON.stringify(userData));
-
-        // ۳. به‌روزرسانی کاربر فعلی اگر خودش باشد
         const currentUser = getCurrentUser();
         if (currentUser && currentUser.phone === walletTargetPhone) {
             currentUser.wallet = userData.wallet;
             setCurrentUser(currentUser);
         }
-
         closeModal('walletModal');
         showToast(`✅ ${amount.toLocaleString('fa-IR')} تومان به کیف پول ${userData.name} شارژ شد`, 'success');
         await updateAdminWalletDisplay();
@@ -682,10 +587,8 @@ async function confirmWalletAdd() {
 
 function openAdminWalletAddModal() {
     redisCommand('GET', 'admin:wallet').then(bal => {
-        const walletEl = document.getElementById('adminCurrentWallet');
-        const amountEl = document.getElementById('adminWalletAddAmount');
-        if (walletEl) walletEl.textContent = (bal ? parseInt(bal) : INITIAL_ADMIN_WALLET).toLocaleString('fa-IR');
-        if (amountEl) amountEl.value = '';
+        if (document.getElementById('adminCurrentWallet')) document.getElementById('adminCurrentWallet').textContent = (bal ? parseInt(bal) : INITIAL_ADMIN_WALLET).toLocaleString('fa-IR');
+        if (document.getElementById('adminWalletAddAmount')) document.getElementById('adminWalletAddAmount').value = '';
         openModal('adminWalletAddModal');
     });
 }
@@ -693,115 +596,84 @@ function openAdminWalletAddModal() {
 async function confirmAdminWalletAdd() {
     const amount = parseInt(document.getElementById('adminWalletAddAmount').value);
     if (!amount || amount <= 0) return showToast('لطفاً مبلغ معتبر وارد کنید', 'error');
-
     const balStr = await redisCommand('GET', 'admin:wallet');
     const currentBal = balStr ? parseInt(balStr) : INITIAL_ADMIN_WALLET;
-
     await redisCommand('SET', 'admin:wallet', currentBal + amount);
     closeModal('adminWalletAddModal');
     await updateAdminWalletDisplay();
     showToast(`✅ ${amount.toLocaleString('fa-IR')} تومان به کیف پول پنل اضافه شد`, 'success');
 }
 
-// ============================================================
-// 🔹 گفتگوهای ادمین
-// ============================================================
-
 async function loadAdminChats() {
     const phones = await redisCommand('SMEMBERS', 'users:all');
     const list = document.getElementById('adminChatList');
     if (!list) return;
     list.innerHTML = '';
-
     if (!phones) return;
-
     let hasChats = false;
     for (const phone of phones) {
         if (phone === ADMIN_PHONE) continue;
-
         const msgCount = await redisCommand('LLEN', `chat:${phone}`);
         if (!msgCount || parseInt(msgCount) === 0) continue;
-
         hasChats = true;
-
         const userStr = await redisCommand('GET', `user:${phone}`);
         const userData = userStr ? JSON.parse(userStr) : null;
         const userName = userData ? userData.name : 'کاربر ناشناس';
         const userAvatar = userData ? userData.avatar : 'https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff';
-
         const lastMsgStr = await redisCommand('LRANGE', `chat:${phone}`, 0, 0);
         let lastText = '';
         let unreadCount = 0;
-
         if (lastMsgStr && lastMsgStr.length > 0) {
             const lastMsg = JSON.parse(lastMsgStr[0]);
             lastText = lastMsg.text;
-
             const allMsgsStr = await redisCommand('LRANGE', `chat:${phone}`, 0, -1);
             if (allMsgsStr) {
                 const allMsgs = allMsgsStr.map(m => JSON.parse(m));
                 unreadCount = allMsgs.filter(m => m.sender === 'user' && !m.read).length;
             }
         }
-
         const unreadBadge = unreadCount > 0 ? `<span class="unread-badge">${unreadCount}</span>` : '';
         const previewText = lastText ? (lastText.substring(0, 40) + (lastText.length > 40 ? '...' : '')) : 'بدون پیام';
-
-        list.innerHTML += `
-            <div class="user-list-item" onclick="openAdminChatPage('${phone}')" style="cursor:pointer">
-                <img src="${userAvatar}" alt="${userName}">
-                <div class="user-list-item-info">
-                    <h4>${userName} ${unreadBadge}</h4>
-                    <p>${previewText}</p>
-                </div>
-            </div>`;
+        list.innerHTML += `<div class="user-list-item" onclick="openAdminChatPage('${phone}')" style="cursor:pointer"><img src="${userAvatar}" alt="${userName}"><div class="user-list-item-info"><h4>${userName} ${unreadBadge}</h4><p>${previewText}</p></div></div>`;
     }
-
-    if (!hasChats) {
-        list.innerHTML = '<p style="text-align:center;color:#64748b;padding:20px">هنوز گفتگویی وجود ندارد</p>';
-    }
+    if (!hasChats) list.innerHTML = '<p style="text-align:center;color:#64748b;padding:20px">هنوز گفتگویی وجود ندارد</p>';
 }
 
-// ✅ باز شدن سریع و صحیح پیوی
 async function openAdminChatPage(phone) {
     currentAdminChatPhone = phone;
-    
-    // نمایش حالت لودینگ سریع
     const container = document.getElementById('adminChatMsgs');
     if (container) container.innerHTML = '<p style="text-align:center;padding:20px">در حال بارگذاری...</p>';
-    
     const chatPage = document.getElementById('adminChatPage');
     if (chatPage) chatPage.classList.add('on');
 
-    // دریافت داده‌ها
     const msgsStr = await redisCommand('LRANGE', `chat:${phone}`, 0, -1);
     const msgs = msgsStr ? msgsStr.map(m => JSON.parse(m)).reverse() : [];
-
     const userStr = await redisCommand('GET', `user:${phone}`);
     const userData = userStr ? JSON.parse(userStr) : null;
     const userName = userData ? userData.name : 'کاربر';
     const userAvatar = userData ? userData.avatar : 'https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff';
 
-    const nameEl = document.getElementById('adminChatUserName');
-    const phoneEl = document.getElementById('adminChatUserPhone');
-    const avatarEl = document.getElementById('adminChatUserAvatar');
-    if (nameEl) nameEl.textContent = userName;
-    if (phoneEl) phoneEl.textContent = phone;
-    if (avatarEl) avatarEl.src = userAvatar;
+    if (document.getElementById('adminChatUserName')) document.getElementById('adminChatUserName').textContent = userName;
+    if (document.getElementById('adminChatUserPhone')) document.getElementById('adminChatUserPhone').textContent = phone;
+    if (document.getElementById('adminChatUserAvatar')) document.getElementById('adminChatUserAvatar').src = userAvatar;
 
-    // علامت‌گذاری به عنوان خوانده شده
-    const updatedMsgs = msgs.map(m => {
-        if (m.sender === 'user') m.read = true;
-        return m;
-    });
-
-    // ذخیره وضعیت خوانده شده
+    const updatedMsgs = msgs.map(m => { if (m.sender === 'user') m.read = true; return m; });
     await redisCommand('DEL', `chat:${phone}`);
     for (let i = updatedMsgs.length - 1; i >= 0; i--) {
         await redisCommand('LPUSH', `chat:${phone}`, JSON.stringify(updatedMsgs[i]));
     }
-
     renderAdminChatMsgs(updatedMsgs.reverse());
+}
+
+// ✅ تابع جدید: حذف کامل گفتگو از دیتابیس (برای همیشه)
+async function deleteCurrentChat() {
+    if (!currentAdminChatPhone) return;
+    if (confirm('آیا از حذف کامل و دائمی این گفتگو مطمئن هستید؟ این عمل غیرقابل بازگشت است.')) {
+        await redisCommand('DEL', `chat:${currentAdminChatPhone}`);
+        showToast('گفتگو با موفقیت و به طور کامل حذف شد', 'success');
+        closeAdminChatPage();
+        await loadAdminChats(); // به‌روزرسانی لیست
+    }
 }
 
 function closeAdminChatPage() {
@@ -813,10 +685,7 @@ function closeAdminChatPage() {
 function renderAdminChatMsgs(msgs) {
     const container = document.getElementById('adminChatMsgs');
     if (!container) return;
-    
-    // استفاده از Fragment برای سرعت بالا در رندر هزاران پیام
     const fragment = document.createDocumentFragment();
-    
     if (msgs.length === 0) {
         const p = document.createElement('p');
         p.style.cssText = 'text-align:center;color:#64748b;padding:20px';
@@ -838,7 +707,6 @@ function renderAdminChatMsgs(msgs) {
             fragment.appendChild(div);
         });
     }
-    
     container.innerHTML = '';
     container.appendChild(fragment);
     container.scrollTop = container.scrollHeight;
@@ -849,27 +717,16 @@ async function sendAdminChatMsg() {
     const input = document.getElementById('adminChatInput');
     const text = input ? input.value.trim() : '';
     if (!text) return;
-
     if (isSending) return;
     isSending = true;
-
     try {
         const currentUser = getCurrentUser();
         const time = new Date().toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'});
         const msg = {
-            id: Date.now(),
-            userPhone: currentAdminChatPhone,
-            userName: currentUser ? currentUser.name : 'مدیر',
-            userAvatar: currentUser ? currentUser.avatar : '',
-            sender: 'admin',
-            text: text,
-            time: time,
-            timestamp: Date.now(),
-            read: true
+            id: Date.now(), userPhone: currentAdminChatPhone, userName: currentUser ? currentUser.name : 'مدیر',
+            userAvatar: currentUser ? currentUser.avatar : '', sender: 'admin', text: text, time: time, timestamp: Date.now(), read: true
         };
-
         await redisCommand('LPUSH', `chat:${currentAdminChatPhone}`, JSON.stringify(msg));
-
         input.value = '';
         const msgsStr = await redisCommand('LRANGE', `chat:${currentAdminChatPhone}`, 0, -1);
         renderAdminChatMsgs(msgsStr ? msgsStr.map(m => JSON.parse(m)).reverse() : []);
@@ -877,7 +734,6 @@ async function sendAdminChatMsg() {
         console.error('خطا:', err);
         showToast('❌ خطا در ارسال پیام', 'error');
     }
-
     isSending = false;
 }
 
@@ -885,58 +741,33 @@ async function sendBroadcast() {
     const title = document.getElementById('broadcastTitle').value.trim();
     const message = document.getElementById('broadcastMessage').value.trim();
     const resultDiv = document.getElementById('broadcastResult');
-
     if (!message) return showToast('لطفاً متن پیام را وارد کنید', 'error');
-
     const phones = await redisCommand('SMEMBERS', 'users:all');
     const regularUsers = phones ? phones.filter(p => p !== ADMIN_PHONE) : [];
-
     if (regularUsers.length === 0) {
         if (resultDiv) resultDiv.innerHTML = '<div style="background:#f59e0b;color:#fff;padding:15px;border-radius:10px;margin-top:15px;text-align:center">هیچ کاربر عادی برای ارسال پیام وجود ندارد</div>';
         return;
     }
-
     const time = new Date().toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'});
     const currentUser = getCurrentUser();
-
     for (const phone of regularUsers) {
         const msg = {
-            id: Date.now() + Math.random(),
-            userPhone: phone,
-            userName: currentUser ? currentUser.name : 'مدیر',
-            userAvatar: currentUser ? currentUser.avatar : '',
-            sender: 'broadcast',
-            isBroadcast: true,
-            broadcastTitle: title || 'اطلاعیه سیستم',
-            text: message,
-            time: time,
-            timestamp: Date.now(),
-            read: false
+            id: Date.now() + Math.random(), userPhone: phone, userName: currentUser ? currentUser.name : 'مدیر',
+            userAvatar: currentUser ? currentUser.avatar : '', sender: 'broadcast', isBroadcast: true,
+            broadcastTitle: title || 'اطلاعیه سیستم', text: message, time: time, timestamp: Date.now(), read: false
         };
         await redisCommand('LPUSH', `chat:${phone}`, JSON.stringify(msg));
     }
-
     if (resultDiv) resultDiv.innerHTML = `<div style="background:#10b981;color:#fff;padding:15px;border-radius:10px;margin-top:15px;text-align:center">✅ پیام با موفقیت به ${regularUsers.length} کاربر ارسال شد</div>`;
-    const titleEl = document.getElementById('broadcastTitle');
-    const msgEl = document.getElementById('broadcastMessage');
-    if (titleEl) titleEl.value = '';
-    if (msgEl) msgEl.value = '';
+    if (document.getElementById('broadcastTitle')) document.getElementById('broadcastTitle').value = '';
+    if (document.getElementById('broadcastMessage')) document.getElementById('broadcastMessage').value = '';
     showToast(`پیام به ${regularUsers.length} کاربر ارسال شد`, 'success');
     setTimeout(() => { if (resultDiv) resultDiv.innerHTML = ''; }, 5000);
 }
 
-function openModal(id) { 
-    const modal = document.getElementById(id);
-    if (modal) modal.classList.add('on'); 
-}
-function closeModal(id) { 
-    const modal = document.getElementById(id);
-    if (modal) modal.classList.remove('on'); 
-}
-function switchModal(from, to) { 
-    closeModal(from); 
-    setTimeout(() => openModal(to), 200); 
-}
+function openModal(id) { const modal = document.getElementById(id); if (modal) modal.classList.add('on'); }
+function closeModal(id) { const modal = document.getElementById(id); if (modal) modal.classList.remove('on'); }
+function switchModal(from, to) { closeModal(from); setTimeout(() => openModal(to), 200); }
 
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('keydown', e => {
