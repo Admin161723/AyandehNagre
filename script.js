@@ -213,7 +213,7 @@ async function handleLogin() {
             await redisCommand('SET', `user:${ADMIN_PHONE}`, JSON.stringify(adminProfile));
             await redisCommand('SADD', 'users:all', ADMIN_PHONE);
             await redisCommand('SET', 'admin:wallet', INITIAL_ADMIN_WALLET);
-            showToast('پروفایل مدیر ساخته شد با موجودی ۵,۰۰۰,۰۰۰ تومان', 'success');
+            showToast('پروفایل مدیر ساخته شد با موجودی ۵,۰۰,۰۰۰ تومان', 'success');
         }
         setCurrentUser(adminProfile);
         closeModal('loginModal');
@@ -466,7 +466,7 @@ async function sendUserMsg() {
         await loadUserChat(user.phone);
     } catch (err) {
         console.error('خطا در ارسال پیام:', err);
-        showToast(' خطا در ارسال پیام', 'error');
+        showToast('❌ خطا در ارسال پیام', 'error');
     }
 
     isSending = false;
@@ -521,6 +521,7 @@ async function loadAdminData() {
         const isBanned = await redisCommand('GET', `ban:${u.phone}`);
         const bannedBadge = isBanned ? `<span class="banned-badge">بن</span>` : '';
         const walletBadge = `<span class="wallet-badge">${Number(u.wallet || 0).toLocaleString('fa-IR')} ت</span>`;
+        // ✅ تغییر مهم: استفاده از onclick با پارامترهای صحیح
         list.innerHTML += `<div class="user-list-item"><img src="${u.avatar}" alt="${u.name}"><div class="user-list-item-info"><h4>${u.name} ${bannedBadge} ${walletBadge}</h4><p>${u.phone}</p></div><div class="user-actions"><button class="btn-small btn-wallet" onclick="openWalletModal('${u.phone}', '${u.name}', ${u.wallet || 0})">💰 شارژ</button>${isBanned ? `<button class="btn-small btn-unban" onclick="unbanUser('${u.phone}')">رفع بن</button>` : `<button class="btn-small btn-ban" onclick="openBanModal('${u.phone}', '${u.name}')">بن</button>`}</div></div>`;
     }
 }
@@ -549,11 +550,10 @@ async function unbanUser(phone) {
     await loadAdminData();
 }
 
-// ✅ تابع باز کردن مودال شارژ - با ذخیره دقیق شماره کاربر
+// ✅ تابع باز کردن مودال شارژ - ساده و مطمئن
 function openWalletModal(phone, name, currentBalance) {
-    // ✅ اطمینان از ذخیره صحیح شماره کاربر هدف
-    walletTargetPhone = String(phone).trim();
-    console.log('🎯 کاربر هدف برای شارژ:', walletTargetPhone, 'نام:', name, 'موجودی فعلی:', currentBalance);
+    walletTargetPhone = phone;
+    console.log('🎯 کاربر هدف:', walletTargetPhone);
     
     redisCommand('GET', 'admin:wallet').then(adminBal => {
         const adminWallet = adminBal ? Number(adminBal) : INITIAL_ADMIN_WALLET;
@@ -565,99 +565,61 @@ function openWalletModal(phone, name, currentBalance) {
     });
 }
 
-// ✅ تابع اصلی شارژ کیف پول - کاملاً اصلاح شده
+// ✅ تابع اصلی شارژ کیف پول - کاملاً ساده و کارآمد
 async function confirmWalletAdd() {
-    // ✅ بررسی شماره کاربر هدف
-    if (!walletTargetPhone || walletTargetPhone.trim() === '') {
-        showToast('❌ خطا: شماره کاربر مشخص نیست. لطفاً دوباره تلاش کنید.', 'error');
-        console.error('walletTargetPhone is empty!');
+    if (!walletTargetPhone) {
+        showToast(' خطا: کاربر مشخص نیست', 'error');
         return;
     }
 
-    const phone = walletTargetPhone.trim();
-    console.log('📞 شروع شارژ برای شماره:', phone);
-
-    // ✅ دریافت و بررسی مبلغ
     const amountInput = document.getElementById('walletAmountInput');
-    if (!amountInput) {
-        showToast('❌ خطا در فرم', 'error');
-        return;
-    }
+    if (!amountInput) return;
     
     const amount = Number(amountInput.value);
-    
-    if (!amount || amount <= 0 || isNaN(amount)) {
+    if (!amount || amount <= 0) {
         showToast('لطفاً مبلغ معتبر وارد کنید', 'error');
         return;
     }
 
-    console.log('💰 مبلغ شارژ:', amount);
-
-    // ✅ دریافت موجودی فعلی پنل
+    // دریافت موجودی پنل
     const adminBalStr = await redisCommand('GET', 'admin:wallet');
     const adminBalance = adminBalStr ? Number(adminBalStr) : INITIAL_ADMIN_WALLET;
-    
-    console.log('🏦 موجودی فعلی پنل:', adminBalance);
 
     if (adminBalance < amount) {
-        showToast(`موجودی پنل کافی نیست! موجودی فعلی: ${adminBalance.toLocaleString('fa-IR')} تومان`, 'error');
+        showToast(`موجودی پنل کافی نیست! موجودی: ${adminBalance.toLocaleString('fa-IR')} تومان`, 'error');
         return;
     }
 
-    // ✅ کسر مبلغ از کیف پول پنل
-    const newAdminBalance = adminBalance - amount;
-    const setResult1 = await redisCommand('SET', 'admin:wallet', newAdminBalance);
-    console.log('✅ کسر از پنل انجام شد. موجودی جدید پنل:', newAdminBalance);
+    // کسر از پنل
+    await redisCommand('SET', 'admin:wallet', adminBalance - amount);
 
-    // ✅ دریافت اطلاعات کاربر هدف
-    const userStr = await redisCommand('GET', `user:${phone}`);
-    console.log(' داده کاربر از دیتابیس:', userStr);
-    
+    // دریافت اطلاعات کاربر
+    const userStr = await redisCommand('GET', `user:${walletTargetPhone}`);
     if (!userStr) {
-        showToast('❌ کاربر پیدا نشد! لطفاً صفحه را رفرش کنید.', 'error');
-        // برگرداندن پول به پنل
-        await redisCommand('SET', 'admin:wallet', adminBalance);
+        showToast('❌ کاربر پیدا نشد', 'error');
+        await redisCommand('SET', 'admin:wallet', adminBalance); // برگرداندن پول
         return;
     }
 
-    let userData;
-    try {
-        userData = JSON.parse(userStr);
-    } catch (e) {
-        console.error('خطا در parse داده کاربر:', e);
-        showToast('❌ خطا در خواندن اطلاعات کاربر', 'error');
-        await redisCommand('SET', 'admin:wallet', adminBalance);
-        return;
-    }
-
-    // ✅ محاسبه موجودی جدید کاربر (با اطمینان از عدد بودن)
-    const currentWallet = Number(userData.wallet || 0);
-    const newWallet = currentWallet + amount;
-    
-    console.log('💵 موجودی قبلی کاربر:', currentWallet, 'مبلغ شارژ:', amount, 'موجودی جدید:', newWallet);
-
-    // ✅ به‌روزرسانی موجودی کاربر
+    const userData = JSON.parse(userStr);
+    const newWallet = Number(userData.wallet || 0) + amount;
     userData.wallet = newWallet;
-    const setResult2 = await redisCommand('SET', `user:${phone}`, JSON.stringify(userData));
-    console.log('✅ شارژ کاربر انجام شد. نتیجه:', setResult2);
 
-    // ✅ به‌روزرسانی کاربر فعلی اگر خودش باشد
+    // ذخیره اطلاعات کاربر با موجودی جدید
+    await redisCommand('SET', `user:${walletTargetPhone}`, JSON.stringify(userData));
+
+    // به‌روزرسانی کاربر فعلی اگر خودش باشد
     const currentUser = getCurrentUser();
-    if (currentUser && currentUser.phone === phone) {
+    if (currentUser && currentUser.phone === walletTargetPhone) {
         currentUser.wallet = newWallet;
         setCurrentUser(currentUser);
-        console.log('🔄 کاربر فعلی به‌روز شد');
     }
 
-    // ✅ بستن مودال و نمایش پیام موفقیت
     closeModal('walletModal');
-    showToast(`✅ ${amount.toLocaleString('fa-IR')} تومان به کیف پول ${userData.name} شارژ شد`, 'success');
+    showToast(`✅ ${amount.toLocaleString('fa-IR')} تومان به ${userData.name} شارژ شد`, 'success');
     
-    // ✅ به‌روزرسانی نمایش پنل
     await updateAdminWalletDisplay();
     await loadAdminData();
-    
-    console.log('🎉 عملیات شارژ با موفقیت کامل شد');
 }
 
 function openAdminWalletAddModal() {
@@ -673,7 +635,7 @@ async function confirmAdminWalletAdd() {
     const amountInput = document.getElementById('adminWalletAddAmount');
     if (!amountInput) return;
     const amount = Number(amountInput.value);
-    if (!amount || amount <= 0 || isNaN(amount)) return showToast('لطفاً مبلغ معتبر وارد کنید', 'error');
+    if (!amount || amount <= 0) return showToast('لطفاً مبلغ معتبر وارد کنید', 'error');
     const balStr = await redisCommand('GET', 'admin:wallet');
     const currentBal = balStr ? Number(balStr) : INITIAL_ADMIN_WALLET;
     await redisCommand('SET', 'admin:wallet', currentBal + amount);
@@ -745,9 +707,9 @@ async function openAdminChatPage(phone) {
 
 async function deleteCurrentChat() {
     if (!currentAdminChatPhone) return;
-    if (confirm('آیا از حذف کامل و دائمی این گفتگو مطمئن هستید؟ این عمل غیرقابل بازگشت است.')) {
+    if (confirm('آیا از حذف کامل و دائمی این گفتگو مطمئن هستید؟')) {
         await redisCommand('DEL', `chat:${currentAdminChatPhone}`);
-        showToast('گفتگو با موفقیت و به طور کامل حذف شد', 'success');
+        showToast('گفتگو حذف شد', 'success');
         closeAdminChatPage();
         await loadAdminChats();
     }
@@ -835,7 +797,7 @@ async function sendBroadcast() {
         };
         await redisCommand('LPUSH', `chat:${phone}`, JSON.stringify(msg));
     }
-    if (resultDiv) resultDiv.innerHTML = `<div style="background:#10b981;color:#fff;padding:15px;border-radius:10px;margin-top:15px;text-align:center">✅ پیام با موفقیت به ${regularUsers.length} کاربر ارسال شد</div>`;
+    if (resultDiv) resultDiv.innerHTML = `<div style="background:#10b981;color:#fff;padding:15px;border-radius:10px;margin-top:15px;text-align:center">✅ پیام به ${regularUsers.length} کاربر ارسال شد</div>`;
     if (document.getElementById('broadcastTitle')) document.getElementById('broadcastTitle').value = '';
     if (document.getElementById('broadcastMessage')) document.getElementById('broadcastMessage').value = '';
     showToast(`پیام به ${regularUsers.length} کاربر ارسال شد`, 'success');
