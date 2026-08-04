@@ -3,9 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- ✅ بهینه‌سازی کامل برای سئو و رتبه اول گوگل -->
+    <title>آینده نگر | خدمات و آموزش‌های تخصصی و نوآورانه</title>
+    <meta name="description" content="آینده نگر، مجموعه‌ای پیشرو و نوآور در ارائه خدمات و آموزش‌های باکیفیت با تیمی متخصص. برای مشاوره و پشتیبانی آنلاین با ما در تماس باشید.">
+    <meta name="keywords" content="آینده نگر, خدمات آینده نگر, آموزش تخصصی, تیم متخصص, پشتیبانی آنلاین, آینده نگر گیم">
+    <meta name="author" content="تیم آینده نگر">
+    <meta name="robots" content="index, follow, max-image-preview:large">
     <meta name="google-site-verification" content="40gN4zdcwAcxmP3ibQDcn7nfBBFxUijDhbSUZ6kObvk" />
-    <title>آینده نگر</title>
+
+    <!-- Open Graph برای نمایش عالی در گوگل و شبکه‌های اجتماعی -->
+    <meta property="og:title" content="آینده نگر | خدمات و آموزش‌های تخصصی">
+    <meta property="og:description" content="مجموعه‌ای پیشرو در ارائه خدمات و آموزش‌های باکیفیت با تیمی متخصص.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-username.github.io/your-repo/"> <!-- آدرس سایت خود را اینجا بگذارید -->
+    <meta property="og:image" content="https://your-username.github.io/your-repo/InShot_20260712_161951935.png">
+
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <link rel="icon" type="image/png" href="InShot_20260712_161951935.png">
+
+    <!-- ✅ داده‌های ساختاریافته (JSON-LD) برای رتبه ۱ گوگل -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "آینده نگر",
+      "url": "https://your-username.github.io/your-repo/",
+      "logo": "https://your-username.github.io/your-repo/InShot_20260712_161951935.png",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+989904844031",
+        "contactType": "customer service"
+      },
+      "sameAs": [
+        "https://instagram.com/yourpage",
+        "https://t.me/yourchannel"
+      ]
+    }
+    </script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-user-select: none; user-select: none; font-family: 'Vazirmatn', sans-serif; }
         body { background: #f8fafc; color: #334155; line-height: 1.8; overflow-x: hidden; }
@@ -174,7 +210,12 @@
         .admin-chat-user-info img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; }
         .admin-chat-user-info h3 { font-size: 1.1rem; font-weight: 700; }
         .admin-chat-user-info p { font-size: 0.8rem; opacity: 0.9; direction: ltr; }
-        .admin-chat-back { background: rgba(255,255,255,0.2); color: #fff; padding: 8px 15px; border-radius: 8px; font-weight: 600; }
+        .admin-chat-actions { display: flex; gap: 8px; margin-right: auto; }
+        .admin-chat-btn { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 5px; }
+        .admin-chat-btn:hover { background: rgba(255,255,255,0.3); }
+        .admin-chat-btn.delete { background: rgba(239,68,68,0.8); }
+        .admin-chat-btn.delete:hover { background: #ef4444; }
+
         .admin-chat-body { flex: 1; display: flex; flex-direction: column; max-width: 800px; margin: 0 auto; width: 100%; }
         .admin-chat-msgs { flex: 1; padding: 20px; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column; gap: 10px; }
         .admin-chat-input { padding: 15px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; }
@@ -203,7 +244,8 @@
     <div id="toast"></div>
 
     <div class="loader" id="loader">
-        <video id="loaderVideo" autoplay muted loop playsinline class="loader-video">
+        <!-- ✅ preload="metadata" برای جلوگیری از کندی لود اولیه -->
+        <video id="loaderVideo" autoplay muted loop playsinline preload="metadata" class="loader-video">
             <source src="d25ea088c4f4cba95d597054dea5abc317578539-480p.mp4" type="video/mp4">
         </video>
         <div class="loader-overlay"></div>
@@ -216,7 +258,7 @@
 
     <header>
         <div class="logo-area">
-            <img src="InShot_20260712_161951935.png" alt="لوگو">
+            <img src="InShot_20260712_161951935.png" alt="لوگو آینده نگر">
             <span>آینده نگر</span>
         </div>
         <button class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></button>
@@ -234,7 +276,7 @@
         </div>
         <ul>
             <li><a href="#home" onclick="toggleMenu()">🏠 خانه</a></li>
-            <li class="menu-item visible" id="menuLogin"><a href="#" onclick="openModal('loginModal'); toggleMenu()"> ورود / ثبت‌نام</a></li>
+            <li class="menu-item visible" id="menuLogin"><a href="#" onclick="openModal('loginModal'); toggleMenu()">🔐 ورود / ثبت‌نام</a></li>
             <li class="menu-item" id="menuSettings"><a href="#" onclick="openSettingsPage(); toggleMenu()">⚙️ تنظیمات اکانت</a></li>
             <li class="menu-item" id="menuAdmin"><a href="#" onclick="openAdminPanel(); toggleMenu()" style="color:#ef4444">🛡️ پنل مدیریت</a></li>
         </ul>
@@ -242,16 +284,17 @@
     </aside>
 
     <section class="video-sec">
-        <video id="mainVideo" autoplay muted loop playsinline>
+        <!-- ✅ preload="metadata" برای لود روان و سریع -->
+        <video id="mainVideo" autoplay muted loop playsinline preload="metadata">
             <source src="Anim.mp4" type="video/mp4">
         </video>
     </section>
 
     <section id="home" class="slider-sec">
         <div class="slider-box">
-            <div class="slide on"><img src="1.png" alt="1"></div>
-            <div class="slide"><img src="2.png" alt="2"></div>
-            <div class="slide"><img src="3.png" alt="3"></div>
+            <div class="slide on"><img src="1.png" alt="آینده نگر 1"></div>
+            <div class="slide"><img src="2.png" alt="آینده نگر 2"></div>
+            <div class="slide"><img src="3.png" alt="آینده نگر 3"></div>
         </div>
     </section>
 
@@ -263,18 +306,19 @@
     <section class="content">
         <h2>تیم ما</h2>
         <div class="team-grid">
+            <!-- ✅ loading="lazy" برای لود شدن فقط هنگام اسکرول (افزایش سرعت سایت) -->
             <div class="team-member" onclick="showMember('matin')">
-                <img src="4.jpg" alt="متین">
+                <img src="4.jpg" alt="متین" loading="lazy">
                 <h4>متین</h4>
                 <div class="role">توسعه‌دهنده</div>
             </div>
             <div class="team-member" onclick="showMember('abolfazl')">
-                <img src="30.jpg" alt="ابوالفضل">
+                <img src="30.jpg" alt="ابوالفضل" loading="lazy">
                 <h4>ابوالفضل بشارت</h4>
                 <div class="role">عضو تیم</div>
             </div>
             <div class="team-member" onclick="showMember('amirhossein')">
-                <img src="5.jpg" alt="امیرحسین">
+                <img src="5.jpg" alt="امیرحسین" loading="lazy">
                 <h4>امیرحسین شکری زاده</h4>
                 <div class="role">عضو تیم</div>
             </div>
@@ -288,9 +332,9 @@
             <div class="contact-item"><span>st16172365@gmail.com</span></div>
         </div>
         <div class="trust">
-            <img src="logo.png" alt="لوگو">
-            <img src="nezam_senfi.png" alt="نظام صنفی">
-            <img src="samandehi.png" alt="ساماندهی">
+            <img src="logo.png" alt="لوگو" loading="lazy">
+            <img src="nezam_senfi.png" alt="نظام صنفی" loading="lazy">
+            <img src="samandehi.png" alt="ساماندهی" loading="lazy">
         </div>
         <p style="margin-top:20px;opacity:0.8;font-size:0.8rem">© 2026 آینده نگر - تمامی حقوق محفوظ است</p>
     </footer>
@@ -366,7 +410,7 @@
     <div class="modal" id="teamModal">
         <div class="modal-box" style="text-align:center">
             <button class="modal-close" onclick="closeModal('teamModal')">×</button>
-            <img id="teamModalImg" src="" style="width:100px;height:100px;border-radius:50%;object-fit:cover;margin:0 auto 15px;border:4px solid #fff;box-shadow:0 4px 15px rgba(0,0,0,0.1)">
+            <img id="teamModalImg" src="" style="width:100px;height:100px;border-radius:50%;object-fit:cover;margin:0 auto 15px;border:4px solid #fff;box-shadow:0 4px 15px rgba(0,0,0,0.1)" loading="lazy">
             <h2 id="teamModalName" style="margin-bottom:5px"></h2>
             <p id="teamModalRole" style="color:#2563eb;font-weight:600;margin-bottom:15px"></p>
             <p id="teamModalDesc" style="color:#64748b;line-height:1.8;font-size:0.9rem"></p>
@@ -403,7 +447,7 @@
                 <h3>کیف پول</h3>
                 <div class="wallet-display">
                     <div class="label">موجودی کیف پول</div>
-                    <div class="amount" id="walletAmount"> تومان</div>
+                    <div class="amount" id="walletAmount">۰ تومان</div>
                     <div class="label">برای شارژ کیف پول با پشتیبانی تماس بگیرید</div>
                 </div>
             </div>
@@ -476,7 +520,11 @@
                     <p id="adminChatUserPhone">09xxxxxxxxx</p>
                 </div>
             </div>
-            <button class="admin-chat-back" onclick="closeAdminChatPage()">بازگشت</button>
+            <!-- ✅ دکمه‌های عملیات چت (بازگشت و حذف) -->
+            <div class="admin-chat-actions">
+                <button class="admin-chat-btn delete" onclick="deleteCurrentChat()">🗑️ حذف گفتگو</button>
+                <button class="admin-chat-btn" onclick="closeAdminChatPage()">بازگشت</button>
+            </div>
         </div>
         <div class="admin-chat-body">
             <div class="admin-chat-msgs" id="adminChatMsgs"></div>
