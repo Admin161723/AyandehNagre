@@ -57,7 +57,10 @@ async function redisCommand(command, ...args) {
             body: JSON.stringify([command, ...args])
         });
         const data = await response.json();
-        if (data.error) return null;
+        if (data.error) {
+            console.error("Redis Error:", data.error);
+            return null;
+        }
         return data.result;
     } catch (e) {
         console.error("Redis Error:", e);
@@ -94,7 +97,8 @@ async function updateAdminWalletDisplay() {
     const balance = await redisCommand('GET', 'admin:wallet');
     const balanceEl = document.getElementById('adminWalletBalance');
     if (balanceEl) {
-        balanceEl.textContent = (balance ? parseInt(balance) : INITIAL_ADMIN_WALLET).toLocaleString('fa-IR') + ' تومان';
+        const walletAmount = balance ? Number(balance) : INITIAL_ADMIN_WALLET;
+        balanceEl.textContent = walletAmount.toLocaleString('fa-IR') + ' تومان';
     }
 }
 
@@ -112,12 +116,11 @@ document.addEventListener('click', e => {
 });
 
 let tempAvatar = '';
-// ✅ محدودیت حجم عکس برای جلوگیری از کندی دیتابیس (حداکثر 500 کیلوبایت)
 function previewAvatar(e) {
     const f = e.target.files[0];
     if (!f) return;
     if (f.size > 500000) {
-        showToast('حجم عکس باید کمتر از 500 کیلوبایت باشد تا سرعت سایت حفظ شود', 'error');
+        showToast('حجم عکس باید کمتر از 500 کیلوبایت باشد', 'error');
         e.target.value = '';
         return;
     }
@@ -268,7 +271,7 @@ function openSettingsPage() {
         document.getElementById('settingsName').value = user.name;
         document.getElementById('settingsPhone').value = user.phone;
         document.getElementById('settingsJoinDate').value = user.joinDate || 'نامشخص';
-        document.getElementById('walletAmount').textContent = (user.wallet || 0).toLocaleString('fa-IR') + ' تومان';
+        document.getElementById('walletAmount').textContent = Number(user.wallet || 0).toLocaleString('fa-IR') + ' تومان';
         settingsPage.classList.add('on');
     }
 }
@@ -392,7 +395,7 @@ async function handleChatClick() {
     }
     const isBanned = await redisCommand('GET', `ban:${user.phone}`);
     if (isBanned) {
-        showToast('⛔ حساب شما از چت محروم شده است. با پشتیبانی تماس بگیرید.', 'error');
+        showToast(' حساب شما از چت محروم شده است. با پشتیبانی تماس بگیرید.', 'error');
         return;
     }
     toggleChatBox();
@@ -463,7 +466,7 @@ async function sendUserMsg() {
         await loadUserChat(user.phone);
     } catch (err) {
         console.error('خطا در ارسال پیام:', err);
-        showToast('❌ خطا در ارسال پیام', 'error');
+        showToast(' خطا در ارسال پیام', 'error');
     }
 
     isSending = false;
@@ -512,12 +515,12 @@ async function loadAdminData() {
         if (!userStr) continue;
         const u = JSON.parse(userStr);
         if (u.phone === ADMIN_PHONE) {
-            list.innerHTML += `<div class="user-list-item" style="background:#f0fdf4;border:1px solid #10b981;border-radius:10px"><img src="${u.avatar}" alt="${u.name}"><div class="user-list-item-info"><h4>${u.name} <span style="background:#ef4444;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.7rem;margin-right:5px">مدیر</span></h4><p>${u.phone} | موجودی: ${(u.wallet || 0).toLocaleString('fa-IR')} تومان</p></div></div>`;
+            list.innerHTML += `<div class="user-list-item" style="background:#f0fdf4;border:1px solid #10b981;border-radius:10px"><img src="${u.avatar}" alt="${u.name}"><div class="user-list-item-info"><h4>${u.name} <span style="background:#ef4444;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.7rem;margin-right:5px">مدیر</span></h4><p>${u.phone} | موجودی: ${Number(u.wallet || 0).toLocaleString('fa-IR')} تومان</p></div></div>`;
             continue;
         }
         const isBanned = await redisCommand('GET', `ban:${u.phone}`);
         const bannedBadge = isBanned ? `<span class="banned-badge">بن</span>` : '';
-        const walletBadge = `<span class="wallet-badge">${(u.wallet || 0).toLocaleString('fa-IR')} ت</span>`;
+        const walletBadge = `<span class="wallet-badge">${Number(u.wallet || 0).toLocaleString('fa-IR')} ت</span>`;
         list.innerHTML += `<div class="user-list-item"><img src="${u.avatar}" alt="${u.name}"><div class="user-list-item-info"><h4>${u.name} ${bannedBadge} ${walletBadge}</h4><p>${u.phone}</p></div><div class="user-actions"><button class="btn-small btn-wallet" onclick="openWalletModal('${u.phone}', '${u.name}', ${u.wallet || 0})">💰 شارژ</button>${isBanned ? `<button class="btn-small btn-unban" onclick="unbanUser('${u.phone}')">رفع بن</button>` : `<button class="btn-small btn-ban" onclick="openBanModal('${u.phone}', '${u.name}')">بن</button>`}</div></div>`;
     }
 }
@@ -546,58 +549,133 @@ async function unbanUser(phone) {
     await loadAdminData();
 }
 
+// ✅ تابع باز کردن مودال شارژ - با ذخیره دقیق شماره کاربر
 function openWalletModal(phone, name, currentBalance) {
-    walletTargetPhone = phone;
+    // ✅ اطمینان از ذخیره صحیح شماره کاربر هدف
+    walletTargetPhone = String(phone).trim();
+    console.log('🎯 کاربر هدف برای شارژ:', walletTargetPhone, 'نام:', name, 'موجودی فعلی:', currentBalance);
+    
     redisCommand('GET', 'admin:wallet').then(adminBal => {
+        const adminWallet = adminBal ? Number(adminBal) : INITIAL_ADMIN_WALLET;
         if (document.getElementById('walletUserName')) document.getElementById('walletUserName').textContent = name;
-        if (document.getElementById('walletCurrentBalance')) document.getElementById('walletCurrentBalance').textContent = currentBalance.toLocaleString('fa-IR');
-        if (document.getElementById('walletPanelBalance')) document.getElementById('walletPanelBalance').textContent = (adminBal ? parseInt(adminBal) : INITIAL_ADMIN_WALLET).toLocaleString('fa-IR');
+        if (document.getElementById('walletCurrentBalance')) document.getElementById('walletCurrentBalance').textContent = Number(currentBalance || 0).toLocaleString('fa-IR');
+        if (document.getElementById('walletPanelBalance')) document.getElementById('walletPanelBalance').textContent = adminWallet.toLocaleString('fa-IR');
         if (document.getElementById('walletAmountInput')) document.getElementById('walletAmountInput').value = '';
         openModal('walletModal');
     });
 }
 
+// ✅ تابع اصلی شارژ کیف پول - کاملاً اصلاح شده
 async function confirmWalletAdd() {
-    if (!walletTargetPhone) return;
-    const amount = parseInt(document.getElementById('walletAmountInput').value);
-    if (!amount || amount <= 0) return showToast('لطفاً مبلغ معتبر وارد کنید', 'error');
+    // ✅ بررسی شماره کاربر هدف
+    if (!walletTargetPhone || walletTargetPhone.trim() === '') {
+        showToast('❌ خطا: شماره کاربر مشخص نیست. لطفاً دوباره تلاش کنید.', 'error');
+        console.error('walletTargetPhone is empty!');
+        return;
+    }
+
+    const phone = walletTargetPhone.trim();
+    console.log('📞 شروع شارژ برای شماره:', phone);
+
+    // ✅ دریافت و بررسی مبلغ
+    const amountInput = document.getElementById('walletAmountInput');
+    if (!amountInput) {
+        showToast('❌ خطا در فرم', 'error');
+        return;
+    }
+    
+    const amount = Number(amountInput.value);
+    
+    if (!amount || amount <= 0 || isNaN(amount)) {
+        showToast('لطفاً مبلغ معتبر وارد کنید', 'error');
+        return;
+    }
+
+    console.log('💰 مبلغ شارژ:', amount);
+
+    // ✅ دریافت موجودی فعلی پنل
     const adminBalStr = await redisCommand('GET', 'admin:wallet');
-    const adminBalance = adminBalStr ? parseInt(adminBalStr) : INITIAL_ADMIN_WALLET;
+    const adminBalance = adminBalStr ? Number(adminBalStr) : INITIAL_ADMIN_WALLET;
+    
+    console.log('🏦 موجودی فعلی پنل:', adminBalance);
+
     if (adminBalance < amount) {
         showToast(`موجودی پنل کافی نیست! موجودی فعلی: ${adminBalance.toLocaleString('fa-IR')} تومان`, 'error');
         return;
     }
-    await redisCommand('SET', 'admin:wallet', adminBalance - amount);
-    const userStr = await redisCommand('GET', `user:${walletTargetPhone}`);
-    const userData = userStr ? JSON.parse(userStr) : null;
-    if (userData) {
-        userData.wallet = (userData.wallet || 0) + amount;
-        await redisCommand('SET', `user:${walletTargetPhone}`, JSON.stringify(userData));
-        const currentUser = getCurrentUser();
-        if (currentUser && currentUser.phone === walletTargetPhone) {
-            currentUser.wallet = userData.wallet;
-            setCurrentUser(currentUser);
-        }
-        closeModal('walletModal');
-        showToast(`✅ ${amount.toLocaleString('fa-IR')} تومان به کیف پول ${userData.name} شارژ شد`, 'success');
-        await updateAdminWalletDisplay();
-        await loadAdminData();
+
+    // ✅ کسر مبلغ از کیف پول پنل
+    const newAdminBalance = adminBalance - amount;
+    const setResult1 = await redisCommand('SET', 'admin:wallet', newAdminBalance);
+    console.log('✅ کسر از پنل انجام شد. موجودی جدید پنل:', newAdminBalance);
+
+    // ✅ دریافت اطلاعات کاربر هدف
+    const userStr = await redisCommand('GET', `user:${phone}`);
+    console.log(' داده کاربر از دیتابیس:', userStr);
+    
+    if (!userStr) {
+        showToast('❌ کاربر پیدا نشد! لطفاً صفحه را رفرش کنید.', 'error');
+        // برگرداندن پول به پنل
+        await redisCommand('SET', 'admin:wallet', adminBalance);
+        return;
     }
+
+    let userData;
+    try {
+        userData = JSON.parse(userStr);
+    } catch (e) {
+        console.error('خطا در parse داده کاربر:', e);
+        showToast('❌ خطا در خواندن اطلاعات کاربر', 'error');
+        await redisCommand('SET', 'admin:wallet', adminBalance);
+        return;
+    }
+
+    // ✅ محاسبه موجودی جدید کاربر (با اطمینان از عدد بودن)
+    const currentWallet = Number(userData.wallet || 0);
+    const newWallet = currentWallet + amount;
+    
+    console.log('💵 موجودی قبلی کاربر:', currentWallet, 'مبلغ شارژ:', amount, 'موجودی جدید:', newWallet);
+
+    // ✅ به‌روزرسانی موجودی کاربر
+    userData.wallet = newWallet;
+    const setResult2 = await redisCommand('SET', `user:${phone}`, JSON.stringify(userData));
+    console.log('✅ شارژ کاربر انجام شد. نتیجه:', setResult2);
+
+    // ✅ به‌روزرسانی کاربر فعلی اگر خودش باشد
+    const currentUser = getCurrentUser();
+    if (currentUser && currentUser.phone === phone) {
+        currentUser.wallet = newWallet;
+        setCurrentUser(currentUser);
+        console.log('🔄 کاربر فعلی به‌روز شد');
+    }
+
+    // ✅ بستن مودال و نمایش پیام موفقیت
+    closeModal('walletModal');
+    showToast(`✅ ${amount.toLocaleString('fa-IR')} تومان به کیف پول ${userData.name} شارژ شد`, 'success');
+    
+    // ✅ به‌روزرسانی نمایش پنل
+    await updateAdminWalletDisplay();
+    await loadAdminData();
+    
+    console.log('🎉 عملیات شارژ با موفقیت کامل شد');
 }
 
 function openAdminWalletAddModal() {
     redisCommand('GET', 'admin:wallet').then(bal => {
-        if (document.getElementById('adminCurrentWallet')) document.getElementById('adminCurrentWallet').textContent = (bal ? parseInt(bal) : INITIAL_ADMIN_WALLET).toLocaleString('fa-IR');
+        const walletAmount = bal ? Number(bal) : INITIAL_ADMIN_WALLET;
+        if (document.getElementById('adminCurrentWallet')) document.getElementById('adminCurrentWallet').textContent = walletAmount.toLocaleString('fa-IR');
         if (document.getElementById('adminWalletAddAmount')) document.getElementById('adminWalletAddAmount').value = '';
         openModal('adminWalletAddModal');
     });
 }
 
 async function confirmAdminWalletAdd() {
-    const amount = parseInt(document.getElementById('adminWalletAddAmount').value);
-    if (!amount || amount <= 0) return showToast('لطفاً مبلغ معتبر وارد کنید', 'error');
+    const amountInput = document.getElementById('adminWalletAddAmount');
+    if (!amountInput) return;
+    const amount = Number(amountInput.value);
+    if (!amount || amount <= 0 || isNaN(amount)) return showToast('لطفاً مبلغ معتبر وارد کنید', 'error');
     const balStr = await redisCommand('GET', 'admin:wallet');
-    const currentBal = balStr ? parseInt(balStr) : INITIAL_ADMIN_WALLET;
+    const currentBal = balStr ? Number(balStr) : INITIAL_ADMIN_WALLET;
     await redisCommand('SET', 'admin:wallet', currentBal + amount);
     closeModal('adminWalletAddModal');
     await updateAdminWalletDisplay();
@@ -614,7 +692,7 @@ async function loadAdminChats() {
     for (const phone of phones) {
         if (phone === ADMIN_PHONE) continue;
         const msgCount = await redisCommand('LLEN', `chat:${phone}`);
-        if (!msgCount || parseInt(msgCount) === 0) continue;
+        if (!msgCount || Number(msgCount) === 0) continue;
         hasChats = true;
         const userStr = await redisCommand('GET', `user:${phone}`);
         const userData = userStr ? JSON.parse(userStr) : null;
@@ -665,14 +743,13 @@ async function openAdminChatPage(phone) {
     renderAdminChatMsgs(updatedMsgs.reverse());
 }
 
-// ✅ تابع جدید: حذف کامل گفتگو از دیتابیس (برای همیشه)
 async function deleteCurrentChat() {
     if (!currentAdminChatPhone) return;
     if (confirm('آیا از حذف کامل و دائمی این گفتگو مطمئن هستید؟ این عمل غیرقابل بازگشت است.')) {
         await redisCommand('DEL', `chat:${currentAdminChatPhone}`);
         showToast('گفتگو با موفقیت و به طور کامل حذف شد', 'success');
         closeAdminChatPage();
-        await loadAdminChats(); // به‌روزرسانی لیست
+        await loadAdminChats();
     }
 }
 
@@ -696,7 +773,7 @@ function renderAdminChatMsgs(msgs) {
             const div = document.createElement('div');
             if (m.isBroadcast) {
                 div.className = 'msg system-broadcast';
-                div.innerHTML = `📢 <strong>${m.broadcastTitle || 'اطلاعیه'}</strong><br>${m.text}<span class="time">${m.time}</span>`;
+                div.innerHTML = ` <strong>${m.broadcastTitle || 'اطلاعیه'}</strong><br>${m.text}<span class="time">${m.time}</span>`;
             } else if (m.sender === 'user') {
                 div.className = 'msg user';
                 div.innerHTML = `${m.text}<span class="time">${m.time}</span>`;
