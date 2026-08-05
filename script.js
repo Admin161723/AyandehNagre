@@ -1,4 +1,4 @@
-// ========== تنظیمات اصلی ==========
+ // ========== تنظیمات اصلی ==========
 const UPSTASH_URL = "https://smooth-werewolf-200782.upstash.io";
 const UPSTASH_TOKEN = "gQAAAAAAAxBOAAIgcDFjN2NiMjYxOWNlNjE0NzgyOTExM2JjMjA5ZTc0MjVjMA";
 
