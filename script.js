@@ -1,3 +1,4 @@
+// ========== تنظیمات اصلی ==========
 const UPSTASH_URL = "https://smooth-werewolf-200782.upstash.io";
 const UPSTASH_TOKEN = "gQAAAAAAAxBOAAIgcDFjN2NiMjYxOWNlNjE0NzgyOTExM2JjMjA5ZTc0MjVjMA";
 
@@ -17,6 +18,7 @@ let slideInterval = null;
 let promoSlideIndex = 0;
 let promoSlideInterval = null;
 
+// ========== بارگذاری اولیه ==========
 document.addEventListener('DOMContentLoaded', () => {
     const loaderFill = document.getElementById('loaderFill');
     if (loaderFill) {
@@ -42,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     }
 
-    // اسلایدر تبلیغاتی
     startPromoSlider();
 
     // کلیک روی تصاویر اسلایدر تبلیغاتی
@@ -54,6 +55,15 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('این بخش به زودی فعال می‌شود', 'info');
         });
     });
+
+    // ✅ انیمیشن ظاهر شدن کارت‌های خدمات
+    initServiceCardsAnimation();
+
+    // ✅ اسکرول نرم برای لینک‌های داخلی
+    initSmoothScroll();
+
+    // ✅ ردیابی عملکرد برای SEO
+    initPerformanceTracking();
 
     updateUI();
 });
@@ -68,7 +78,72 @@ setTimeout(() => {
     }
 }, 8000);
 
-// توابع اسلایدر تبلیغاتی
+// ========== توابع جدید: پیام "به زودی" ==========
+function showSoonMessage(sectionName) {
+    showToast(`🚧 ${sectionName} به زودی فعال می‌شود - منتظر باشید!`, 'warning');
+    
+    // ثبت رویداد برای آنالیز
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'soon_button_click', {
+            'event_category': 'services',
+            'event_label': sectionName
+        });
+    }
+}
+
+// ========== انیمیشن کارت‌های خدمات ==========
+function initServiceCardsAnimation() {
+    const cards = document.querySelectorAll('.service-card');
+    if (!('IntersectionObserver' in window)) {
+        cards.forEach(c => c.classList.add('visible'));
+        return;
+    }
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.classList.add('visible');
+                }, i * 100);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+    
+    cards.forEach(card => observer.observe(card));
+}
+
+// ========== اسکرول نرم ==========
+function initSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (href === '#' || href === '#home') return;
+            
+            const target = document.querySelector(href);
+            if (target) {
+                e.preventDefault();
+                const offsetTop = target.getBoundingClientRect().top + window.pageYOffset - 80;
+                window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+            }
+        });
+    });
+}
+
+// ========== ردیابی عملکرد برای SEO ==========
+function initPerformanceTracking() {
+    if ('performance' in window) {
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const timing = performance.timing;
+                const loadTime = timing.loadEventEnd - timing.navigationStart;
+                console.log(`⚡ زمان بارگذاری: ${loadTime}ms`);
+            }, 0);
+        });
+    }
+}
+
+// ========== توابع اسلایدر تبلیغاتی ==========
 function startPromoSlider() {
     if (promoSlideInterval) clearInterval(promoSlideInterval);
     promoSlideInterval = setInterval(() => {
@@ -80,12 +155,12 @@ function nextSlide() {
     const slides = document.querySelectorAll('.slider-slide');
     const dots = document.querySelectorAll('.slider-dot');
     if (slides.length === 0) return;
-    
+
     slides[promoSlideIndex].classList.remove('active');
     dots[promoSlideIndex].classList.remove('active');
-    
+
     promoSlideIndex = (promoSlideIndex + 1) % slides.length;
-    
+
     slides[promoSlideIndex].classList.add('active');
     dots[promoSlideIndex].classList.add('active');
 }
@@ -94,15 +169,15 @@ function prevSlide() {
     const slides = document.querySelectorAll('.slider-slide');
     const dots = document.querySelectorAll('.slider-dot');
     if (slides.length === 0) return;
-    
+
     slides[promoSlideIndex].classList.remove('active');
     dots[promoSlideIndex].classList.remove('active');
-    
+
     promoSlideIndex = (promoSlideIndex - 1 + slides.length) % slides.length;
-    
+
     slides[promoSlideIndex].classList.add('active');
     dots[promoSlideIndex].classList.add('active');
-    
+
     startPromoSlider();
 }
 
@@ -110,15 +185,15 @@ function goToSlide(index) {
     const slides = document.querySelectorAll('.slider-slide');
     const dots = document.querySelectorAll('.slider-dot');
     if (slides.length === 0) return;
-    
+
     slides[promoSlideIndex].classList.remove('active');
     dots[promoSlideIndex].classList.remove('active');
-    
+
     promoSlideIndex = index;
-    
+
     slides[promoSlideIndex].classList.add('active');
     dots[promoSlideIndex].classList.add('active');
-    
+
     startPromoSlider();
 }
 
@@ -156,7 +231,7 @@ function showToast(message, type = 'info') {
     if (!toast) return;
     toast.textContent = message;
     toast.className = `show ${type}`;
-    setTimeout(() => { toast.classList.remove('show'); }, 2500);
+    setTimeout(() => { toast.classList.remove('show'); }, 3000);
 }
 
 function getCurrentUser() { 
@@ -346,23 +421,23 @@ function handleLogout() {
 async function openSettingsPage() {
     const user = getCurrentUser();
     if (!user) return showToast('لطفاً ابتدا وارد شوید', 'error');
-    
+
     const settingsPage = document.getElementById('settingsPage');
     if (!settingsPage) return;
-    
+
     const userStr = await redisCommand('GET', `user:${user.phone}`);
     const freshData = userStr ? JSON.parse(userStr) : user;
-    
+
     setCurrentUser(freshData);
-    
+
     document.getElementById('settingsAvatar').src = freshData.avatar;
     document.getElementById('settingsName').value = freshData.name;
     document.getElementById('settingsPhone').value = freshData.phone;
     document.getElementById('settingsJoinDate').value = freshData.joinDate || 'نامشخص';
-    
+
     const walletAmount = Number(freshData.wallet || 0);
     document.getElementById('walletAmount').textContent = walletAmount.toLocaleString('fa-IR') + ' تومان';
-    
+
     settingsPage.classList.add('on');
 }
 
@@ -497,7 +572,6 @@ function toggleChatBox() {
     if (chatBox) chatBox.classList.toggle('on');
 }
 
-// ✅ نمایش پروفایل در چت کاربر
 async function loadUserChat(phone) {
     const msgsStr = await redisCommand('LRANGE', `chat:${phone}`, 0, -1);
     const msgs = msgsStr ? msgsStr.map(m => JSON.parse(m)).reverse() : [];
@@ -604,14 +678,14 @@ async function loadAdminData() {
         list.innerHTML = '<p style="text-align:center;padding:20px;color:#64748b">هنوز کاربری ثبت‌نام نکرده است</p>';
         return;
     }
-    
+
     const adminWallet = await getAdminWallet();
-    
+
     for (const phone of phones) {
         const userStr = await redisCommand('GET', `user:${phone}`);
         if (!userStr) continue;
         const u = JSON.parse(userStr);
-        
+
         if (u.phone === ADMIN_PHONE) {
             list.innerHTML += `<div class="user-list-item" style="background:#f0fdf4;border:1px solid #10b981;border-radius:10px"><img src="${u.avatar}" alt="${u.name}"><div class="user-list-item-info"><h4>${u.name} <span style="background:#ef4444;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.7rem;margin-right:5px">مدیر</span></h4><p>${u.phone} | موجودی: ${adminWallet.toLocaleString('fa-IR')} تومان</p></div></div>`;
             continue;
@@ -649,7 +723,7 @@ async function unbanUser(phone) {
 
 function openWalletModal(phone, name, currentBalance) {
     walletTargetPhone = phone;
-    
+
     getAdminWallet().then(adminWallet => {
         if (document.getElementById('walletUserName')) document.getElementById('walletUserName').textContent = name;
         if (document.getElementById('walletCurrentBalance')) document.getElementById('walletCurrentBalance').textContent = Number(currentBalance || 0).toLocaleString('fa-IR');
@@ -667,7 +741,7 @@ async function confirmWalletAdd() {
 
     const amountInput = document.getElementById('walletAmountInput');
     if (!amountInput) return;
-    
+
     const amount = Number(amountInput.value);
     if (!amount || amount <= 0) {
         showToast('لطفاً مبلغ معتبر وارد کنید', 'error');
@@ -697,10 +771,10 @@ async function confirmWalletAdd() {
 
     userData.wallet = newWallet;
     await redisCommand('SET', `user:${walletTargetPhone}`, JSON.stringify(userData));
-    
+
     const verifyStr = await redisCommand('GET', `user:${walletTargetPhone}`);
     const verifyData = verifyStr ? JSON.parse(verifyStr) : null;
-    
+
     if (verifyData && Number(verifyData.wallet) !== newWallet) {
         showToast('خطا در ذخیره‌سازی', 'error');
         await redisCommand('SET', 'admin:wallet', adminBalance);
@@ -715,30 +789,30 @@ async function confirmWalletAdd() {
 
     closeModal('walletModal');
     showToast(`${amount.toLocaleString('fa-IR')} تومان به ${userData.name} شارژ شد`, 'success');
-    
+
     await updateAdminWalletDisplay();
     await loadAdminData();
 }
 
 function openWithdrawModal(phone, name, currentBalance) {
     withdrawTargetPhone = phone;
-    
+
     if (document.getElementById('withdrawUserName')) document.getElementById('withdrawUserName').textContent = name;
     if (document.getElementById('withdrawCurrentBalance')) document.getElementById('withdrawCurrentBalance').textContent = Number(currentBalance || 0).toLocaleString('fa-IR');
     if (document.getElementById('withdrawAmountInput')) document.getElementById('withdrawAmountInput').value = '';
     if (document.getElementById('targetUserPhone')) document.getElementById('targetUserPhone').value = '';
-    
+
     document.getElementById('withdrawToAdmin').checked = true;
     document.getElementById('targetPhoneField').classList.remove('show');
     document.querySelectorAll('.radio-option').forEach(opt => opt.classList.remove('selected'));
     document.querySelector('.radio-option').classList.add('selected');
-    
+
     openModal('withdrawModal');
 }
 
 function selectWithdrawOption(type) {
     document.querySelectorAll('.radio-option').forEach(opt => opt.classList.remove('selected'));
-    
+
     if (type === 'admin') {
         document.getElementById('withdrawToAdmin').checked = true;
         document.getElementById('targetPhoneField').classList.remove('show');
@@ -758,7 +832,7 @@ async function confirmWithdraw() {
 
     const amountInput = document.getElementById('withdrawAmountInput');
     if (!amountInput) return;
-    
+
     const amount = Number(amountInput.value);
     if (!amount || amount <= 0) {
         showToast('لطفاً مبلغ معتبر وارد کنید', 'error');
@@ -789,19 +863,19 @@ async function confirmWithdraw() {
         const adminBalance = await getAdminWallet();
         const newAdminBal = adminBalance + amount;
         await redisCommand('SET', 'admin:wallet', newAdminBal);
-        
+
         const adminProfileStr = await redisCommand('GET', `user:${ADMIN_PHONE}`);
         if (adminProfileStr) {
             const adminProfile = JSON.parse(adminProfileStr);
             adminProfile.wallet = newAdminBal;
             await redisCommand('SET', `user:${ADMIN_PHONE}`, JSON.stringify(adminProfile));
         }
-        
+
         closeModal('withdrawModal');
         showToast(`${amount.toLocaleString('fa-IR')} تومان از ${userData.name} به پنل منتقل شد`, 'success');
     } else {
         const targetPhone = document.getElementById('targetUserPhone').value.trim();
-        
+
         if (!targetPhone || !/^09\d{9}$/.test(targetPhone)) {
             showToast('لطفاً شماره موبایل مقصد معتبر وارد کنید', 'error');
             userData.wallet = currentWallet;
@@ -827,7 +901,7 @@ async function confirmWithdraw() {
         const targetUserData = JSON.parse(targetUserStr);
         const targetOldWallet = Number(targetUserData.wallet || 0);
         const targetNewWallet = targetOldWallet + amount;
-        
+
         targetUserData.wallet = targetNewWallet;
         await redisCommand('SET', `user:${targetPhone}`, JSON.stringify(targetUserData));
 
@@ -866,14 +940,14 @@ async function confirmAdminWalletAdd() {
     const currentBal = await getAdminWallet();
     const newBal = currentBal + amount;
     await redisCommand('SET', 'admin:wallet', newBal);
-    
+
     const adminProfileStr = await redisCommand('GET', `user:${ADMIN_PHONE}`);
     if (adminProfileStr) {
         const adminProfile = JSON.parse(adminProfileStr);
         adminProfile.wallet = newBal;
         await redisCommand('SET', `user:${ADMIN_PHONE}`, JSON.stringify(adminProfile));
     }
-    
+
     closeModal('adminWalletAddModal');
     await updateAdminWalletDisplay();
     showToast(`${amount.toLocaleString('fa-IR')} تومان به کیف پول پنل اضافه شد`, 'success');
@@ -914,7 +988,6 @@ async function loadAdminChats() {
     if (!hasChats) list.innerHTML = '<p style="text-align:center;color:#64748b;padding:20px">هنوز گفتگویی وجود ندارد</p>';
 }
 
-// ✅ نمایش پروفایل در چت ادمین
 async function openAdminChatPage(phone) {
     currentAdminChatPhone = phone;
     const container = document.getElementById('adminChatMsgs');
@@ -957,7 +1030,6 @@ function closeAdminChatPage() {
     currentAdminChatPhone = null;
 }
 
-// ✅ نمایش پروفایل در چت ادمین
 function renderAdminChatMsgs(msgs) {
     const container = document.getElementById('adminChatMsgs');
     if (!container) return;
