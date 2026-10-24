@@ -11,10 +11,8 @@
 </head>
 <body>
 
-  <!-- لودینگ -->
   <div id="screen-loading" class="screen active"></div>
 
-  <!-- ورود شماره -->
   <div id="screen-login" class="screen">
     <div class="header">
       <h1>آموزیار</h1>
@@ -28,7 +26,6 @@
     </div>
   </div>
 
-  <!-- ورود رمز -->
   <div id="screen-password" class="screen">
     <div class="header">
       <h1>ورود به حساب</h1>
@@ -40,10 +37,9 @@
       <div class="error" id="error-password"></div>
       <button class="btn" id="btn-password" onclick="doLogin()">تأیید و ورود</button>
     </div>
-    <a href="#" class="back-link" onclick="showScreen('login')">← تغییر شماره</a>
+    <a href="#" class="back-link" onclick="showScreen('login')">تغییر شماره</a>
   </div>
 
-  <!-- تأیید کد -->
   <div id="screen-verify" class="screen">
     <div class="header">
       <h1>تأیید شماره</h1>
@@ -52,7 +48,6 @@
     <div class="card">
       <div class="code-display" id="code-display">----</div>
       <p class="code-hint">این کد تا پایان ثبت‌نام معتبر است</p>
-
       <label>کد تأیید</label>
       <input type="tel"
              id="code-input"
@@ -67,10 +62,9 @@
       <div class="error" id="error-code"></div>
       <button class="btn" onclick="verifyCode()">تأیید کد</button>
     </div>
-    <a href="#" class="back-link" onclick="showScreen('login')">← بازگشت</a>
+    <a href="#" class="back-link" onclick="showScreen('login')">بازگشت</a>
   </div>
 
-  <!-- ساخت پروفایل -->
   <div id="screen-profile" class="screen">
     <div class="header">
       <h1>ساخت پروفایل</h1>
@@ -83,22 +77,17 @@
         </div>
         <input type="file" id="file-input" accept="image/*" onchange="previewAvatar(event)">
       </div>
-
       <label>نام و نام خانوادگی</label>
       <input type="text" id="name-input" placeholder="مثال: علی رضایی">
-
       <label>رمز عبور</label>
       <input type="password" id="pass1" placeholder="حداقل ۶ کاراکتر">
-
       <label>تکرار رمز عبور</label>
       <input type="password" id="pass2" placeholder="رمز را دوباره وارد کنید">
-
       <div class="error" id="error-profile"></div>
       <button class="btn" onclick="saveProfile()">ادامه</button>
     </div>
   </div>
 
-  <!-- اطلاعات مدرسه / تأیید نقش -->
   <div id="screen-school" class="screen">
     <div class="header">
       <h1>اطلاعات مدرسه</h1>
@@ -107,10 +96,8 @@
     <div class="card">
       <label>نام استان</label>
       <input type="text" id="province" placeholder="مثال: تهران">
-
       <label>نام مدرسه</label>
       <input type="text" id="school" placeholder="مثال: دبیرستان شهید بهشتی">
-
       <label>پایه / کلاس چندم</label>
       <input type="text" id="grade" placeholder="مثال: دهم ریاضی">
 
@@ -137,22 +124,19 @@
     </div>
   </div>
 
-  <!-- صفحه اصلی -->
   <div id="screen-main" class="screen">
     <div class="topbar">
       <div class="avatar-small" id="main-avatar"></div>
       <div class="user-info">
         <h2 id="main-name">کاربر</h2>
-        <p id="main-info">مدرسه</p>
+        <p id="main-info">آموزیار</p>
       </div>
     </div>
-
     <div class="content">
       <div class="card">
         <h3>خوش آمدید</h3>
         <p>به برنامه آموزیار خوش آمدید. از منوی زیر می‌توانید به بخش‌های مختلف دسترسی داشته باشید.</p>
       </div>
-
       <div class="menu">
         <div class="menu-item"><span>درس‌ها</span></div>
         <div class="menu-item"><span>تکالیف</span></div>
@@ -161,12 +145,10 @@
         <div class="menu-item"><span>اطلاعیه‌ها</span></div>
         <div class="menu-item"><span>پروفایل</span></div>
       </div>
-
       <div class="logout-box">
         <button class="btn-logout" onclick="logout()">خروج از حساب</button>
       </div>
     </div>
-
     <div class="bottom-nav">
       <div class="nav-item active">خانه</div>
       <div class="nav-item">دروس</div>
@@ -175,7 +157,6 @@
     </div>
   </div>
 
-  <!-- پنل مدیر -->
   <div id="screen-manager" class="screen">
     <div class="topbar manager-topbar">
       <div class="avatar-small" id="manager-avatar"></div>
@@ -185,19 +166,16 @@
         <span class="badge">پنل مدیریت</span>
       </div>
     </div>
-
     <div class="content">
       <div class="stats">
         <div class="stat-box"><div class="num" id="mgr-students">0</div><div class="label">دانش‌آموز</div></div>
         <div class="stat-box"><div class="num" id="mgr-teachers">0</div><div class="label">معلم</div></div>
         <div class="stat-box"><div class="num" id="mgr-classes">0</div><div class="label">کلاس</div></div>
       </div>
-
       <div class="card">
         <h3>پنل مدیریت مدرسه</h3>
         <p>شما به عنوان مدیر مدرسه وارد شده‌اید.</p>
       </div>
-
       <div class="menu">
         <div class="menu-item"><span>دانش‌آموزان</span></div>
         <div class="menu-item"><span>معلمان</span></div>
@@ -206,14 +184,12 @@
         <div class="menu-item"><span>تنظیمات</span></div>
         <div class="menu-item"><span>دسترسی‌ها</span></div>
       </div>
-
       <div class="logout-box">
         <button class="btn-logout" onclick="logout()">خروج از حساب</button>
       </div>
     </div>
   </div>
 
-  <!-- پنل سازنده -->
   <div id="screen-creator" class="screen">
     <div class="topbar creator-topbar">
       <div class="avatar-small" id="creator-avatar"></div>
@@ -223,19 +199,16 @@
         <span class="badge">پنل سازنده</span>
       </div>
     </div>
-
     <div class="content">
       <div class="stats">
         <div class="stat-box"><div class="num" id="cr-total">0</div><div class="label">کل کاربران</div></div>
         <div class="stat-box"><div class="num" id="cr-managers">0</div><div class="label">مدیران</div></div>
         <div class="stat-box"><div class="num" id="cr-teachers">0</div><div class="label">معلمان</div></div>
       </div>
-
       <div class="card">
-        <h3>لیست کاربران (از دیتابیس)</h3>
+        <h3>لیست کاربران</h3>
         <div id="user-list"><p style="color:#999; font-size:13px;">در حال بارگذاری...</p></div>
       </div>
-
       <div class="logout-box">
         <button class="btn-logout" onclick="logout()">خروج از حساب</button>
       </div>
