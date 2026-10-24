@@ -21,7 +21,7 @@ window.onload = async function () {
       if (u.bannedUntil && u.bannedUntil > Date.now()) {
         localStorage.removeItem('currentUser');
       } else {
-        window.location.href = 'amoz.html';
+        window.location.href = encodeURI('safe asli amoz.html');
         return;
       }
     }
@@ -49,7 +49,6 @@ async function goLogin() {
   }
   err.style.display = 'none';
   tempPhone = phone;
-
   btn.disabled = true;
   btn.textContent = 'بررسی...';
 
@@ -112,7 +111,7 @@ async function doLogin() {
 
     if (u && u.password === pass) {
       localStorage.setItem('currentUser', tempPhone);
-      window.location.href = 'amoz.html';
+      window.location.href = encodeURI('safe asli amoz.html');
     } else {
       err.style.display = 'block';
       err.textContent = 'رمز اشتباه است';
@@ -274,12 +273,13 @@ async function finishRegister() {
       isVice: isVic,
       role: 'user',
       bannedUntil: null,
+      profileComplete: true,
       createdAt: Date.now()
     };
 
     await saveUser(tempPhone, newU);
     localStorage.setItem('currentUser', tempPhone);
-    window.location.href = 'amoz.html';
+    window.location.href = encodeURI('safe asli amoz.html');
 
   } catch (e) {
     err.style.display = 'block';
