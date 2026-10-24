@@ -11,13 +11,13 @@ window.onload = function () {
   document.getElementById('pm-phone').value = pendingManager.phone || '';
   document.getElementById('pm-name').value = pendingManager.name || '';
 
-  const nidInput = document.getElementById('national-id');
-  nidInput.addEventListener('input', function () {
+  const nid = document.getElementById('national-id');
+  nid.addEventListener('input', function () {
     this.value = this.value.replace(/\D/g, '').slice(0, 10);
   });
 
-  const phoneInput = document.getElementById('pm-phone');
-  phoneInput.addEventListener('input', function () {
+  const ph = document.getElementById('pm-phone');
+  ph.addEventListener('input', function () {
     this.value = this.value.replace(/\D/g, '').slice(0, 11);
   });
 };
@@ -85,7 +85,10 @@ async function submitManagerPanel() {
       grade: '',
       isManager: true,
       isTeacher: pendingManager.isTeacher || false,
+      isVice: pendingManager.isVice || false,
       role: 'user',
+      bannedUntil: null,
+      profileComplete: true,
       createdAt: pendingManager.createdAt || Date.now()
     };
 
@@ -97,7 +100,7 @@ async function submitManagerPanel() {
 
     localStorage.setItem('currentUser', phone);
     localStorage.removeItem('pendingManager');
-    window.location.href = 'amoz.html';
+    window.location.href = encodeURI('safe asli amoz.html');
   } catch (e) {
     error.style.display = 'block';
     error.textContent = 'خطا در ذخیره اطلاعات';
