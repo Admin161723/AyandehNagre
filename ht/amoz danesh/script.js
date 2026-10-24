@@ -11,6 +11,15 @@ const TEACHER_PASS = 'shaki007-2026-mfa';
 
 // ========== شروع ==========
 window.onload = function () {
+  // ضد کپی/پیست/راست‌کلیک روی کد
+  const codeInput = document.getElementById('code-input');
+  ['paste', 'copy', 'cut', 'contextmenu', 'selectstart', 'dragstart'].forEach(evt => {
+    codeInput.addEventListener(evt, e => e.preventDefault());
+  });
+  codeInput.addEventListener('input', function () {
+    this.value = this.value.replace(/\D/g, '').slice(0, 4);
+  });
+
   const current = localStorage.getItem('currentUser');
   if (current) {
     const users = JSON.parse(localStorage.getItem('users') || '{}');
@@ -27,7 +36,7 @@ window.onload = function () {
     }
   }
 
-  // لودینگ ۲ ثانیه (فقط عکس نمایش داده می‌شود)
+  // لودینگ ۲ ثانیه
   setTimeout(() => {
     showScreen('login');
   }, 2000);
@@ -38,6 +47,13 @@ function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
   window.scrollTo(0, 0);
+}
+
+// ========== حرف اول اسم برای آواتار ==========
+function initialOf(name) {
+  if (!name) return '';
+  const t = name.trim();
+  return t ? t.charAt(0) : '';
 }
 
 // ========== ورود شماره ==========
@@ -59,8 +75,14 @@ function goLogin() {
     document.getElementById('phone-show').textContent = phone;
     showScreen('password');
   } else {
+    // کاربر جدید → کد ۴ رقمی
     tempCode = Math.floor(1000 + Math.random() * 9000).toString();
-    alert('کد تأیید شما: ' + tempCode + '\n(در نسخه واقعی پیامک می‌شود)');
+
+    // نمایش کد داخل خود صفحه
+    document.getElementById('code-display').textContent = tempCode;
+    document.getElementById('code-input').value = '';
+    document.getElementById('error-code').style.display = 'none';
+
     showScreen('verify');
   }
 }
@@ -171,21 +193,19 @@ function finishRegister() {
   const error = document.getElementById('error-school');
   error.style.display = 'none';
 
-  // --- تأیید مدیر ---
   if (isManager && managerPass !== MANAGER_PASS) {
     error.style.display = 'block';
     error.textContent = 'رمز مدیر اشتباه است';
     return;
   }
 
-  // --- تأیید معلم ---
   if (isTeacher && teacherPass !== TEACHER_PASS) {
     error.style.display = 'block';
     error.textContent = 'رمز معلم اشتباه است';
     return;
   }
 
-  // اگر معلم تأییدشده باشد، نیازی به پر کردن اطلاعات مدرسه نیست
+  // اگر معلم تأییدشده باشد، نیازی به اطلاعات مدرسه نیست
   const schoolRequired = !isTeacher || isManager;
 
   if (schoolRequired && (!province || !school || !grade)) {
@@ -194,7 +214,6 @@ function finishRegister() {
     return;
   }
 
-  // ذخیره کاربر
   const users = JSON.parse(localStorage.getItem('users') || '{}');
   users[tempPhone] = {
     name: tempName,
@@ -210,7 +229,6 @@ function finishRegister() {
   localStorage.setItem('users', JSON.stringify(users));
   localStorage.setItem('currentUser', tempPhone);
 
-  // ورود مستقیم به حساب کاربری
   if (isManager) {
     loadManager(users[tempPhone]);
     showScreen('manager');
@@ -228,16 +246,15 @@ function loadMain(user) {
   if (user.isTeacher) parts.push('معلم');
   if (user.school) parts.push(user.school);
   if (user.grade) parts.push(user.grade);
-
   document.getElementById('main-info').textContent = parts.join(' | ') || 'آموزیار';
 
   const av = document.getElementById('main-avatar');
   if (user.avatar) {
     av.style.backgroundImage = `url(${user.avatar})`;
-    av.innerHTML = '';
+    av.textContent = '';
   } else {
     av.style.backgroundImage = '';
-    av.innerHTML = '👤';
+    av.textContent = initialOf(user.name);
   }
 }
 
@@ -250,10 +267,10 @@ function loadManager(user) {
   const av = document.getElementById('manager-avatar');
   if (user.avatar) {
     av.style.backgroundImage = `url(${user.avatar})`;
-    av.innerHTML = '';
+    av.textContent = '';
   } else {
     av.style.backgroundImage = '';
-    av.innerHTML = '👔';
+    av.textContent = initialOf(user.name);
   }
 }
 
@@ -278,6 +295,8 @@ function logout() {
   document.getElementById('is-teacher').checked = false;
   document.getElementById('teacher-pass').value = '';
   document.getElementById('teacher-box').style.display = 'none';
+
+  document.getElementById('code-display').textContent = '----';
 
   const av = document.getElementById('avatar-preview');
   av.style.backgroundImage = '';
