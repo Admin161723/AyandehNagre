@@ -4,6 +4,8 @@ let tempName = '';
 let tempPass = '';
 let tempAvatar = '';
 
+const MAIN_PAGE = 'safe%20asli%20amoz.html';
+
 window.onload = async function () {
   const ci = document.getElementById('code-input');
   ['paste','copy','cut','contextmenu','selectstart','dragstart'].forEach(evt => {
@@ -21,7 +23,7 @@ window.onload = async function () {
       if (u.bannedUntil && u.bannedUntil > Date.now()) {
         localStorage.removeItem('currentUser');
       } else {
-        window.location.href = encodeURI('safe asli amoz.html');
+        window.location.href = MAIN_PAGE;
         return;
       }
     }
@@ -111,7 +113,7 @@ async function doLogin() {
 
     if (u && u.password === pass) {
       localStorage.setItem('currentUser', tempPhone);
-      window.location.href = encodeURI('safe asli amoz.html');
+      window.location.href = MAIN_PAGE;
     } else {
       err.style.display = 'block';
       err.textContent = 'رمز اشتباه است';
@@ -279,7 +281,7 @@ async function finishRegister() {
 
     await saveUser(tempPhone, newU);
     localStorage.setItem('currentUser', tempPhone);
-    window.location.href = encodeURI('safe asli amoz.html');
+    window.location.href = MAIN_PAGE;
 
   } catch (e) {
     err.style.display = 'block';
