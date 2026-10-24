@@ -1,1 +1,204 @@
-salam khobi azizam
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>آموزیار</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- لودینگ -->
+  <div id="screen-loading" class="screen active">
+    <div class="logo-big">📚</div>
+    <h1>آموزیار</h1>
+    <p>در حال بارگذاری...</p>
+    <div class="loader"></div>
+  </div>
+
+  <!-- ورود شماره -->
+  <div id="screen-login" class="screen">
+    <div class="header">
+      <div class="logo">📚</div>
+      <h1>آموزیار</h1>
+      <p class="subtitle">ورود / ثبت‌نام</p>
+    </div>
+    <div class="card">
+      <label>شماره موبایل</label>
+      <input type="tel" id="phone" placeholder="09xxxxxxxxx" maxlength="11">
+      <div class="error" id="error-phone"></div>
+      <button class="btn" onclick="goLogin()">ادامه</button>
+    </div>
+  </div>
+
+  <!-- ورود رمز -->
+  <div id="screen-password" class="screen">
+    <div class="header">
+      <div class="logo">📚</div>
+      <h1>ورود به حساب</h1>
+      <p class="subtitle" id="phone-show"></p>
+    </div>
+    <div class="card">
+      <label>رمز عبور</label>
+      <input type="password" id="password-input" placeholder="رمز عبور خود را وارد کنید">
+      <div class="error" id="error-password"></div>
+      <button class="btn" onclick="doLogin()">تأیید و ورود</button>
+    </div>
+    <a href="#" class="back-link" onclick="showScreen('login')">← تغییر شماره</a>
+  </div>
+
+  <!-- تأیید کد -->
+  <div id="screen-verify" class="screen">
+    <div class="header">
+      <div class="logo">📚</div>
+      <h1>تأیید شماره</h1>
+      <p class="subtitle">کد ۴ رقمی را وارد کنید</p>
+    </div>
+    <div class="card">
+      <label>کد تأیید</label>
+      <input type="tel" id="code-input" placeholder="••••" maxlength="4">
+      <div class="error" id="error-code"></div>
+      <button class="btn" onclick="verifyCode()">تأیید کد</button>
+    </div>
+    <a href="#" class="back-link" onclick="showScreen('login')">← بازگشت</a>
+  </div>
+
+  <!-- ساخت پروفایل -->
+  <div id="screen-profile" class="screen">
+    <div class="header">
+      <h1>ساخت پروفایل</h1>
+      <p class="subtitle">اطلاعات خود را وارد کنید</p>
+    </div>
+    <div class="card">
+      <div class="avatar-section">
+        <div class="avatar" id="avatar-preview" onclick="document.getElementById('file-input').click()">
+          <span>انتخاب عکس</span>
+        </div>
+        <input type="file" id="file-input" accept="image/*" onchange="previewAvatar(event)">
+      </div>
+
+      <label>نام و نام خانوادگی</label>
+      <input type="text" id="name-input" placeholder="مثال: علی رضایی">
+
+      <label>رمز عبور</label>
+      <input type="password" id="pass1" placeholder="حداقل ۶ کاراکتر">
+
+      <label>تکرار رمز عبور</label>
+      <input type="password" id="pass2" placeholder="رمز را دوباره وارد کنید">
+
+      <div class="error" id="error-profile"></div>
+      <button class="btn" onclick="saveProfile()">ادامه</button>
+    </div>
+  </div>
+
+  <!-- اطلاعات مدرسه -->
+  <div id="screen-school" class="screen">
+    <div class="header">
+      <h1>اطلاعات مدرسه</h1>
+      <p class="subtitle">اطلاعات مدرسه خود را وارد کنید</p>
+    </div>
+    <div class="card">
+      <label>نام استان</label>
+      <input type="text" id="province" placeholder="مثال: تهران">
+
+      <label>نام مدرسه</label>
+      <input type="text" id="school" placeholder="مثال: دبیرستان شهید بهشتی">
+
+      <label>پایه / کلاس چندم</label>
+      <input type="text" id="grade" placeholder="مثال: دهم ریاضی">
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="is-manager" onchange="toggleManager()">
+        <label for="is-manager">من مدیر مدرسه هستم</label>
+      </div>
+
+      <div class="manager-box" id="manager-box">
+        <label>رمز مخصوص مدیر مدرسه</label>
+        <input type="password" id="manager-pass" placeholder="رمز مدیر را وارد کنید">
+      </div>
+
+      <div class="error" id="error-school"></div>
+      <button class="btn" onclick="finishRegister()">تأیید و ورود</button>
+    </div>
+  </div>
+
+  <!-- صفحه اصلی -->
+  <div id="screen-main" class="screen">
+    <div class="topbar">
+      <div class="avatar-small" id="main-avatar">👤</div>
+      <div class="user-info">
+        <h2 id="main-name">کاربر</h2>
+        <p id="main-info">مدرسه</p>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="card">
+        <h3>خوش آمدید 👋</h3>
+        <p>به برنامه آموزیار خوش آمدید. از منوی زیر می‌توانید به بخش‌های مختلف دسترسی داشته باشید.</p>
+      </div>
+
+      <div class="menu">
+        <div class="menu-item"><div class="icon">📖</div><span>درس‌ها</span></div>
+        <div class="menu-item"><div class="icon">📝</div><span>تکالیف</span></div>
+        <div class="menu-item"><div class="icon">📊</div><span>نمرات</span></div>
+        <div class="menu-item"><div class="icon">📅</div><span>برنامه هفتگی</span></div>
+        <div class="menu-item"><div class="icon">📢</div><span>اطلاعیه‌ها</span></div>
+        <div class="menu-item"><div class="icon">👤</div><span>پروفایل</span></div>
+      </div>
+
+      <div class="logout-box">
+        <button class="btn-logout" onclick="logout()">خروج از حساب</button>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item active"><span class="icon">🏠</span>خانه</div>
+      <div class="nav-item"><span class="icon">📚</span>دروس</div>
+      <div class="nav-item"><span class="icon">💬</span>پیام‌ها</div>
+      <div class="nav-item"><span class="icon">⚙️</span>تنظیمات</div>
+    </div>
+  </div>
+
+  <!-- پنل مدیر -->
+  <div id="screen-manager" class="screen">
+    <div class="topbar manager-topbar">
+      <div class="avatar-small" id="manager-avatar">👔</div>
+      <div class="user-info">
+        <h2 id="manager-name">مدیر</h2>
+        <p id="manager-info">مدرسه</p>
+        <span class="badge">پنل مدیریت</span>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="stats">
+        <div class="stat-box"><div class="num">0</div><div class="label">دانش‌آموز</div></div>
+        <div class="stat-box"><div class="num">0</div><div class="label">معلم</div></div>
+        <div class="stat-box"><div class="num">0</div><div class="label">کلاس</div></div>
+      </div>
+
+      <div class="card">
+        <h3>پنل مدیریت مدرسه</h3>
+        <p>شما به عنوان مدیر مدرسه وارد شده‌اید. از این بخش می‌توانید مدرسه را مدیریت کنید.</p>
+      </div>
+
+      <div class="menu">
+        <div class="menu-item"><div class="icon">👥</div><span>دانش‌آموزان</span></div>
+        <div class="menu-item"><div class="icon">👨‍🏫</div><span>معلمان</span></div>
+        <div class="menu-item"><div class="icon">📢</div><span>اطلاعیه</span></div>
+        <div class="menu-item"><div class="icon">📊</div><span>گزارش‌ها</span></div>
+        <div class="menu-item"><div class="icon">🏫</div><span>تنظیمات</span></div>
+        <div class="menu-item"><div class="icon">🔐</div><span>دسترسی‌ها</span></div>
+      </div>
+
+      <div class="logout-box">
+        <button class="btn-logout" onclick="logout()">خروج از حساب</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
