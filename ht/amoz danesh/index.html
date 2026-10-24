@@ -8,13 +8,8 @@
 </head>
 <body>
 
-  <!-- لودینگ -->
-  <div id="screen-loading" class="screen active">
-    <div class="logo-big">📚</div>
-    <h1>آموزیار</h1>
-    <p>در حال بارگذاری...</p>
-    <div class="loader"></div>
-  </div>
+  <!-- لودینگ (فقط عکس پس‌زمینه) -->
+  <div id="screen-loading" class="screen active"></div>
 
   <!-- ورود شماره -->
   <div id="screen-login" class="screen">
@@ -91,7 +86,7 @@
     </div>
   </div>
 
-  <!-- اطلاعات مدرسه -->
+  <!-- اطلاعات مدرسه / تأیید نقش -->
   <div id="screen-school" class="screen">
     <div class="header">
       <h1>اطلاعات مدرسه</h1>
@@ -107,6 +102,7 @@
       <label>پایه / کلاس چندم</label>
       <input type="text" id="grade" placeholder="مثال: دهم ریاضی">
 
+      <!-- تأیید مدیر -->
       <div class="checkbox-row">
         <input type="checkbox" id="is-manager" onchange="toggleManager()">
         <label for="is-manager">من مدیر مدرسه هستم</label>
@@ -115,6 +111,17 @@
       <div class="manager-box" id="manager-box">
         <label>رمز مخصوص مدیر مدرسه</label>
         <input type="password" id="manager-pass" placeholder="رمز مدیر را وارد کنید">
+      </div>
+
+      <!-- تأیید معلم -->
+      <div class="checkbox-row">
+        <input type="checkbox" id="is-teacher" onchange="toggleTeacher()">
+        <label for="is-teacher">من معلم هستم</label>
+      </div>
+
+      <div class="teacher-box" id="teacher-box">
+        <label>رمز مخصوص معلم</label>
+        <input type="password" id="teacher-pass" placeholder="رمز معلم را وارد کنید">
       </div>
 
       <div class="error" id="error-school"></div>
@@ -201,4 +208,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-
