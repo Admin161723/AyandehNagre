@@ -68,10 +68,10 @@
     <div class="header"><h1>اطلاعات مدرسه</h1><p class="subtitle">اطلاعات خود را وارد کنید</p></div>
     <div class="card">
 
-      <div class="checkbox-row">
+      <label class="checkbox-row" style="cursor:pointer;">
         <input type="checkbox" id="is-manager" onchange="toggleManager()">
-        <label for="is-manager">من مدیر مدرسه هستم</label>
-      </div>
+        <span>من مدیر مدرسه هستم</span>
+      </label>
       <div class="manager-box" id="manager-box">
         <label>رمز مخصوص مدیر مدرسه</label>
         <input type="password" id="manager-pass" placeholder="رمز مدیر را وارد کنید">
@@ -86,10 +86,10 @@
         <input type="text" id="grade" placeholder="مثال: دهم ریاضی">
       </div>
 
-      <div class="checkbox-row">
+      <label class="checkbox-row" style="cursor:pointer;">
         <input type="checkbox" id="is-teacher" onchange="toggleTeacher()">
-        <label for="is-teacher">من معلم هستم</label>
-      </div>
+        <span>من معلم هستم</span>
+      </label>
       <div class="teacher-box" id="teacher-box">
         <label>رمز مخصوص معلم</label>
         <input type="password" id="teacher-pass" placeholder="رمز معلم را وارد کنید">
@@ -120,33 +120,6 @@
     <div class="bottom-nav">
       <div class="nav-item active">خانه</div><div class="nav-item">دروس</div>
       <div class="nav-item">پیام‌ها</div><div class="nav-item">تنظیمات</div>
-    </div>
-  </div>
-
-  <div id="screen-manager" class="screen">
-    <div class="topbar manager-topbar">
-      <div class="avatar-small" id="manager-avatar"></div>
-      <div class="user-info">
-        <h2 id="manager-name">مدیر</h2><p id="manager-info">مدرسه</p>
-        <span class="badge">پنل مدیریت</span>
-      </div>
-    </div>
-    <div class="content">
-      <div class="stats">
-        <div class="stat-box"><div class="num" id="mgr-students">0</div><div class="label">دانش‌آموز</div></div>
-        <div class="stat-box"><div class="num" id="mgr-teachers">0</div><div class="label">معلم</div></div>
-        <div class="stat-box"><div class="num" id="mgr-classes">0</div><div class="label">کلاس</div></div>
-      </div>
-      <div class="card"><h3>پنل مدیریت مدرسه</h3><p>شما به عنوان مدیر مدرسه وارد شده‌اید.</p></div>
-      <div class="menu">
-        <div class="menu-item"><span>دانش‌آموزان</span></div>
-        <div class="menu-item"><span>معلمان</span></div>
-        <div class="menu-item"><span>اطلاعیه</span></div>
-        <div class="menu-item"><span>گزارش‌ها</span></div>
-        <div class="menu-item"><span>تنظیمات</span></div>
-        <div class="menu-item"><span>دسترسی‌ها</span></div>
-      </div>
-      <div class="logout-box"><button class="btn-logout" onclick="logout()">خروج از حساب</button></div>
     </div>
   </div>
 
