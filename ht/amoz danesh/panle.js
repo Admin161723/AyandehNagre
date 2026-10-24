@@ -66,6 +66,8 @@ async function submitManagerPanel() {
       if (existing) {
         error.style.display = 'block';
         error.textContent = 'این شماره قبلاً ثبت‌نام کرده';
+        btn.disabled = false;
+        btn.textContent = 'تأیید و ورود';
         return;
       }
     }
@@ -95,12 +97,11 @@ async function submitManagerPanel() {
 
     localStorage.setItem('currentUser', phone);
     localStorage.removeItem('pendingManager');
-    window.location.href = 'index.html';
+    window.location.href = 'amoz.html';
   } catch (e) {
     error.style.display = 'block';
     error.textContent = 'خطا در ذخیره اطلاعات';
     console.error(e);
-  } finally {
     btn.disabled = false;
     btn.textContent = 'تأیید و ورود';
   }
