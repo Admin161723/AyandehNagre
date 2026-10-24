@@ -1,12 +1,16 @@
+// ========== متغیرهای موقت ==========
 let tempPhone = '';
 let tempCode = '';
 let tempName = '';
 let tempPass = '';
 let tempAvatar = '';
 
+// ========== رمزهای تأیید ==========
+const MANAGER_PASS = 'amoz2026-shaki007-madars-modir';
+const TEACHER_PASS = 'shaki007-2026-mfa';
+
 // ========== شروع ==========
 window.onload = function () {
-  // اگر قبلاً لاگین کرده
   const current = localStorage.getItem('currentUser');
   if (current) {
     const users = JSON.parse(localStorage.getItem('users') || '{}');
@@ -23,7 +27,7 @@ window.onload = function () {
     }
   }
 
-  // لودینگ ۲ ثانیه
+  // لودینگ ۲ ثانیه (فقط عکس نمایش داده می‌شود)
   setTimeout(() => {
     showScreen('login');
   }, 2000);
@@ -52,11 +56,9 @@ function goLogin() {
   const users = JSON.parse(localStorage.getItem('users') || '{}');
 
   if (users[phone]) {
-    // کاربر قبلی
     document.getElementById('phone-show').textContent = phone;
     showScreen('password');
   } else {
-    // کاربر جدید → کد ۴ رقمی
     tempCode = Math.floor(1000 + Math.random() * 9000).toString();
     alert('کد تأیید شما: ' + tempCode + '\n(در نسخه واقعی پیامک می‌شود)');
     showScreen('verify');
@@ -148,24 +150,47 @@ function toggleManager() {
   document.getElementById('manager-box').style.display = checked ? 'block' : 'none';
 }
 
+// ========== تیک معلم ==========
+function toggleTeacher() {
+  const checked = document.getElementById('is-teacher').checked;
+  document.getElementById('teacher-box').style.display = checked ? 'block' : 'none';
+}
+
 // ========== ثبت‌نام نهایی ==========
 function finishRegister() {
   const province = document.getElementById('province').value.trim();
   const school = document.getElementById('school').value.trim();
   const grade = document.getElementById('grade').value.trim();
-  const isManager = document.getElementById('is-manager').checked;
-  const managerPass = document.getElementById('manager-pass').value;
-  const error = document.getElementById('error-school');
 
-  if (!province || !school || !grade) {
+  const isManager = document.getElementById('is-manager').checked;
+  const isTeacher = document.getElementById('is-teacher').checked;
+
+  const managerPass = document.getElementById('manager-pass').value.trim();
+  const teacherPass = document.getElementById('teacher-pass').value.trim();
+
+  const error = document.getElementById('error-school');
+  error.style.display = 'none';
+
+  // --- تأیید مدیر ---
+  if (isManager && managerPass !== MANAGER_PASS) {
     error.style.display = 'block';
-    error.textContent = 'همه فیلدها را پر کنید';
+    error.textContent = 'رمز مدیر اشتباه است';
     return;
   }
 
-  if (isManager && managerPass !== 'amoz2026-shaki007-madars-modir') {
+  // --- تأیید معلم ---
+  if (isTeacher && teacherPass !== TEACHER_PASS) {
     error.style.display = 'block';
-    error.textContent = 'رمز مدیر اشتباه است';
+    error.textContent = 'رمز معلم اشتباه است';
+    return;
+  }
+
+  // اگر معلم تأییدشده باشد، نیازی به پر کردن اطلاعات مدرسه نیست
+  const schoolRequired = !isTeacher || isManager;
+
+  if (schoolRequired && (!province || !school || !grade)) {
+    error.style.display = 'block';
+    error.textContent = 'همه فیلدها را پر کنید';
     return;
   }
 
@@ -178,12 +203,14 @@ function finishRegister() {
     province: province,
     school: school,
     grade: grade,
-    isManager: isManager
+    isManager: isManager,
+    isTeacher: isTeacher
   };
 
   localStorage.setItem('users', JSON.stringify(users));
   localStorage.setItem('currentUser', tempPhone);
 
+  // ورود مستقیم به حساب کاربری
   if (isManager) {
     loadManager(users[tempPhone]);
     showScreen('manager');
@@ -196,7 +223,13 @@ function finishRegister() {
 // ========== بارگذاری صفحه اصلی ==========
 function loadMain(user) {
   document.getElementById('main-name').textContent = user.name || 'کاربر';
-  document.getElementById('main-info').textContent = (user.school || '') + ' | ' + (user.grade || '');
+
+  const parts = [];
+  if (user.isTeacher) parts.push('معلم');
+  if (user.school) parts.push(user.school);
+  if (user.grade) parts.push(user.grade);
+
+  document.getElementById('main-info').textContent = parts.join(' | ') || 'آموزیار';
 
   const av = document.getElementById('main-avatar');
   if (user.avatar) {
@@ -211,7 +244,8 @@ function loadMain(user) {
 // ========== بارگذاری پنل مدیر ==========
 function loadManager(user) {
   document.getElementById('manager-name').textContent = user.name || 'مدیر';
-  document.getElementById('manager-info').textContent = (user.school || '') + ' | ' + (user.province || '');
+  document.getElementById('manager-info').textContent =
+    (user.school || '') + (user.province ? ' | ' + user.province : '');
 
   const av = document.getElementById('manager-avatar');
   if (user.avatar) {
@@ -226,7 +260,7 @@ function loadManager(user) {
 // ========== خروج ==========
 function logout() {
   localStorage.removeItem('currentUser');
-  // ریست فرم‌ها
+
   document.getElementById('phone').value = '';
   document.getElementById('password-input').value = '';
   document.getElementById('code-input').value = '';
@@ -236,9 +270,14 @@ function logout() {
   document.getElementById('province').value = '';
   document.getElementById('school').value = '';
   document.getElementById('grade').value = '';
+
   document.getElementById('is-manager').checked = false;
   document.getElementById('manager-pass').value = '';
   document.getElementById('manager-box').style.display = 'none';
+
+  document.getElementById('is-teacher').checked = false;
+  document.getElementById('teacher-pass').value = '';
+  document.getElementById('teacher-box').style.display = 'none';
 
   const av = document.getElementById('avatar-preview');
   av.style.backgroundImage = '';
