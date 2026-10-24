@@ -9,140 +9,102 @@
 </head>
 <body>
 
-  <div id="screen-loading" class="screen active"></div>
+<div id="screen-loading" class="screen active"></div>
 
-  <div id="screen-login" class="screen">
-    <div class="header"><h1>آموزیار</h1><p class="subtitle">ورود / ثبت‌نام</p></div>
-    <div class="card">
-      <label>شماره موبایل</label>
-      <input type="tel" id="phone" placeholder="09xxxxxxxxx" maxlength="11" inputmode="numeric">
-      <div class="error" id="error-phone"></div>
-      <button class="btn" id="btn-phone" onclick="goLogin()">ادامه</button>
-    </div>
+<div id="screen-login" class="screen">
+  <div class="header"><h1>آموزیار</h1><p class="subtitle">ورود / ثبت‌نام</p></div>
+  <div class="card">
+    <label>شماره موبایل</label>
+    <input type="tel" id="phone" placeholder="09xxxxxxxxx" maxlength="11" inputmode="numeric">
+    <div class="error" id="error-phone"></div>
+    <button class="btn" id="btn-phone" onclick="goLogin()">ادامه</button>
   </div>
+</div>
 
-  <div id="screen-password" class="screen">
-    <div class="header"><h1>ورود به حساب</h1><p class="subtitle" id="phone-show"></p></div>
-    <div class="card">
-      <label>رمز عبور</label>
-      <input type="password" id="password-input" placeholder="رمز عبور خود را وارد کنید">
-      <div class="error" id="error-password"></div>
-      <button class="btn" id="btn-password" onclick="doLogin()">تأیید و ورود</button>
-    </div>
-    <a href="#" class="back-link" onclick="showScreen('login')">تغییر شماره</a>
+<div id="screen-password" class="screen">
+  <div class="header"><h1>ورود به حساب</h1><p class="subtitle" id="phone-show"></p></div>
+  <div class="card">
+    <label>رمز عبور</label>
+    <input type="password" id="password-input" placeholder="رمز عبور">
+    <div class="error" id="error-password"></div>
+    <button class="btn" id="btn-password" onclick="doLogin()">تأیید و ورود</button>
   </div>
+  <a href="#" class="back-link" onclick="showScreen('login')">تغییر شماره</a>
+</div>
 
-  <div id="screen-verify" class="screen">
-    <div class="header"><h1>تأیید شماره</h1><p class="subtitle">کد ۴ رقمی به شماره شما ارسال شد</p></div>
-    <div class="card">
-      <div class="code-display" id="code-display">----</div>
-      <p class="code-hint">این کد تا پایان ثبت‌نام معتبر است</p>
-      <label>کد تأیید</label>
-      <input type="tel" id="code-input" placeholder="••••" maxlength="4" inputmode="numeric" autocomplete="off"
-             onpaste="return false" oncopy="return false" oncut="return false" oncontextmenu="return false">
-      <div class="error" id="error-code"></div>
-      <button class="btn" onclick="verifyCode()">تأیید کد</button>
-    </div>
-    <a href="#" class="back-link" onclick="showScreen('login')">بازگشت</a>
+<div id="screen-verify" class="screen">
+  <div class="header"><h1>تأیید شماره</h1><p class="subtitle">کد ۴ رقمی به شماره شما ارسال شد</p></div>
+  <div class="card">
+    <div class="code-display" id="code-display">----</div>
+    <p class="code-hint">این کد تا پایان ثبت‌نام معتبر است</p>
+    <label>کد تأیید</label>
+    <input type="tel" id="code-input" placeholder="••••" maxlength="4" inputmode="numeric" autocomplete="off"
+           onpaste="return false" oncopy="return false" oncut="return false" oncontextmenu="return false">
+    <div class="error" id="error-code"></div>
+    <button class="btn" onclick="verifyCode()">تأیید کد</button>
   </div>
+  <a href="#" class="back-link" onclick="showScreen('login')">بازگشت</a>
+</div>
 
-  <div id="screen-profile" class="screen">
-    <div class="header"><h1>ساخت پروفایل</h1><p class="subtitle">اطلاعات خود را وارد کنید</p></div>
-    <div class="card">
-      <div class="avatar-section">
-        <div class="avatar" id="avatar-preview" onclick="document.getElementById('file-input').click()"><span>انتخاب عکس</span></div>
-        <input type="file" id="file-input" accept="image/*" onchange="previewAvatar(event)">
-      </div>
-      <label>نام و نام خانوادگی</label>
-      <input type="text" id="name-input" placeholder="مثال: علی رضایی">
-      <label>رمز عبور</label>
-      <input type="password" id="pass1" placeholder="حداقل ۶ کاراکتر">
-      <label>تکرار رمز عبور</label>
-      <input type="password" id="pass2" placeholder="رمز را دوباره وارد کنید">
-      <div class="error" id="error-profile"></div>
-      <button class="btn" onclick="saveProfile()">ادامه</button>
+<div id="screen-profile" class="screen">
+  <div class="header"><h1>ساخت پروفایل</h1><p class="subtitle">اطلاعات خود را وارد کنید</p></div>
+  <div class="card">
+    <div class="avatar-section">
+      <div class="avatar" id="avatar-preview" onclick="document.getElementById('file-input').click()"><span>انتخاب عکس</span></div>
+      <input type="file" id="file-input" accept="image/*" onchange="previewAvatar(event)">
     </div>
+    <label>نام و نام خانوادگی</label>
+    <input type="text" id="name-input" placeholder="نام کامل">
+    <label>رمز عبور</label>
+    <input type="password" id="pass1" placeholder="حداقل ۶ کاراکتر">
+    <label>تکرار رمز عبور</label>
+    <input type="password" id="pass2" placeholder="تکرار رمز">
+    <div class="error" id="error-profile"></div>
+    <button class="btn" onclick="saveProfile()">ادامه</button>
   </div>
+</div>
 
-  <div id="screen-school" class="screen">
-    <div class="header"><h1>اطلاعات مدرسه</h1><p class="subtitle">اطلاعات خود را وارد کنید</p></div>
-    <div class="card">
-
-      <label class="checkbox-row" style="cursor:pointer;">
-        <input type="checkbox" id="is-manager" onchange="toggleManager()">
-        <span>من مدیر مدرسه هستم</span>
-      </label>
-      <div class="manager-box" id="manager-box">
-        <label>رمز مخصوص مدیر مدرسه</label>
-        <input type="password" id="manager-pass" placeholder="رمز مدیر را وارد کنید">
-      </div>
-
-      <div id="school-fields">
-        <label>نام استان</label>
-        <input type="text" id="province" placeholder="مثال: تهران">
-        <label>نام مدرسه</label>
-        <input type="text" id="school" placeholder="مثال: دبیرستان شهید بهشتی">
-        <label>پایه / کلاس چندم</label>
-        <input type="text" id="grade" placeholder="مثال: دهم ریاضی">
-      </div>
-
-      <label class="checkbox-row" style="cursor:pointer;">
-        <input type="checkbox" id="is-teacher" onchange="toggleTeacher()">
-        <span>من معلم هستم</span>
-      </label>
-      <div class="teacher-box" id="teacher-box">
-        <label>رمز مخصوص معلم</label>
-        <input type="password" id="teacher-pass" placeholder="رمز معلم را وارد کنید">
-      </div>
-
-      <div class="error" id="error-school"></div>
-      <button class="btn" id="btn-finish" onclick="finishRegister()">تأیید و ورود</button>
+<div id="screen-school" class="screen">
+  <div class="header"><h1>اطلاعات مدرسه</h1><p class="subtitle">اطلاعات خود را وارد کنید</p></div>
+  <div class="card">
+    <label class="checkbox-row" style="cursor:pointer;">
+      <input type="checkbox" id="is-manager" onchange="toggleManager()">
+      <span>من مدیر مدرسه هستم</span>
+    </label>
+    <div class="manager-box" id="manager-box">
+      <label>رمز مدیر</label>
+      <input type="password" id="manager-pass" placeholder="رمز مدیر">
     </div>
+    <div id="school-fields">
+      <label>استان</label>
+      <input type="text" id="province" placeholder="مثال: تهران">
+      <label>نام مدرسه</label>
+      <input type="text" id="school" placeholder="نام مدرسه">
+      <label>پایه / کلاس</label>
+      <input type="text" id="grade" placeholder="مثال: دهم ریاضی">
+    </div>
+    <label class="checkbox-row" style="cursor:pointer;">
+      <input type="checkbox" id="is-teacher" onchange="toggleTeacher()">
+      <span>من معلم هستم</span>
+    </label>
+    <div class="teacher-box" id="teacher-box">
+      <label>رمز معلم</label>
+      <input type="password" id="teacher-pass" placeholder="رمز معلم">
+    </div>
+    <label class="checkbox-row" style="cursor:pointer;">
+      <input type="checkbox" id="is-vice" onchange="toggleVice()">
+      <span>من معاون هستم</span>
+    </label>
+    <div class="teacher-box" id="vice-box" style="display:none;">
+      <label>رمز معاون</label>
+      <input type="password" id="vice-pass" placeholder="رمز معاون">
+    </div>
+    <div class="error" id="error-school"></div>
+    <button class="btn" id="btn-finish" onclick="finishRegister()">تأیید و ورود</button>
   </div>
+</div>
 
-  <div id="screen-main" class="screen">
-    <div class="topbar">
-      <div class="avatar-small" id="main-avatar"></div>
-      <div class="user-info"><h2 id="main-name">کاربر</h2><p id="main-info">آموزیار</p></div>
-    </div>
-    <div class="content">
-      <div class="card"><h3>خوش آمدید</h3><p>به برنامه آموزیار خوش آمدید.</p></div>
-      <div class="menu">
-        <div class="menu-item"><span>درس‌ها</span></div>
-        <div class="menu-item"><span>تکالیف</span></div>
-        <div class="menu-item"><span>نمرات</span></div>
-        <div class="menu-item"><span>برنامه هفتگی</span></div>
-        <div class="menu-item"><span>اطلاعیه‌ها</span></div>
-        <div class="menu-item"><span>پروفایل</span></div>
-      </div>
-      <div class="logout-box"><button class="btn-logout" onclick="logout()">خروج از حساب</button></div>
-    </div>
-    <div class="bottom-nav">
-      <div class="nav-item active">خانه</div><div class="nav-item">دروس</div>
-      <div class="nav-item">پیام‌ها</div><div class="nav-item">تنظیمات</div>
-    </div>
-  </div>
-
-  <div id="screen-creator" class="screen">
-    <div class="topbar creator-topbar">
-      <div class="avatar-small" id="creator-avatar"></div>
-      <div class="user-info">
-        <h2 id="creator-name">سازنده</h2><p>دسترسی کامل به سامانه</p>
-        <span class="badge">پنل سازنده</span>
-      </div>
-    </div>
-    <div class="content">
-      <div class="stats">
-        <div class="stat-box"><div class="num" id="cr-total">0</div><div class="label">کل کاربران</div></div>
-        <div class="stat-box"><div class="num" id="cr-managers">0</div><div class="label">مدیران</div></div>
-        <div class="stat-box"><div class="num" id="cr-teachers">0</div><div class="label">معلمان</div></div>
-      </div>
-      <div class="card"><h3>لیست کاربران</h3><div id="user-list"><p style="color:#999; font-size:13px;">در حال بارگذاری...</p></div></div>
-      <div class="logout-box"><button class="btn-logout" onclick="logout()">خروج از حساب</button></div>
-    </div>
-  </div>
-
-  <script src="api.js"></script>
-  <script src="script.js"></script>
+<script src="api.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
