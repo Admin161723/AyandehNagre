@@ -9,6 +9,7 @@ body {
   font-family: Tahoma, Arial, sans-serif;
   background: #f5f7fa;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
   touch-action: manipulation;
 }
@@ -16,42 +17,40 @@ body {
 .screen {
   display: none;
   min-height: 100vh;
+  min-height: 100dvh;
   flex-direction: column;
   align-items: center;
   padding: 30px 20px;
 }
 
-.screen.active {
-  display: flex;
-}
+.screen.active { display: flex; }
 
-/* ===== لودینگ: فقط عکس پس‌زمینه ===== */
+/* ===== لودینگ تمام‌صفحه گوشی (بدون زوم/کشیدگی) ===== */
 #screen-loading {
+  position: fixed;
+  inset: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: 0;
+  margin: 0;
   background-color: #0d47a1;
   background-image: url('300.webp');
   background-size: cover;
-  background-position: center;
+  background-position: center center;
   background-repeat: no-repeat;
-  justify-content: center;
-  padding: 0;
+  -webkit-background-size: cover;
+  z-index: 9999;
+  overflow: hidden;
 }
 
-/* ===== هدر مشترک (بدون لوگو) ===== */
-.header {
-  text-align: center;
-  margin-bottom: 24px;
-}
-
-.header h1 {
-  font-size: 22px;
-  color: #1a73e8;
-}
-
-.subtitle {
-  color: #666;
-  font-size: 13px;
-  margin-top: 6px;
-}
+/* ===== هدر ===== */
+.header { text-align: center; margin-bottom: 24px; }
+.header h1 { font-size: 22px; color: #1a73e8; }
+.subtitle { color: #666; font-size: 13px; margin-top: 6px; }
 
 /* ===== کارت ===== */
 .card {
@@ -72,9 +71,7 @@ label {
   font-weight: bold;
 }
 
-label:first-of-type {
-  margin-top: 0;
-}
+label:first-of-type { margin-top: 0; }
 
 input[type="tel"],
 input[type="text"],
@@ -88,17 +85,9 @@ input[type="password"] {
   transition: border 0.25s;
 }
 
-input:focus {
-  border-color: #1a73e8;
-}
+input:focus { border-color: #1a73e8; }
+input[type="tel"] { text-align: center; direction: ltr; letter-spacing: 1px; }
 
-input[type="tel"] {
-  text-align: center;
-  direction: ltr;
-  letter-spacing: 1px;
-}
-
-/* ===== کادر کد تأیید (ضد کپی/انتخاب/زوم) ===== */
 #code-input {
   font-size: 22px;
   letter-spacing: 10px;
@@ -133,7 +122,6 @@ input[type="tel"] {
   margin-bottom: 16px;
 }
 
-/* ===== دکمه ===== */
 .btn {
   width: 100%;
   padding: 15px;
@@ -147,9 +135,8 @@ input[type="tel"] {
   cursor: pointer;
 }
 
-.btn:active {
-  opacity: 0.9;
-}
+.btn:active { opacity: 0.9; }
+.btn:disabled { opacity: 0.6; cursor: wait; }
 
 .error {
   color: #e53935;
@@ -167,11 +154,7 @@ input[type="tel"] {
 }
 
 /* ===== آواتار ===== */
-.avatar-section {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
-}
+.avatar-section { display: flex; justify-content: center; margin-bottom: 10px; }
 
 .avatar {
   width: 110px;
@@ -200,11 +183,9 @@ input[type="tel"] {
   border-radius: 10px;
 }
 
-#file-input {
-  display: none;
-}
+#file-input { display: none; }
 
-/* ===== چک‌باکس تأیید ===== */
+/* ===== چک‌باکس‌ها ===== */
 .checkbox-row {
   display: flex;
   align-items: center;
@@ -215,17 +196,9 @@ input[type="tel"] {
   border-radius: 12px;
 }
 
-.checkbox-row input {
-  width: 20px;
-  height: 20px;
-}
+.checkbox-row input { width: 20px; height: 20px; }
+.checkbox-row label { margin: 0; font-weight: normal; }
 
-.checkbox-row label {
-  margin: 0;
-  font-weight: normal;
-}
-
-/* باکس مدیر */
 .manager-box {
   display: none;
   margin-top: 12px;
@@ -234,13 +207,8 @@ input[type="tel"] {
   border-radius: 12px;
   border: 1px solid #ffb74d;
 }
+.manager-box label { color: #e65100; margin-top: 0; }
 
-.manager-box label {
-  color: #e65100;
-  margin-top: 0;
-}
-
-/* باکس معلم */
 .teacher-box {
   display: none;
   margin-top: 12px;
@@ -249,15 +217,10 @@ input[type="tel"] {
   border-radius: 12px;
   border: 1px solid #81c784;
 }
+.teacher-box label { color: #2e7d32; margin-top: 0; }
 
-.teacher-box label {
-  color: #2e7d32;
-  margin-top: 0;
-}
-
-/* ===== صفحه اصلی و پنل ===== */
-#screen-main,
-#screen-manager {
+/* ===== پنل‌ها ===== */
+#screen-main, #screen-manager, #screen-creator {
   padding: 0;
   align-items: stretch;
 }
@@ -271,9 +234,8 @@ input[type="tel"] {
   gap: 14px;
 }
 
-.manager-topbar {
-  background: linear-gradient(135deg, #e65100, #bf360c);
-}
+.manager-topbar { background: linear-gradient(135deg, #e65100, #bf360c); }
+.creator-topbar { background: linear-gradient(135deg, #6a1b9a, #4a148c); }
 
 .avatar-small {
   width: 52px;
@@ -291,18 +253,11 @@ input[type="tel"] {
   flex-shrink: 0;
 }
 
-.manager-topbar .avatar-small {
-  color: #e65100;
-}
+.manager-topbar .avatar-small { color: #e65100; }
+.creator-topbar .avatar-small { color: #6a1b9a; }
 
-.user-info h2 {
-  font-size: 17px;
-}
-
-.user-info p {
-  font-size: 12px;
-  opacity: 0.9;
-}
+.user-info h2 { font-size: 17px; }
+.user-info p { font-size: 12px; opacity: 0.9; }
 
 .badge {
   background: rgba(255,255,255,0.25);
@@ -316,23 +271,16 @@ input[type="tel"] {
 .content {
   padding: 18px;
   padding-bottom: 90px;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
 }
 
-.content .card h3 {
-  font-size: 16px;
-  color: #1a73e8;
-  margin-bottom: 8px;
-}
+.content .card h3 { font-size: 16px; color: #1a73e8; margin-bottom: 8px; }
+.manager-topbar + .content .card h3 { color: #e65100; }
+.creator-topbar + .content .card h3 { color: #6a1b9a; }
 
-.manager-topbar + .content .card h3 {
-  color: #e65100;
-}
-
-.content .card p {
-  font-size: 14px;
-  color: #555;
-  line-height: 1.6;
-}
+.content .card p { font-size: 14px; color: #555; line-height: 1.6; }
 
 .menu {
   display: grid;
@@ -349,17 +297,9 @@ input[type="tel"] {
   box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-.menu-item span {
-  font-size: 14px;
-  color: #333;
-  font-weight: bold;
-}
+.menu-item span { font-size: 14px; color: #333; font-weight: bold; }
 
-.stats {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 14px;
-}
+.stats { display: flex; gap: 10px; margin-bottom: 14px; }
 
 .stat-box {
   flex: 1;
@@ -370,22 +310,23 @@ input[type="tel"] {
   box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-.stat-box .num {
-  font-size: 22px;
-  font-weight: bold;
-  color: #e65100;
-}
+.stat-box .num { font-size: 22px; font-weight: bold; color: #e65100; }
+.creator-topbar + .content .stat-box .num { color: #6a1b9a; }
+.stat-box .label { font-size: 12px; color: #777; margin-top: 3px; }
 
-.stat-box .label {
-  font-size: 12px;
-  color: #777;
-  margin-top: 3px;
+.user-row {
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  gap: 8px;
 }
+.user-row:last-child { border-bottom: none; }
+.user-row strong { color: #333; }
+.user-row span { color: #666; direction: ltr; }
 
-.logout-box {
-  margin-top: 25px;
-  text-align: center;
-}
+.logout-box { margin-top: 25px; text-align: center; }
 
 .btn-logout {
   background: #ffebee;
@@ -399,9 +340,7 @@ input[type="tel"] {
 
 .bottom-nav {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 0; left: 0; right: 0;
   background: white;
   display: flex;
   justify-content: space-around;
@@ -409,13 +348,5 @@ input[type="tel"] {
   box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
 }
 
-.nav-item {
-  text-align: center;
-  font-size: 13px;
-  color: #666;
-  font-weight: bold;
-}
-
-.nav-item.active {
-  color: #1a73e8;
-}
+.nav-item { text-align: center; font-size: 13px; color: #666; font-weight: bold; }
+.nav-item.active { color: #1a73e8; }
