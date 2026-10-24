@@ -2,13 +2,16 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0d47a1">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <title>آموزیار</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- لودینگ: فقط عکس -->
+  <!-- لودینگ -->
   <div id="screen-loading" class="screen active"></div>
 
   <!-- ورود شماره -->
@@ -21,7 +24,7 @@
       <label>شماره موبایل</label>
       <input type="tel" id="phone" placeholder="09xxxxxxxxx" maxlength="11" inputmode="numeric">
       <div class="error" id="error-phone"></div>
-      <button class="btn" onclick="goLogin()">ادامه</button>
+      <button class="btn" id="btn-phone" onclick="goLogin()">ادامه</button>
     </div>
   </div>
 
@@ -35,7 +38,7 @@
       <label>رمز عبور</label>
       <input type="password" id="password-input" placeholder="رمز عبور خود را وارد کنید">
       <div class="error" id="error-password"></div>
-      <button class="btn" onclick="doLogin()">تأیید و ورود</button>
+      <button class="btn" id="btn-password" onclick="doLogin()">تأیید و ورود</button>
     </div>
     <a href="#" class="back-link" onclick="showScreen('login')">← تغییر شماره</a>
   </div>
@@ -111,7 +114,6 @@
       <label>پایه / کلاس چندم</label>
       <input type="text" id="grade" placeholder="مثال: دهم ریاضی">
 
-      <!-- تأیید مدیر -->
       <div class="checkbox-row">
         <input type="checkbox" id="is-manager" onchange="toggleManager()">
         <label for="is-manager">من مدیر مدرسه هستم</label>
@@ -121,7 +123,6 @@
         <input type="password" id="manager-pass" placeholder="رمز مدیر را وارد کنید">
       </div>
 
-      <!-- تأیید معلم -->
       <div class="checkbox-row">
         <input type="checkbox" id="is-teacher" onchange="toggleTeacher()">
         <label for="is-teacher">من معلم هستم</label>
@@ -132,7 +133,7 @@
       </div>
 
       <div class="error" id="error-school"></div>
-      <button class="btn" onclick="finishRegister()">تأیید و ورود</button>
+      <button class="btn" id="btn-finish" onclick="finishRegister()">تأیید و ورود</button>
     </div>
   </div>
 
@@ -187,14 +188,14 @@
 
     <div class="content">
       <div class="stats">
-        <div class="stat-box"><div class="num">0</div><div class="label">دانش‌آموز</div></div>
-        <div class="stat-box"><div class="num">0</div><div class="label">معلم</div></div>
-        <div class="stat-box"><div class="num">0</div><div class="label">کلاس</div></div>
+        <div class="stat-box"><div class="num" id="mgr-students">0</div><div class="label">دانش‌آموز</div></div>
+        <div class="stat-box"><div class="num" id="mgr-teachers">0</div><div class="label">معلم</div></div>
+        <div class="stat-box"><div class="num" id="mgr-classes">0</div><div class="label">کلاس</div></div>
       </div>
 
       <div class="card">
         <h3>پنل مدیریت مدرسه</h3>
-        <p>شما به عنوان مدیر مدرسه وارد شده‌اید. از این بخش می‌توانید مدرسه را مدیریت کنید.</p>
+        <p>شما به عنوان مدیر مدرسه وارد شده‌اید.</p>
       </div>
 
       <div class="menu">
@@ -212,6 +213,36 @@
     </div>
   </div>
 
+  <!-- پنل سازنده -->
+  <div id="screen-creator" class="screen">
+    <div class="topbar creator-topbar">
+      <div class="avatar-small" id="creator-avatar"></div>
+      <div class="user-info">
+        <h2 id="creator-name">سازنده</h2>
+        <p>دسترسی کامل به سامانه</p>
+        <span class="badge">پنل سازنده</span>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="stats">
+        <div class="stat-box"><div class="num" id="cr-total">0</div><div class="label">کل کاربران</div></div>
+        <div class="stat-box"><div class="num" id="cr-managers">0</div><div class="label">مدیران</div></div>
+        <div class="stat-box"><div class="num" id="cr-teachers">0</div><div class="label">معلمان</div></div>
+      </div>
+
+      <div class="card">
+        <h3>لیست کاربران (از دیتابیس)</h3>
+        <div id="user-list"><p style="color:#999; font-size:13px;">در حال بارگذاری...</p></div>
+      </div>
+
+      <div class="logout-box">
+        <button class="btn-logout" onclick="logout()">خروج از حساب</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
