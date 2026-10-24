@@ -196,7 +196,7 @@ async function finishRegister() {
   btn.textContent = 'در حال بررسی...';
 
   try {
-    // ===== مسیر مدیر =====
+    // ========== مسیر مدیر (بدون هیچ بررسی فیلد استان/مدرسه/پایه) ==========
     if (isManager) {
       const correctMgr = await getManagerPass();
       if (!correctMgr || managerPassInput !== correctMgr) {
@@ -234,7 +234,7 @@ async function finishRegister() {
       return;
     }
 
-    // ===== مسیر معلم / دانش‌آموز =====
+    // ========== مسیر معلم / دانش‌آموز ==========
     const province = document.getElementById('province').value.trim();
     const school = document.getElementById('school').value.trim();
     const grade = document.getElementById('grade').value.trim();
@@ -377,10 +377,7 @@ async function loadCreator(user) {
       const tag = u.role === 'creator' ? ' [سازنده]' :
                   u.isManager ? ' [مدیر]' :
                   u.isTeacher ? ' [معلم]' : '';
-      row.innerHTML = `
-        <strong>${(u.name || 'بدون نام') + tag}</strong>
-        <span>${u.phone}</span>
-      `;
+      row.innerHTML = `<strong>${(u.name || 'بدون نام') + tag}</strong><span>${u.phone}</span>`;
       list.appendChild(row);
     });
   } catch (e) {
