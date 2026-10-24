@@ -9,6 +9,7 @@
 </head>
 <body>
 
+<!-- ========== HOME ========== -->
 <div id="screen-home" class="screen active" style="padding:0;">
   <div class="topbar">
     <div class="avatar-small" id="home-avatar" onclick="goPage('settings')"></div>
@@ -18,21 +19,20 @@
     </div>
   </div>
   <div class="content">
-    <div class="home-card">
-      <button onclick="goPage('tutorial')">آموزش‌ها</button>
-    </div>
+    <button class="menu-item" onclick="goPage('tutorial')">آموزش‌ها</button>
     <div class="logout-box">
       <button class="btn-logout" onclick="logout()">خروج از حساب</button>
     </div>
   </div>
   <div class="bottom-nav">
-    <div class="nav-item active" onclick="goPage('home')">خانه</div>
-    <div class="nav-item" onclick="goPage('store')">فروشگاه</div>
-    <div class="nav-item" onclick="goPage('messages')">پیام‌ها</div>
-    <div class="nav-item" onclick="goPage('settings')">تنظیمات</div>
+    <div class="nav-item active" data-page="home" onclick="goPage('home')">خانه</div>
+    <div class="nav-item" data-page="store" onclick="goPage('store')">فروشگاه</div>
+    <div class="nav-item" data-page="messages" onclick="goPage('messages')">پیام‌ها</div>
+    <div class="nav-item" data-page="settings" onclick="goPage('settings')">تنظیمات</div>
   </div>
 </div>
 
+<!-- ========== STORE ========== -->
 <div id="screen-store" class="screen" style="padding:0;">
   <div class="panel-header">
     <button class="back-btn" onclick="goPage('home')">→</button>
@@ -41,6 +41,7 @@
   <div class="content"><div class="empty-state">به زودی...</div></div>
 </div>
 
+<!-- ========== TUTORIAL ========== -->
 <div id="screen-tutorial" class="screen" style="padding:0;">
   <div class="panel-header">
     <button class="back-btn" onclick="goPage('home')">→</button>
@@ -49,6 +50,7 @@
   <div class="content"><div class="empty-state">به زودی...</div></div>
 </div>
 
+<!-- ========== MESSAGES ========== -->
 <div id="screen-messages" class="screen" style="padding:0;">
   <div class="panel-header">
     <button class="back-btn" onclick="goPage('home')">→</button>
@@ -57,6 +59,7 @@
   <div class="content" id="messages-list"></div>
 </div>
 
+<!-- ========== CHAT ========== -->
 <div id="screen-chat" class="screen" style="padding:0;">
   <div class="chat-container">
     <div class="chat-header">
@@ -66,16 +69,19 @@
         <h3 id="chat-name">نام</h3>
         <small id="chat-sub"></small>
       </div>
-      <button class="back-btn" onclick="deleteCurrentChat()" style="font-size:13px;">حذف</button>
+      <button class="back-btn" onclick="deleteCurrentChat()" style="font-size:12px;">حذف</button>
     </div>
     <div class="chat-messages" id="chat-messages"></div>
     <div class="chat-input-bar">
+      <button class="attach-btn" onclick="document.getElementById('chat-file').click()">📎</button>
       <input type="text" id="chat-input" placeholder="پیام...">
       <button onclick="sendChatText()">➤</button>
     </div>
+    <input type="file" id="chat-file" accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="sendChatFile(event)" style="display:none;">
   </div>
 </div>
 
+<!-- ========== SETTINGS ========== -->
 <div id="screen-settings" class="screen" style="padding:0;">
   <div class="settings-profile">
     <div class="big-avatar" id="settings-avatar" onclick="document.getElementById('settings-file').click()"></div>
@@ -88,13 +94,14 @@
     <button class="settings-btn" style="color:#c62828;" onclick="logout()">خروج از حساب</button>
   </div>
   <div class="bottom-nav">
-    <div class="nav-item" onclick="goPage('home')">خانه</div>
-    <div class="nav-item" onclick="goPage('store')">فروشگاه</div>
-    <div class="nav-item" onclick="goPage('messages')">پیام‌ها</div>
-    <div class="nav-item active" onclick="goPage('settings')">تنظیمات</div>
+    <div class="nav-item" data-page="home" onclick="goPage('home')">خانه</div>
+    <div class="nav-item" data-page="store" onclick="goPage('store')">فروشگاه</div>
+    <div class="nav-item" data-page="messages" onclick="goPage('messages')">پیام‌ها</div>
+    <div class="nav-item active" data-page="settings" onclick="goPage('settings')">تنظیمات</div>
   </div>
 </div>
 
+<!-- ========== EDIT PROFILE ========== -->
 <div id="screen-edit-profile" class="screen" style="padding:0;">
   <div class="panel-header">
     <button class="back-btn" onclick="goPage('settings')">→</button>
@@ -120,6 +127,7 @@
   </div>
 </div>
 
+<!-- ========== PANEL ========== -->
 <div id="screen-panel" class="screen" style="padding:0;">
   <div class="panel-header">
     <button class="back-btn" onclick="goPage('settings')">→</button>
@@ -128,6 +136,7 @@
   <div class="content"><div class="menu" id="panel-menu"></div></div>
 </div>
 
+<!-- ========== LIST ========== -->
 <div id="screen-list" class="screen" style="padding:0;">
   <div class="panel-header">
     <button class="back-btn" onclick="goPage('panel')">→</button>
@@ -139,6 +148,7 @@
   </div>
 </div>
 
+<!-- ========== EDIT USER ========== -->
 <div id="screen-edit-user" class="screen" style="padding:0;">
   <div class="panel-header">
     <button class="back-btn" onclick="goPage('list')">→</button>
@@ -148,10 +158,13 @@
     <div class="card">
       <label>نام</label>
       <input type="text" id="eu-name">
-      <label>شماره</label>
-      <input type="tel" id="eu-phone">
-      <label>رمز جدید</label>
-      <input type="password" id="eu-pass" placeholder="خالی = بدون تغییر">
+      <label>شماره (غیرقابل تغییر)</label>
+      <input type="tel" id="eu-phone" disabled>
+      <label>رمز جدید (خالی = بدون تغییر)</label>
+      <input type="password" id="eu-pass">
+      <label>مدرسه</label>
+      <input type="text" id="eu-school">
+      <div id="eu-toggles" style="margin-top:14px;"></div>
       <div class="error" id="eu-error"></div>
       <button class="btn" onclick="saveUserEdit()">ذخیره</button>
       <button class="btn" style="background:#ff9800;" onclick="banAction()">بن ۷ روز</button>
@@ -161,6 +174,7 @@
   </div>
 </div>
 
+<!-- ========== ADD PERSON ========== -->
 <div id="screen-add-person" class="screen" style="padding:0;">
   <div class="panel-header">
     <button class="back-btn" onclick="goPage('list')">→</button>
@@ -174,12 +188,15 @@
       <input type="tel" id="add-phone" maxlength="11">
       <label>رمز</label>
       <input type="password" id="add-pass">
+      <label>مدرسه</label>
+      <input type="text" id="add-school">
       <div class="error" id="add-error"></div>
       <button class="btn" onclick="submitAddPerson()">ایجاد</button>
     </div>
   </div>
 </div>
 
+<!-- ========== ATT GRADES ========== -->
 <div id="screen-att-grades" class="screen" style="padding:0;">
   <div class="panel-header">
     <button class="back-btn" onclick="goPage('panel')">→</button>
@@ -194,6 +211,7 @@
   </div>
 </div>
 
+<!-- ========== ATT CLASSES ========== -->
 <div id="screen-att-classes" class="screen" style="padding:0;">
   <div class="panel-header">
     <button class="back-btn" onclick="goPage('att-grades')">→</button>
@@ -202,12 +220,108 @@
   <div class="content" id="att-classes-list"></div>
 </div>
 
+<!-- ========== ATT SHEET ========== -->
 <div id="screen-att-sheet" class="screen" style="padding:0;">
   <div class="panel-header">
     <button class="back-btn" onclick="goPage('att-classes')">→</button>
     <h2 id="att-sheet-title">حضور غیاب</h2>
   </div>
-  <div class="content" id="att-sheet-container"></div>
+  <div class="content">
+    <div class="bell-tabs" id="bell-tabs"></div>
+    <div id="att-sheet-container"></div>
+  </div>
+</div>
+
+<!-- ========== CREATOR LISTS ========== -->
+<div id="screen-creator-lists" class="screen" style="padding:0;">
+  <div class="panel-header">
+    <button class="back-btn" onclick="goPage('panel')">→</button>
+    <h2>مدیریت لیست‌ها</h2>
+  </div>
+  <div class="content">
+    <div class="menu">
+      <div class="menu-item" onclick="openGradeManage('دهم')"><span>پایه دهم</span></div>
+      <div class="menu-item" onclick="openGradeManage('یازدهم')"><span>پایه یازدهم</span></div>
+      <div class="menu-item" onclick="openGradeManage('دوازدهم')"><span>پایه دوازدهم</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== GRADE MANAGE ========== -->
+<div id="screen-grade-manage" class="screen" style="padding:0;">
+  <div class="panel-header">
+    <button class="back-btn" onclick="goPage('creator-lists')">→</button>
+    <h2 id="gm-title">مدیریت پایه</h2>
+  </div>
+  <div class="content">
+    <button class="btn" onclick="promptAddClass()">+ افزودن کلاس</button>
+    <div id="gm-classes" style="margin-top:14px;"></div>
+  </div>
+</div>
+
+<!-- ========== CLASS STUDENTS ========== -->
+<div id="screen-class-students" class="screen" style="padding:0;">
+  <div class="panel-header">
+    <button class="back-btn" onclick="goPage('grade-manage')">→</button>
+    <h2 id="cs-title">دانش‌آموزان</h2>
+  </div>
+  <div class="content">
+    <button class="btn" onclick="openAddStudent()">+ افزودن دانش‌آموز</button>
+    <div id="cs-list" style="margin-top:14px;"></div>
+  </div>
+</div>
+
+<!-- ========== ADD STUDENT ========== -->
+<div id="screen-add-student" class="screen" style="padding:0;">
+  <div class="panel-header">
+    <button class="back-btn" onclick="goPage('class-students')">→</button>
+    <h2>افزودن دانش‌آموز</h2>
+  </div>
+  <div class="content">
+    <div class="card">
+      <label>نام و نام خانوادگی</label>
+      <input type="text" id="st-name">
+      <label>شماره موبایل (اختیاری)</label>
+      <input type="tel" id="st-phone" maxlength="11">
+      <label>مدرسه</label>
+      <input type="text" id="st-school">
+      <div class="error" id="st-error"></div>
+      <button class="btn" onclick="submitAddStudent()">ایجاد</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== WEEKLY ATT ========== -->
+<div id="screen-weekly-att" class="screen" style="padding:0;">
+  <div class="panel-header">
+    <button class="back-btn" onclick="goPage('panel')">→</button>
+    <h2>حضور هفتگی</h2>
+  </div>
+  <div class="content">
+    <div class="menu">
+      <div class="menu-item" onclick="openWeeklyGrade('دهم')"><span>پایه دهم</span></div>
+      <div class="menu-item" onclick="openWeeklyGrade('یازدهم')"><span>پایه یازدهم</span></div>
+      <div class="menu-item" onclick="openWeeklyGrade('دوازدهم')"><span>پایه دوازدهم</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== WEEKLY CLASSES ========== -->
+<div id="screen-weekly-classes" class="screen" style="padding:0;">
+  <div class="panel-header">
+    <button class="back-btn" onclick="goPage('weekly-att')">→</button>
+    <h2 id="wc-title">کلاس‌ها</h2>
+  </div>
+  <div class="content" id="wc-list"></div>
+</div>
+
+<!-- ========== WEEKLY VIEW ========== -->
+<div id="screen-weekly-view" class="screen" style="padding:0;">
+  <div class="panel-header">
+    <button class="back-btn" onclick="goPage('weekly-classes')">→</button>
+    <h2 id="wv-title">حضور هفتگی</h2>
+  </div>
+  <div class="content" id="wv-container"></div>
 </div>
 
 <script src="api.js"></script>
