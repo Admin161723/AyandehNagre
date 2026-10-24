@@ -15,10 +15,7 @@ async function redisCmd(command) {
   return data.result;
 }
 
-const KEY_INDEX       = 'amzyar:users:index';
-const KEY_CFG_MANAGER = 'amzyar:config:managerPass';
-const KEY_CFG_TEACHER = 'amzyar:config:teacherPass';
-const KEY_CFG_CREATOR = 'amzyar:config:creatorPhone';
+const KEY_INDEX = 'amzyar:users:index';
 
 const userKey = (phone) => `amzyar:user:${phone}`;
 
@@ -28,7 +25,6 @@ async function getUser(phone) {
     if (!raw) return null;
     return typeof raw === 'string' ? JSON.parse(raw) : raw;
   } catch (e) {
-    console.error('getUser error:', e);
     return null;
   }
 }
@@ -49,7 +45,6 @@ async function getIndexArray() {
     if (!raw) return [];
     return typeof raw === 'string' ? JSON.parse(raw) : raw;
   } catch (e) {
-    console.error('getIndexArray error:', e);
     return [];
   }
 }
@@ -86,7 +81,6 @@ async function getSetting(key) {
     const val = await redisCmd(['GET', key]);
     return val === null || val === undefined ? '' : String(val);
   } catch (e) {
-    console.error('getSetting error:', e);
     return '';
   }
 }
@@ -95,6 +89,7 @@ async function setSetting(key, value) {
   await redisCmd(['SET', key, String(value)]);
 }
 
-async function getManagerPass()  { return getSetting(KEY_CFG_MANAGER); }
-async function getTeacherPass()  { return getSetting(KEY_CFG_TEACHER); }
-async function getCreatorPhone() { return getSetting(KEY_CFG_CREATOR); }
+async function getManagerPass() { return getSetting('amzyar:config:managerPass'); }
+async function getTeacherPass() { return getSetting('amzyar:config:teacherPass'); }
+async function getVicePass()    { return getSetting('amzyar:config:vicePass'); }
+async function getSupportPhone(){ return getSetting('amzyar:config:supportPhone'); }
