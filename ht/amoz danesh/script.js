@@ -23,8 +23,8 @@ window.onload = async function () {
         await loadCreator(user);
         showScreen('creator');
       } else if (user.isManager) {
-        await loadManager(user);
-        showScreen('manager');
+        window.location.href = 'amoz.html';
+        return;
       } else {
         loadMain(user);
         showScreen('main');
@@ -111,8 +111,8 @@ async function doLogin() {
         await loadCreator(user);
         showScreen('creator');
       } else if (user.isManager) {
-        await loadManager(user);
-        showScreen('manager');
+        window.location.href = 'amoz.html';
+        return;
       } else {
         loadMain(user);
         showScreen('main');
@@ -185,8 +185,6 @@ function toggleTeacher() {
 async function finishRegister() {
   const isManager = document.getElementById('is-manager').checked;
   const isTeacher = document.getElementById('is-teacher').checked;
-  const managerPassInput = document.getElementById('manager-pass').value.trim();
-  const teacherPassInput = document.getElementById('teacher-pass').value.trim();
 
   const error = document.getElementById('error-school');
   const btn = document.getElementById('btn-finish');
@@ -196,12 +194,20 @@ async function finishRegister() {
   btn.textContent = 'در حال بررسی...';
 
   try {
-    // ========== مسیر مدیر (بدون هیچ بررسی فیلد استان/مدرسه/پایه) ==========
+    // ============================================================
+    //  مسیر مدیر: هیچ فیلدی پر نمی‌کنه، فقط رمز → panleamoz.html
+    //  ⚠️ اینجا هیچ اکانتی در دیتابیس ساخته نمی‌شه
+    // ============================================================
     if (isManager) {
+      const managerPassInput = document.getElementById('manager-pass').value.trim();
+      const teacherPassInput = document.getElementById('teacher-pass').value.trim();
+
       const correctMgr = await getManagerPass();
       if (!correctMgr || managerPassInput !== correctMgr) {
         error.style.display = 'block';
         error.textContent = 'رمز مدیر اشتباه است';
+        btn.disabled = false;
+        btn.textContent = 'تأیید و ورود';
         return;
       }
 
@@ -210,17 +216,23 @@ async function finishRegister() {
         if (!correctTch || teacherPassInput !== correctTch) {
           error.style.display = 'block';
           error.textContent = 'رمز معلم اشتباه است';
+          btn.disabled = false;
+          btn.textContent = 'تأیید و ورود';
           return;
         }
       }
 
+      // بررسی اینکه شماره قبلاً ثبت‌نام نکرده باشه
       const existing = await getUser(tempPhone);
       if (existing) {
         error.style.display = 'block';
         error.textContent = 'این شماره قبلاً ثبت‌نام کرده';
+        btn.disabled = false;
+        btn.textContent = 'تأیید و ورود';
         return;
       }
 
+      // ⚠️ اینجا فقط توی مرورگر ذخیره می‌شه، نه توی دیتابیس
       localStorage.setItem('pendingManager', JSON.stringify({
         phone: tempPhone,
         name: tempName,
@@ -234,16 +246,21 @@ async function finishRegister() {
       return;
     }
 
-    // ========== مسیر معلم / دانش‌آموز ==========
+    // ============================================================
+    //  مسیر معلم / دانش‌آموز: پر کردن فیلدها + ذخیره در دیتابیس
+    // ============================================================
     const province = document.getElementById('province').value.trim();
     const school = document.getElementById('school').value.trim();
     const grade = document.getElementById('grade').value.trim();
+    const teacherPassInput = document.getElementById('teacher-pass').value.trim();
 
     if (isTeacher) {
       const correctTch = await getTeacherPass();
       if (!correctTch || teacherPassInput !== correctTch) {
         error.style.display = 'block';
         error.textContent = 'رمز معلم اشتباه است';
+        btn.disabled = false;
+        btn.textContent = 'تأیید و ورود';
         return;
       }
     }
@@ -251,6 +268,8 @@ async function finishRegister() {
     if (!province || !school || !grade) {
       error.style.display = 'block';
       error.textContent = 'همه فیلدها را پر کنید';
+      btn.disabled = false;
+      btn.textContent = 'تأیید و ورود';
       return;
     }
 
@@ -258,6 +277,8 @@ async function finishRegister() {
     if (existing) {
       error.style.display = 'block';
       error.textContent = 'این شماره قبلاً ثبت‌نام کرده';
+      btn.disabled = false;
+      btn.textContent = 'تأیید و ورود';
       return;
     }
 
@@ -285,7 +306,6 @@ async function finishRegister() {
     error.style.display = 'block';
     error.textContent = 'خطا در ذخیره اطلاعات. دوباره امتحان کنید.';
     console.error(e);
-  } finally {
     btn.disabled = false;
     btn.textContent = 'تأیید و ورود';
   }
@@ -307,36 +327,6 @@ function loadMain(user) {
     av.style.backgroundImage = '';
     av.textContent = initialOf(user.name);
   }
-}
-
-async function loadManager(user) {
-  document.getElementById('manager-name').textContent = user.name || 'مدیر';
-  const infoParts = [];
-  if (user.school) infoParts.push(user.school);
-  if (user.city) infoParts.push(user.city);
-  else if (user.province) infoParts.push(user.province);
-  if (user.district) infoParts.push(user.district);
-  document.getElementById('manager-info').textContent = infoParts.join(' | ');
-
-  const av = document.getElementById('manager-avatar');
-  if (user.avatar) {
-    av.style.backgroundImage = `url(${user.avatar})`;
-    av.textContent = '';
-  } else {
-    av.style.backgroundImage = '';
-    av.textContent = initialOf(user.name);
-  }
-
-  try {
-    const all = await getAllUsers();
-    const sameSchool = all.filter(u => u.school === user.school && u.school);
-    document.getElementById('mgr-students').textContent =
-      sameSchool.filter(u => !u.isTeacher && !u.isManager && u.role !== 'creator').length;
-    document.getElementById('mgr-teachers').textContent =
-      sameSchool.filter(u => u.isTeacher).length;
-    document.getElementById('mgr-classes').textContent =
-      new Set(sameSchool.map(u => u.grade).filter(Boolean)).size;
-  } catch (e) { console.error(e); }
 }
 
 async function loadCreator(user) {
