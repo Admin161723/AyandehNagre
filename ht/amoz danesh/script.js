@@ -5,70 +5,63 @@ let tempPass = '';
 let tempAvatar = '';
 
 window.onload = async function () {
-  const codeInput = document.getElementById('code-input');
-  ['paste', 'copy', 'cut', 'contextmenu', 'selectstart', 'dragstart'].forEach(evt => {
-    codeInput.addEventListener(evt, e => e.preventDefault());
+  const ci = document.getElementById('code-input');
+  ['paste','copy','cut','contextmenu','selectstart','dragstart'].forEach(evt => {
+    ci.addEventListener(evt, e => e.preventDefault());
   });
-  codeInput.addEventListener('input', function () {
+  ci.addEventListener('input', function () {
     this.value = this.value.replace(/\D/g, '').slice(0, 4);
   });
 
   const startTime = Date.now();
-
-  const current = localStorage.getItem('currentUser');
-  if (current) {
-    const user = await getUser(current);
-    if (user) {
-      if (user.role === 'creator') {
-        await loadCreator(user);
-        showScreen('creator');
-      } else if (user.isManager) {
+  const cur = localStorage.getItem('currentUser');
+  if (cur) {
+    const u = await getUser(cur);
+    if (u) {
+      if (u.bannedUntil && u.bannedUntil > Date.now()) {
+        localStorage.removeItem('currentUser');
+      } else {
         window.location.href = 'amoz.html';
         return;
-      } else {
-        loadMain(user);
-        showScreen('main');
       }
-      return;
     }
   }
-
   const elapsed = Date.now() - startTime;
-  const remaining = Math.max(0, 2000 - elapsed);
-  setTimeout(() => showScreen('login'), remaining);
+  setTimeout(() => showScreen('login'), Math.max(0, 2000 - elapsed));
 };
 
 function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
+  const el = document.getElementById('screen-' + name);
+  if (el) el.classList.add('active');
   window.scrollTo(0, 0);
-}
-
-function initialOf(name) {
-  if (!name) return '';
-  const t = name.trim();
-  return t ? t.charAt(0) : '';
 }
 
 async function goLogin() {
   const phone = document.getElementById('phone').value.trim();
-  const error = document.getElementById('error-phone');
+  const err = document.getElementById('error-phone');
   const btn = document.getElementById('btn-phone');
 
   if (!/^09\d{9}$/.test(phone)) {
-    error.style.display = 'block';
-    error.textContent = 'شماره موبایل معتبر وارد کنید (۱۱ رقم با ۰۹)';
+    err.style.display = 'block';
+    err.textContent = 'شماره معتبر وارد کنید';
     return;
   }
-  error.style.display = 'none';
+  err.style.display = 'none';
   tempPhone = phone;
 
   btn.disabled = true;
-  btn.textContent = 'در حال بررسی...';
+  btn.textContent = 'بررسی...';
 
   try {
-    const user = await getUser(phone);
-    if (user) {
+    const u = await getUser(phone);
+    if (u) {
+      if (u.bannedUntil && u.bannedUntil > Date.now()) {
+        const d = new Date(u.bannedUntil).toLocaleDateString('fa-IR');
+        err.style.display = 'block';
+        err.textContent = 'حساب شما تا ' + d + ' مسدود است';
+        return;
+      }
       document.getElementById('phone-show').textContent = phone;
       document.getElementById('password-input').value = '';
       document.getElementById('error-password').style.display = 'none';
@@ -81,8 +74,8 @@ async function goLogin() {
       showScreen('verify');
     }
   } catch (e) {
-    error.style.display = 'block';
-    error.textContent = 'خطا در ارتباط با دیتابیس. اینترنت را بررسی کنید.';
+    err.style.display = 'block';
+    err.textContent = 'خطا در اتصال';
   } finally {
     btn.disabled = false;
     btn.textContent = 'ادامه';
@@ -91,39 +84,42 @@ async function goLogin() {
 
 async function doLogin() {
   const pass = document.getElementById('password-input').value;
-  const error = document.getElementById('error-password');
+  const err = document.getElementById('error-password');
   const btn = document.getElementById('btn-password');
 
   if (!pass) {
-    error.style.display = 'block';
-    error.textContent = 'رمز عبور را وارد کنید';
+    err.style.display = 'block';
+    err.textContent = 'رمز را وارد کنید';
     return;
   }
 
   btn.disabled = true;
-  btn.textContent = 'در حال ورود...';
+  btn.textContent = 'ورود...';
 
   try {
-    const user = await getUser(tempPhone);
-    if (user && user.password === pass) {
+    let u = await getUser(tempPhone);
+
+    if (u && u.bannedUntil && u.bannedUntil <= Date.now()) {
+      u.bannedUntil = null;
+      await saveUser(tempPhone, u);
+    }
+
+    if (u && u.bannedUntil && u.bannedUntil > Date.now()) {
+      err.style.display = 'block';
+      err.textContent = 'حساب مسدود است';
+      return;
+    }
+
+    if (u && u.password === pass) {
       localStorage.setItem('currentUser', tempPhone);
-      if (user.role === 'creator') {
-        await loadCreator(user);
-        showScreen('creator');
-      } else if (user.isManager) {
-        window.location.href = 'amoz.html';
-        return;
-      } else {
-        loadMain(user);
-        showScreen('main');
-      }
+      window.location.href = 'amoz.html';
     } else {
-      error.style.display = 'block';
-      error.textContent = 'رمز عبور اشتباه است';
+      err.style.display = 'block';
+      err.textContent = 'رمز اشتباه است';
     }
   } catch (e) {
-    error.style.display = 'block';
-    error.textContent = 'خطا در ارتباط با دیتابیس';
+    err.style.display = 'block';
+    err.textContent = 'خطا';
   } finally {
     btn.disabled = false;
     btn.textContent = 'تأیید و ورود';
@@ -131,50 +127,50 @@ async function doLogin() {
 }
 
 function verifyCode() {
-  const code = document.getElementById('code-input').value.trim();
-  const error = document.getElementById('error-code');
-  if (code === tempCode) {
-    error.style.display = 'none';
+  const c = document.getElementById('code-input').value.trim();
+  const e = document.getElementById('error-code');
+  if (c === tempCode) {
+    e.style.display = 'none';
     showScreen('profile');
   } else {
-    error.style.display = 'block';
-    error.textContent = 'کد وارد شده اشتباه است';
+    e.style.display = 'block';
+    e.textContent = 'کد اشتباه';
   }
 }
 
 function previewAvatar(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function (ev) {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = (ev) => {
     tempAvatar = ev.target.result;
     const av = document.getElementById('avatar-preview');
     av.style.backgroundImage = `url(${tempAvatar})`;
     av.innerHTML = '';
   };
-  reader.readAsDataURL(file);
+  r.readAsDataURL(f);
 }
 
 function saveProfile() {
-  const name = document.getElementById('name-input').value.trim();
-  const pass1 = document.getElementById('pass1').value;
-  const pass2 = document.getElementById('pass2').value;
-  const error = document.getElementById('error-profile');
+  const n = document.getElementById('name-input').value.trim();
+  const p1 = document.getElementById('pass1').value;
+  const p2 = document.getElementById('pass2').value;
+  const err = document.getElementById('error-profile');
 
-  if (!name) { error.style.display = 'block'; error.textContent = 'نام را وارد کنید'; return; }
-  if (pass1.length < 6) { error.style.display = 'block'; error.textContent = 'رمز عبور حداقل ۶ کاراکتر باشد'; return; }
-  if (pass1 !== pass2) { error.style.display = 'block'; error.textContent = 'رمز عبور و تکرار آن یکسان نیست'; return; }
+  if (!n) { err.style.display = 'block'; err.textContent = 'نام را وارد کنید'; return; }
+  if (p1.length < 6) { err.style.display = 'block'; err.textContent = 'رمز حداقل ۶ کاراکتر'; return; }
+  if (p1 !== p2) { err.style.display = 'block'; err.textContent = 'رمز یکسان نیست'; return; }
 
-  tempName = name;
-  tempPass = pass1;
-  error.style.display = 'none';
+  tempName = n;
+  tempPass = p1;
+  err.style.display = 'none';
   showScreen('school');
 }
 
 function toggleManager() {
-  const checked = document.getElementById('is-manager').checked;
-  document.getElementById('manager-box').style.display = checked ? 'block' : 'none';
-  document.getElementById('school-fields').style.display = checked ? 'none' : 'block';
+  const c = document.getElementById('is-manager').checked;
+  document.getElementById('manager-box').style.display = c ? 'block' : 'none';
+  document.getElementById('school-fields').style.display = c ? 'none' : 'block';
 }
 
 function toggleTeacher() {
@@ -182,222 +178,114 @@ function toggleTeacher() {
     document.getElementById('is-teacher').checked ? 'block' : 'none';
 }
 
+function toggleVice() {
+  document.getElementById('vice-box').style.display =
+    document.getElementById('is-vice').checked ? 'block' : 'none';
+}
+
 async function finishRegister() {
-  const isManager = document.getElementById('is-manager').checked;
-  const isTeacher = document.getElementById('is-teacher').checked;
-
-  const error = document.getElementById('error-school');
+  const isMgr = document.getElementById('is-manager').checked;
+  const isTch = document.getElementById('is-teacher').checked;
+  const isVic = document.getElementById('is-vice').checked;
+  const err = document.getElementById('error-school');
   const btn = document.getElementById('btn-finish');
-  error.style.display = 'none';
 
+  err.style.display = 'none';
   btn.disabled = true;
-  btn.textContent = 'در حال بررسی...';
+  btn.textContent = 'بررسی...';
 
   try {
-    // ============================================================
-    //  مسیر مدیر: هیچ فیلدی پر نمی‌کنه، فقط رمز → panleamoz.html
-    //  ⚠️ اینجا هیچ اکانتی در دیتابیس ساخته نمی‌شه
-    // ============================================================
-    if (isManager) {
-      const managerPassInput = document.getElementById('manager-pass').value.trim();
-      const teacherPassInput = document.getElementById('teacher-pass').value.trim();
-
-      const correctMgr = await getManagerPass();
-      if (!correctMgr || managerPassInput !== correctMgr) {
-        error.style.display = 'block';
-        error.textContent = 'رمز مدیر اشتباه است';
-        btn.disabled = false;
-        btn.textContent = 'تأیید و ورود';
+    if (isMgr) {
+      const mp = document.getElementById('manager-pass').value.trim();
+      const correct = await getManagerPass();
+      if (!correct || mp !== correct) {
+        err.style.display = 'block';
+        err.textContent = 'رمز مدیر اشتباه';
         return;
       }
-
-      if (isTeacher) {
-        const correctTch = await getTeacherPass();
-        if (!correctTch || teacherPassInput !== correctTch) {
-          error.style.display = 'block';
-          error.textContent = 'رمز معلم اشتباه است';
-          btn.disabled = false;
-          btn.textContent = 'تأیید و ورود';
-          return;
-        }
-      }
-
-      // بررسی اینکه شماره قبلاً ثبت‌نام نکرده باشه
-      const existing = await getUser(tempPhone);
-      if (existing) {
-        error.style.display = 'block';
-        error.textContent = 'این شماره قبلاً ثبت‌نام کرده';
-        btn.disabled = false;
-        btn.textContent = 'تأیید و ورود';
+      const ex = await getUser(tempPhone);
+      if (ex) {
+        err.style.display = 'block';
+        err.textContent = 'شماره قبلاً ثبت‌نام کرده';
         return;
       }
-
-      // ⚠️ اینجا فقط توی مرورگر ذخیره می‌شه، نه توی دیتابیس
       localStorage.setItem('pendingManager', JSON.stringify({
         phone: tempPhone,
         name: tempName,
         password: tempPass,
         avatar: tempAvatar || '',
-        isTeacher: isTeacher,
+        isTeacher: isTch,
+        isVice: isVic,
         createdAt: Date.now()
       }));
-
       window.location.href = 'panleamoz.html';
       return;
     }
 
-    // ============================================================
-    //  مسیر معلم / دانش‌آموز: پر کردن فیلدها + ذخیره در دیتابیس
-    // ============================================================
-    const province = document.getElementById('province').value.trim();
-    const school = document.getElementById('school').value.trim();
-    const grade = document.getElementById('grade').value.trim();
-    const teacherPassInput = document.getElementById('teacher-pass').value.trim();
-
-    if (isTeacher) {
-      const correctTch = await getTeacherPass();
-      if (!correctTch || teacherPassInput !== correctTch) {
-        error.style.display = 'block';
-        error.textContent = 'رمز معلم اشتباه است';
-        btn.disabled = false;
-        btn.textContent = 'تأیید و ورود';
+    if (isTch) {
+      const tp = document.getElementById('teacher-pass').value.trim();
+      const correct = await getTeacherPass();
+      if (!correct || tp !== correct) {
+        err.style.display = 'block';
+        err.textContent = 'رمز معلم اشتباه';
         return;
       }
     }
 
-    if (!province || !school || !grade) {
-      error.style.display = 'block';
-      error.textContent = 'همه فیلدها را پر کنید';
-      btn.disabled = false;
-      btn.textContent = 'تأیید و ورود';
+    if (isVic) {
+      const vp = document.getElementById('vice-pass').value.trim();
+      const correct = await getVicePass();
+      if (!correct || vp !== correct) {
+        err.style.display = 'block';
+        err.textContent = 'رمز معاون اشتباه';
+        return;
+      }
+    }
+
+    const prov = document.getElementById('province').value.trim();
+    const sch = document.getElementById('school').value.trim();
+    const grd = document.getElementById('grade').value.trim();
+
+    if (!prov || !sch || !grd) {
+      err.style.display = 'block';
+      err.textContent = 'همه فیلدها را پر کنید';
       return;
     }
 
-    const existing = await getUser(tempPhone);
-    if (existing) {
-      error.style.display = 'block';
-      error.textContent = 'این شماره قبلاً ثبت‌نام کرده';
-      btn.disabled = false;
-      btn.textContent = 'تأیید و ورود';
+    const ex = await getUser(tempPhone);
+    if (ex) {
+      err.style.display = 'block';
+      err.textContent = 'شماره قبلاً ثبت‌نام کرده';
       return;
     }
 
-    btn.textContent = 'در حال ذخیره...';
+    btn.textContent = 'ذخیره...';
 
-    const newUser = {
+    const newU = {
       name: tempName,
       password: tempPass,
       avatar: tempAvatar || '',
-      province: province,
-      school: school,
-      grade: grade,
+      province: prov,
+      school: sch,
+      city: '',
+      grade: grd,
       isManager: false,
-      isTeacher: isTeacher,
+      isTeacher: isTch,
+      isVice: isVic,
       role: 'user',
+      bannedUntil: null,
       createdAt: Date.now()
     };
 
-    await saveUser(tempPhone, newUser);
+    await saveUser(tempPhone, newU);
     localStorage.setItem('currentUser', tempPhone);
-    loadMain(newUser);
-    showScreen('main');
+    window.location.href = 'amoz.html';
 
   } catch (e) {
-    error.style.display = 'block';
-    error.textContent = 'خطا در ذخیره اطلاعات. دوباره امتحان کنید.';
-    console.error(e);
+    err.style.display = 'block';
+    err.textContent = 'خطا در ذخیره';
+  } finally {
     btn.disabled = false;
     btn.textContent = 'تأیید و ورود';
   }
-}
-
-function loadMain(user) {
-  document.getElementById('main-name').textContent = user.name || 'کاربر';
-  const parts = [];
-  if (user.isTeacher) parts.push('معلم');
-  if (user.school) parts.push(user.school);
-  if (user.grade) parts.push(user.grade);
-  document.getElementById('main-info').textContent = parts.join(' | ') || 'آموزیار';
-
-  const av = document.getElementById('main-avatar');
-  if (user.avatar) {
-    av.style.backgroundImage = `url(${user.avatar})`;
-    av.textContent = '';
-  } else {
-    av.style.backgroundImage = '';
-    av.textContent = initialOf(user.name);
-  }
-}
-
-async function loadCreator(user) {
-  document.getElementById('creator-name').textContent = user.name || 'سازنده';
-
-  const av = document.getElementById('creator-avatar');
-  if (user.avatar) {
-    av.style.backgroundImage = `url(${user.avatar})`;
-    av.textContent = '';
-  } else {
-    av.style.backgroundImage = '';
-    av.textContent = 'س';
-  }
-
-  const list = document.getElementById('user-list');
-  list.innerHTML = '<p style="color:#999; font-size:13px;">در حال بارگذاری...</p>';
-
-  try {
-    const all = await getAllUsers();
-    document.getElementById('cr-total').textContent = all.length;
-    document.getElementById('cr-managers').textContent = all.filter(u => u.isManager).length;
-    document.getElementById('cr-teachers').textContent = all.filter(u => u.isTeacher).length;
-
-    list.innerHTML = '';
-    if (all.length === 0) {
-      list.innerHTML = '<p style="color:#999; font-size:13px;">کاربری یافت نشد</p>';
-      return;
-    }
-
-    all.sort((a, b) => {
-      const w = u => u.role === 'creator' ? 0 : u.isManager ? 1 : u.isTeacher ? 2 : 3;
-      return w(a) - w(b);
-    });
-
-    all.forEach(u => {
-      const row = document.createElement('div');
-      row.className = 'user-row';
-      const tag = u.role === 'creator' ? ' [سازنده]' :
-                  u.isManager ? ' [مدیر]' :
-                  u.isTeacher ? ' [معلم]' : '';
-      row.innerHTML = `<strong>${(u.name || 'بدون نام') + tag}</strong><span>${u.phone}</span>`;
-      list.appendChild(row);
-    });
-  } catch (e) {
-    list.innerHTML = '<p style="color:#e53935; font-size:13px;">خطا در بارگذاری</p>';
-    console.error(e);
-  }
-}
-
-function logout() {
-  localStorage.removeItem('currentUser');
-  document.getElementById('phone').value = '';
-  document.getElementById('password-input').value = '';
-  document.getElementById('code-input').value = '';
-  document.getElementById('name-input').value = '';
-  document.getElementById('pass1').value = '';
-  document.getElementById('pass2').value = '';
-  document.getElementById('province').value = '';
-  document.getElementById('school').value = '';
-  document.getElementById('grade').value = '';
-  document.getElementById('is-manager').checked = false;
-  document.getElementById('manager-pass').value = '';
-  document.getElementById('manager-box').style.display = 'none';
-  document.getElementById('school-fields').style.display = 'block';
-  document.getElementById('is-teacher').checked = false;
-  document.getElementById('teacher-pass').value = '';
-  document.getElementById('teacher-box').style.display = 'none';
-  document.getElementById('code-display').textContent = '----';
-  const av = document.getElementById('avatar-preview');
-  av.style.backgroundImage = '';
-  av.innerHTML = '<span>انتخاب عکس</span>';
-  tempPhone = ''; tempCode = ''; tempName = ''; tempPass = ''; tempAvatar = '';
-  showScreen('login');
 }
