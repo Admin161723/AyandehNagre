@@ -172,8 +172,9 @@ function saveProfile() {
 }
 
 function toggleManager() {
-  document.getElementById('manager-box').style.display =
-    document.getElementById('is-manager').checked ? 'block' : 'none';
+  const checked = document.getElementById('is-manager').checked;
+  document.getElementById('manager-box').style.display = checked ? 'block' : 'none';
+  document.getElementById('school-fields').style.display = checked ? 'none' : 'block';
 }
 
 function toggleTeacher() {
@@ -182,9 +183,6 @@ function toggleTeacher() {
 }
 
 async function finishRegister() {
-  const province = document.getElementById('province').value.trim();
-  const school = document.getElementById('school').value.trim();
-  const grade = document.getElementById('grade').value.trim();
   const isManager = document.getElementById('is-manager').checked;
   const isTeacher = document.getElementById('is-teacher').checked;
   const managerPassInput = document.getElementById('manager-pass').value.trim();
@@ -198,12 +196,22 @@ async function finishRegister() {
   btn.textContent = 'در حال بررسی...';
 
   try {
+    // ===== مسیر مدیر =====
     if (isManager) {
-      const correct = await getManagerPass();
-      if (!correct || managerPassInput !== correct) {
+      const correctMgr = await getManagerPass();
+      if (!correctMgr || managerPassInput !== correctMgr) {
         error.style.display = 'block';
         error.textContent = 'رمز مدیر اشتباه است';
         return;
+      }
+
+      if (isTeacher) {
+        const correctTch = await getTeacherPass();
+        if (!correctTch || teacherPassInput !== correctTch) {
+          error.style.display = 'block';
+          error.textContent = 'رمز معلم اشتباه است';
+          return;
+        }
       }
 
       const existing = await getUser(tempPhone);
@@ -226,17 +234,21 @@ async function finishRegister() {
       return;
     }
 
+    // ===== مسیر معلم / دانش‌آموز =====
+    const province = document.getElementById('province').value.trim();
+    const school = document.getElementById('school').value.trim();
+    const grade = document.getElementById('grade').value.trim();
+
     if (isTeacher) {
-      const correct = await getTeacherPass();
-      if (!correct || teacherPassInput !== correct) {
+      const correctTch = await getTeacherPass();
+      if (!correctTch || teacherPassInput !== correctTch) {
         error.style.display = 'block';
         error.textContent = 'رمز معلم اشتباه است';
         return;
       }
     }
 
-    const schoolRequired = !isTeacher;
-    if (schoolRequired && (!province || !school || !grade)) {
+    if (!province || !school || !grade) {
       error.style.display = 'block';
       error.textContent = 'همه فیلدها را پر کنید';
       return;
@@ -391,6 +403,7 @@ function logout() {
   document.getElementById('is-manager').checked = false;
   document.getElementById('manager-pass').value = '';
   document.getElementById('manager-box').style.display = 'none';
+  document.getElementById('school-fields').style.display = 'block';
   document.getElementById('is-teacher').checked = false;
   document.getElementById('teacher-pass').value = '';
   document.getElementById('teacher-box').style.display = 'none';
