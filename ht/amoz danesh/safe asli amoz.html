@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0d47a1">
+  <title>آموزیار</title>
+  <link rel="stylesheet" href="amoz.css">
+</head>
+<body>
+
+<div id="screen-home" class="screen active" style="padding:0;">
+  <div class="topbar">
+    <div class="avatar-small" id="home-avatar" onclick="goPage('settings')"></div>
+    <div class="user-info">
+      <h2 id="home-name">کاربر</h2>
+      <p id="home-info">آموزیار</p>
+    </div>
+  </div>
+  <div class="content">
+    <div class="home-card">
+      <button onclick="goPage('tutorial')">آموزش‌ها</button>
+    </div>
+    <div class="logout-box">
+      <button class="btn-logout" onclick="logout()">خروج از حساب</button>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="goPage('home')">خانه</div>
+    <div class="nav-item" onclick="goPage('store')">فروشگاه</div>
+    <div class="nav-item" onclick="goPage('messages')">پیام‌ها</div>
+    <div class="nav-item" onclick="goPage('settings')">تنظیمات</div>
+  </div>
+</div>
+
+<div id="screen-store" class="screen" style="padding:0;">
+  <div class="panel-header">
+    <button class="back-btn" onclick="goPage('home')">→</button>
+    <h2>فروشگاه</h2>
+  </div>
+  <div class="content"><div class="empty-state">به زودی...</div></div>
+</div>
+
+<div id="screen-tutorial" class="screen" style="padding:0;">
+  <div class="panel-header">
+    <button class="back-btn" onclick="goPage('home')">→</button>
+    <h2>آموزش‌ها</h2>
+  </div>
+  <div class="content"><div class="empty-state">به زودی...</div></div>
+</div>
+
+<div id="screen-messages" class="screen" style="padding:0;">
+  <div class="panel-header">
+    <button class="back-btn" onclick="goPage('home')">→</button>
+    <h2>پیام‌ها</h2>
+  </div>
+  <div class="content" id="messages-list"></div>
+</div>
+
+<div id="screen-chat" class="screen" style="padding:0;">
+  <div class="chat-container">
+    <div class="chat-header">
+      <button class="back-btn" onclick="goPage('messages')">→</button>
+      <div class="chat-avatar" id="chat-avatar"></div>
+      <div style="flex:1;">
+        <h3 id="chat-name">نام</h3>
+        <small id="chat-sub"></small>
+      </div>
+      <button class="back-btn" onclick="deleteCurrentChat()" style="font-size:13px;">حذف</button>
+    </div>
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-input-bar">
+      <input type="text" id="chat-input" placeholder="پیام...">
+      <button onclick="sendChatText()">➤</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-settings" class="screen" style="padding:0;">
+  <div class="settings-profile">
+    <div class="big-avatar" id="settings-avatar" onclick="document.getElementById('settings-file').click()"></div>
+    <h2 id="settings-name">کاربر</h2>
+    <input type="file" id="settings-file" accept="image/*" onchange="changeAvatar(event)" style="display:none;">
+  </div>
+  <div class="settings-actions">
+    <button class="settings-btn" onclick="goPage('edit-profile')">ویرایش اطلاعات</button>
+    <button class="settings-btn" id="btn-panel" style="display:none;" onclick="goPage('panel')">پنل مدیریت</button>
+    <button class="settings-btn" style="color:#c62828;" onclick="logout()">خروج از حساب</button>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="goPage('home')">خانه</div>
+    <div class="nav-item" onclick="goPage('store')">فروشگاه</div>
+    <div class="nav-item" onclick="goPage('messages')">پیام‌ها</div>
+    <div class="nav-item active" onclick="goPage('settings')">تنظیمات</div>
+  </div>
+</div>
+
+<div id="screen-edit-profile" class="screen" style="padding:0;">
+  <div class="panel-header">
+    <button class="back-btn" onclick="goPage('settings')">→</button>
+    <h2>ویرایش اطلاعات</h2>
+  </div>
+  <div class="content">
+    <div class="card">
+      <label>نام و نام خانوادگی</label>
+      <input type="text" id="ep-name">
+      <label>رمز عبور جدید (خالی = بدون تغییر)</label>
+      <input type="password" id="ep-pass">
+      <label>استان</label>
+      <input type="text" id="ep-province">
+      <label>شهر</label>
+      <input type="text" id="ep-city">
+      <label>مدرسه</label>
+      <input type="text" id="ep-school">
+      <label>پایه</label>
+      <input type="text" id="ep-grade">
+      <div class="error" id="ep-error"></div>
+      <button class="btn" onclick="saveProfileEdit()">ذخیره</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-panel" class="screen" style="padding:0;">
+  <div class="panel-header">
+    <button class="back-btn" onclick="goPage('settings')">→</button>
+    <h2>پنل مدیریت</h2>
+  </div>
+  <div class="content"><div class="menu" id="panel-menu"></div></div>
+</div>
+
+<div id="screen-list" class="screen" style="padding:0;">
+  <div class="panel-header">
+    <button class="back-btn" onclick="goPage('panel')">→</button>
+    <h2 id="list-title">لیست</h2>
+  </div>
+  <div class="content">
+    <button class="btn" id="list-add-btn" style="display:none; margin-bottom:14px;" onclick="openAddPerson()">+ افزودن</button>
+    <div id="list-container"></div>
+  </div>
+</div>
+
+<div id="screen-edit-user" class="screen" style="padding:0;">
+  <div class="panel-header">
+    <button class="back-btn" onclick="goPage('list')">→</button>
+    <h2>ویرایش کاربر</h2>
+  </div>
+  <div class="content">
+    <div class="card">
+      <label>نام</label>
+      <input type="text" id="eu-name">
+      <label>شماره</label>
+      <input type="tel" id="eu-phone">
+      <label>رمز جدید</label>
+      <input type="password" id="eu-pass" placeholder="خالی = بدون تغییر">
+      <div class="error" id="eu-error"></div>
+      <button class="btn" onclick="saveUserEdit()">ذخیره</button>
+      <button class="btn" style="background:#ff9800;" onclick="banAction()">بن ۷ روز</button>
+      <button class="btn" style="background:#4caf50;" onclick="unbanAction()">رفع بن</button>
+      <button class="btn" style="background:#f44336;" onclick="deleteAction()">حذف حساب</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-add-person" class="screen" style="padding:0;">
+  <div class="panel-header">
+    <button class="back-btn" onclick="goPage('list')">→</button>
+    <h2 id="add-title">افزودن</h2>
+  </div>
+  <div class="content">
+    <div class="card">
+      <label>نام</label>
+      <input type="text" id="add-name">
+      <label>شماره</label>
+      <input type="tel" id="add-phone" maxlength="11">
+      <label>رمز</label>
+      <input type="password" id="add-pass">
+      <div class="error" id="add-error"></div>
+      <button class="btn" onclick="submitAddPerson()">ایجاد</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-att-grades" class="screen" style="padding:0;">
+  <div class="panel-header">
+    <button class="back-btn" onclick="goPage('panel')">→</button>
+    <h2>حضور و غیاب</h2>
+  </div>
+  <div class="content">
+    <div class="menu">
+      <div class="menu-item" onclick="openAttClasses('دهم')"><span>پایه دهم</span></div>
+      <div class="menu-item" onclick="openAttClasses('یازدهم')"><span>پایه یازدهم</span></div>
+      <div class="menu-item" onclick="openAttClasses('دوازدهم')"><span>پایه دوازدهم</span></div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-att-classes" class="screen" style="padding:0;">
+  <div class="panel-header">
+    <button class="back-btn" onclick="goPage('att-grades')">→</button>
+    <h2 id="att-grade-title">کلاس‌ها</h2>
+  </div>
+  <div class="content" id="att-classes-list"></div>
+</div>
+
+<div id="screen-att-sheet" class="screen" style="padding:0;">
+  <div class="panel-header">
+    <button class="back-btn" onclick="goPage('att-classes')">→</button>
+    <h2 id="att-sheet-title">حضور غیاب</h2>
+  </div>
+  <div class="content" id="att-sheet-container"></div>
+</div>
+
+<script src="api.js"></script>
+<script src="amoz.js"></script>
+</body>
+</html>
