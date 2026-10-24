@@ -205,6 +205,25 @@ async function finishRegister() {
         error.textContent = 'رمز مدیر اشتباه است';
         return;
       }
+
+      const existing = await getUser(tempPhone);
+      if (existing) {
+        error.style.display = 'block';
+        error.textContent = 'این شماره قبلاً ثبت‌نام کرده';
+        return;
+      }
+
+      localStorage.setItem('pendingManager', JSON.stringify({
+        phone: tempPhone,
+        name: tempName,
+        password: tempPass,
+        avatar: tempAvatar || '',
+        isTeacher: isTeacher,
+        createdAt: Date.now()
+      }));
+
+      window.location.href = 'panleamoz.html';
+      return;
     }
 
     if (isTeacher) {
@@ -216,7 +235,7 @@ async function finishRegister() {
       }
     }
 
-    const schoolRequired = !isTeacher || isManager;
+    const schoolRequired = !isTeacher;
     if (schoolRequired && (!province || !school || !grade)) {
       error.style.display = 'block';
       error.textContent = 'همه فیلدها را پر کنید';
@@ -239,7 +258,7 @@ async function finishRegister() {
       province: province,
       school: school,
       grade: grade,
-      isManager: isManager,
+      isManager: false,
       isTeacher: isTeacher,
       role: 'user',
       createdAt: Date.now()
@@ -247,9 +266,8 @@ async function finishRegister() {
 
     await saveUser(tempPhone, newUser);
     localStorage.setItem('currentUser', tempPhone);
-
-    if (isManager) { await loadManager(newUser); showScreen('manager'); }
-    else { loadMain(newUser); showScreen('main'); }
+    loadMain(newUser);
+    showScreen('main');
 
   } catch (e) {
     error.style.display = 'block';
@@ -281,8 +299,12 @@ function loadMain(user) {
 
 async function loadManager(user) {
   document.getElementById('manager-name').textContent = user.name || 'مدیر';
-  document.getElementById('manager-info').textContent =
-    (user.school || '') + (user.province ? ' | ' + user.province : '');
+  const infoParts = [];
+  if (user.school) infoParts.push(user.school);
+  if (user.city) infoParts.push(user.city);
+  else if (user.province) infoParts.push(user.province);
+  if (user.district) infoParts.push(user.district);
+  document.getElementById('manager-info').textContent = infoParts.join(' | ');
 
   const av = document.getElementById('manager-avatar');
   if (user.avatar) {
