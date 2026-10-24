@@ -1,0 +1,420 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Tahoma, Arial, sans-serif;
+  background: #f5f7fa;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.screen {
+  display: none;
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 20px;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* ===== لودینگ ===== */
+#screen-loading {
+  background: linear-gradient(135deg, #1a73e8, #0d47a1);
+  color: white;
+  justify-content: center;
+}
+
+.logo-big {
+  width: 120px;
+  height: 120px;
+  background: white;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+  margin-bottom: 25px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+#screen-loading h1 {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+#screen-loading p {
+  opacity: 0.9;
+  margin-bottom: 35px;
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255,255,255,0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== هدر مشترک ===== */
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #1a73e8, #0d47a1);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  margin: 0 auto 12px;
+  color: white;
+}
+
+.header h1 {
+  font-size: 22px;
+  color: #1a73e8;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* ===== کارت ===== */
+.card {
+  background: white;
+  width: 100%;
+  max-width: 380px;
+  border-radius: 20px;
+  padding: 28px 22px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.07);
+}
+
+label {
+  display: block;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 6px;
+  margin-top: 14px;
+  font-weight: bold;
+}
+
+label:first-of-type {
+  margin-top: 0;
+}
+
+input[type="tel"],
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 13px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 15px;
+  outline: none;
+  transition: border 0.25s;
+}
+
+input:focus {
+  border-color: #1a73e8;
+}
+
+input[type="tel"] {
+  text-align: center;
+  direction: ltr;
+  letter-spacing: 1px;
+}
+
+#code-input {
+  font-size: 22px;
+  letter-spacing: 10px;
+}
+
+.btn {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #1a73e8, #0d47a1);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 22px;
+  cursor: pointer;
+}
+
+.btn:active {
+  opacity: 0.9;
+}
+
+.error {
+  color: #e53935;
+  font-size: 13px;
+  margin-top: 10px;
+  text-align: center;
+  display: none;
+}
+
+.back-link {
+  margin-top: 20px;
+  color: #1a73e8;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+/* ===== آواتار ===== */
+.avatar-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: #e3f2fd;
+  border: 3px dashed #1a73e8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  cursor: pointer;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.avatar span {
+  font-size: 12px;
+  color: #1a73e8;
+  position: absolute;
+  bottom: 8px;
+  background: rgba(255,255,255,0.85);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+#file-input {
+  display: none;
+}
+
+/* ===== چک‌باکس مدیر ===== */
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 12px;
+  background: #f0f7ff;
+  border-radius: 12px;
+}
+
+.checkbox-row input {
+  width: 20px;
+  height: 20px;
+}
+
+.checkbox-row label {
+  margin: 0;
+  font-weight: normal;
+}
+
+.manager-box {
+  display: none;
+  margin-top: 12px;
+  padding: 14px;
+  background: #fff3e0;
+  border-radius: 12px;
+  border: 1px solid #ffb74d;
+}
+
+.manager-box label {
+  color: #e65100;
+  margin-top: 0;
+}
+
+/* ===== صفحه اصلی و پنل ===== */
+#screen-main,
+#screen-manager {
+  padding: 0;
+  align-items: stretch;
+}
+
+.topbar {
+  background: linear-gradient(135deg, #1a73e8, #0d47a1);
+  color: white;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.manager-topbar {
+  background: linear-gradient(135deg, #e65100, #bf360c);
+}
+
+.avatar-small {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: white;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.user-info h2 {
+  font-size: 17px;
+}
+
+.user-info p {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.badge {
+  background: rgba(255,255,255,0.25);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.content {
+  padding: 18px;
+  padding-bottom: 90px;
+}
+
+.content .card h3 {
+  font-size: 16px;
+  color: #1a73e8;
+  margin-bottom: 8px;
+}
+
+.manager-topbar + .content .card h3 {
+  color: #e65100;
+}
+
+.content .card p {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.menu {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.menu-item {
+  background: white;
+  border-radius: 16px;
+  padding: 18px 10px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.menu-item .icon {
+  font-size: 30px;
+  margin-bottom: 6px;
+}
+
+.menu-item span {
+  font-size: 13px;
+  color: #333;
+}
+
+.stats {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.stat-box {
+  flex: 1;
+  background: white;
+  border-radius: 14px;
+  padding: 14px 8px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.stat-box .num {
+  font-size: 22px;
+  font-weight: bold;
+  color: #e65100;
+}
+
+.stat-box .label {
+  font-size: 12px;
+  color: #777;
+  margin-top: 3px;
+}
+
+.logout-box {
+  margin-top: 25px;
+  text-align: center;
+}
+
+.btn-logout {
+  background: #ffebee;
+  color: #c62828;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+}
+
+.nav-item {
+  text-align: center;
+  font-size: 11px;
+  color: #666;
+}
+
+.nav-item.active {
+  color: #1a73e8;
+}
+
+.nav-item .icon {
+  font-size: 20px;
+  display: block;
+  margin-bottom: 2px;
+}
