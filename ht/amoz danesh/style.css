@@ -25,15 +25,12 @@ body {
 
 .screen.active { display: flex; }
 
-/* ===== لودینگ تمام‌صفحه گوشی (بدون زوم/کشیدگی) ===== */
 #screen-loading {
   position: fixed;
   inset: 0;
-  top: 0; left: 0; right: 0; bottom: 0;
   width: 100vw;
   height: 100vh;
   height: 100dvh;
-  min-height: 100vh;
   min-height: -webkit-fill-available;
   padding: 0;
   margin: 0;
@@ -47,12 +44,22 @@ body {
   overflow: hidden;
 }
 
-/* ===== هدر ===== */
-.header { text-align: center; margin-bottom: 24px; }
-.header h1 { font-size: 22px; color: #1a73e8; }
-.subtitle { color: #666; font-size: 13px; margin-top: 6px; }
+.header {
+  text-align: center;
+  margin-bottom: 24px;
+}
 
-/* ===== کارت ===== */
+.header h1 {
+  font-size: 22px;
+  color: #1a73e8;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
 .card {
   background: white;
   width: 100%;
@@ -86,7 +93,12 @@ input[type="password"] {
 }
 
 input:focus { border-color: #1a73e8; }
-input[type="tel"] { text-align: center; direction: ltr; letter-spacing: 1px; }
+
+input[type="tel"] {
+  text-align: center;
+  direction: ltr;
+  letter-spacing: 1px;
+}
 
 #code-input {
   font-size: 22px;
@@ -153,8 +165,11 @@ input[type="tel"] { text-align: center; direction: ltr; letter-spacing: 1px; }
   text-decoration: none;
 }
 
-/* ===== آواتار ===== */
-.avatar-section { display: flex; justify-content: center; margin-bottom: 10px; }
+.avatar-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
 
 .avatar {
   width: 110px;
@@ -185,7 +200,6 @@ input[type="tel"] { text-align: center; direction: ltr; letter-spacing: 1px; }
 
 #file-input { display: none; }
 
-/* ===== چک‌باکس‌ها ===== */
 .checkbox-row {
   display: flex;
   align-items: center;
@@ -219,8 +233,9 @@ input[type="tel"] { text-align: center; direction: ltr; letter-spacing: 1px; }
 }
 .teacher-box label { color: #2e7d32; margin-top: 0; }
 
-/* ===== پنل‌ها ===== */
-#screen-main, #screen-manager, #screen-creator {
+#screen-main,
+#screen-manager,
+#screen-creator {
   padding: 0;
   align-items: stretch;
 }
