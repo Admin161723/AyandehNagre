@@ -94,12 +94,15 @@
       <p class="subtitle">اطلاعات خود را وارد کنید</p>
     </div>
     <div class="card">
-      <label>نام استان</label>
-      <input type="text" id="province" placeholder="مثال: تهران">
-      <label>نام مدرسه</label>
-      <input type="text" id="school" placeholder="مثال: دبیرستان شهید بهشتی">
-      <label>پایه / کلاس چندم</label>
-      <input type="text" id="grade" placeholder="مثال: دهم ریاضی">
+
+      <div id="school-fields">
+        <label>نام استان</label>
+        <input type="text" id="province" placeholder="مثال: تهران">
+        <label>نام مدرسه</label>
+        <input type="text" id="school" placeholder="مثال: دبیرستان شهید بهشتی">
+        <label>پایه / کلاس چندم</label>
+        <input type="text" id="grade" placeholder="مثال: دهم ریاضی">
+      </div>
 
       <div class="checkbox-row">
         <input type="checkbox" id="is-manager" onchange="toggleManager()">
