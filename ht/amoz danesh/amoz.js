@@ -1,5 +1,5 @@
 // ============================================================
-// amoz.js — منطق اصلی
+// amoz.js — نسخه اصلاح‌شده (رفع خطای پیام‌ها + بروزرسانی آنی پنل)
 // ============================================================
 let currentUser = null;
 let currentChatPhone = null;
@@ -16,10 +16,13 @@ let currentWeeklyClass = '';
 // ============ HELPERS ============
 function initialOf(n) { return n ? n.trim().charAt(0) : ''; }
 
+function isBanned(u) {
+  return !!(u && u.bannedUntil && u.bannedUntil > Date.now());
+}
+
 function tickHtml(u) {
   if (!u) return '';
-  if (u.bannedUntil && u.bannedUntil > Date.now())
-    return '<span class="tick tick-red">!</span>';
+  if (isBanned(u)) return '<span class="tick tick-red">!</span>';
   if (u.role === 'creator') return '<span class="tick tick-black">✓</span>';
   if (u.role === 'support') return '<span class="tick tick-blue">✓</span>';
   if (u.isManager) return '<span class="tick tick-green">✓</span>';
@@ -28,15 +31,15 @@ function tickHtml(u) {
 }
 
 function hasTick(u) {
-  return u && (u.role === 'creator' || u.role === 'support' || u.isManager || u.isVice);
+  return !!(u && (u.role === 'creator' || u.role === 'support' || u.isManager || u.isVice));
 }
 
 function hasPanelAccess(u) {
-  return hasTick(u) || (u && u.isTeacher);
+  return hasTick(u) || !!(u && u.isTeacher);
 }
 
-function isBanned(u) {
-  return u && u.bannedUntil && u.bannedUntil > Date.now();
+function safeName(c) {
+  return (c && (c.name || c.phone)) || 'کاربر';
 }
 
 // ============ INIT ============
@@ -60,14 +63,11 @@ function goPage(name) {
   const el = document.getElementById('screen-' + name);
   if (el) el.classList.add('active');
   window.scrollTo(0, 0);
-
-  // update bottom nav active state
   document.querySelectorAll('.bottom-nav').forEach(nav => {
     nav.querySelectorAll('.nav-item').forEach(it => {
       it.classList.toggle('active', it.dataset.page === name);
     });
   });
-
   if (name === 'messages') loadMessages();
   if (name === 'settings') loadSettings();
   if (name === 'panel') loadPanel();
@@ -166,33 +166,47 @@ async function saveProfileEdit() {
   goPage('settings');
 }
 
-// ============ MESSAGES ============
+// ============ MESSAGES (اصلاح‌شده — بدون خطا، پشتیبانی همیشه هست) ============
 async function loadMessages() {
   const container = document.getElementById('messages-list');
+  if (!container) return;
   container.innerHTML = '<div class="empty-state">بارگذاری...</div>';
 
   try {
     const myPhone = currentUser.phone;
     const contacts = [];
+    const seen = new Set();
+
+    // ۱) پشتیبانی اصلی همیشه اول (اگر خودم پشتیبانی نباشم)
+    let mainSup = '';
+    try { mainSup = await getSupportPhone(); } catch (e) {}
+    if (mainSup && String(mainSup) !== String(myPhone)) {
+      const su = await getUser(mainSup);
+      if (su) { contacts.push(su); seen.add(su.phone); }
+    }
 
     if (hasTick(currentUser)) {
-      // Staff: own contact list (users who messaged me)
-      const cPhones = await getContacts(myPhone);
-      for (const p of cPhones) {
-        const u = await getUser(p);
-        if (u) contacts.push(u);
+      // ۲) پنل‌دار → مخاطبین خودش (کسانی که به او پیام داده‌اند)
+      let cPhones = [];
+      try { cPhones = await getContacts(myPhone); } catch (e) { cPhones = []; }
+      if (Array.isArray(cPhones)) {
+        for (const p of cPhones) {
+          if (!p || seen.has(p)) continue;
+          const u = await getUser(p);
+          if (u) { contacts.push(u); seen.add(p); }
+        }
       }
     } else {
-      // Regular user: main support + all ticked users
-      const mainSup = await getMainSupportPhone();
-      if (mainSup) {
-        const su = await getUser(mainSup);
-        if (su) contacts.push(su);
-      }
-      const all = await getAllUsers();
-      for (const u of all) {
-        if (u.phone === myPhone) continue;
-        if (hasTick(u) && u.phone !== mainSup) contacts.push(u);
+      // ۳) کاربر عادی → همه کسانی که تیک دارند
+      let all = [];
+      try { all = await getAllUsers(); } catch (e) { all = []; }
+      if (Array.isArray(all)) {
+        for (const u of all) {
+          if (!u || !u.phone) continue;
+          if (String(u.phone) === String(myPhone)) continue;
+          if (seen.has(u.phone)) continue;
+          if (hasTick(u)) { contacts.push(u); seen.add(u.phone); }
+        }
       }
     }
 
@@ -202,32 +216,25 @@ async function loadMessages() {
       return;
     }
 
-    // dedupe
-    const seen = new Set();
-    const uniq = contacts.filter(c => {
-      if (seen.has(c.phone)) return false;
-      seen.add(c.phone);
-      return true;
-    });
-
-    uniq.forEach(c => {
+    contacts.forEach(c => {
       const div = document.createElement('div');
       div.className = 'list-item';
       div.onclick = () => openChat(c.phone);
       const av = c.avatar
         ? `<div class="avatar-mini" style="background-image:url(${c.avatar})"></div>`
-        : `<div class="avatar-mini">${initialOf(c.name)}</div>`;
+        : `<div class="avatar-mini">${initialOf(safeName(c))}</div>`;
       let roleLabel = '';
       if (c.role === 'support') roleLabel = 'پشتیبانی';
+      else if (c.role === 'creator') roleLabel = 'سازنده';
       else if (c.isManager) roleLabel = 'مدیر';
       else if (c.isVice) roleLabel = 'معاون';
-      else if (c.role === 'creator') roleLabel = 'سازنده';
       else if (c.isTeacher) roleLabel = 'معلم';
-      div.innerHTML = `${av}<div class="info"><strong>${c.name || 'بدون نام'} ${tickHtml(c)}</strong><small>${roleLabel || c.phone}</small></div>`;
+      div.innerHTML = `${av}<div class="info"><strong>${safeName(c)} ${tickHtml(c)}</strong><small>${roleLabel || c.phone}</small></div>`;
       container.appendChild(div);
     });
   } catch (e) {
-    container.innerHTML = '<div class="empty-state">خطا</div>';
+    console.error('loadMessages:', e);
+    container.innerHTML = '<div class="empty-state">خطا در بارگذاری پیام‌ها</div>';
   }
 }
 
@@ -237,7 +244,7 @@ async function openChat(contactPhone) {
 
   const contact = await getUser(contactPhone);
   document.getElementById('chat-name').innerHTML =
-    ((contact && contact.name) || 'گفتگو') + ' ' + tickHtml(contact);
+    (contact ? safeName(contact) : 'گفتگو') + ' ' + tickHtml(contact);
   document.getElementById('chat-sub').textContent = contactPhone;
 
   const av = document.getElementById('chat-avatar');
@@ -246,13 +253,13 @@ async function openChat(contactPhone) {
     av.textContent = '';
   } else {
     av.style.backgroundImage = '';
-    av.textContent = initialOf(contact ? contact.name : 'گ');
+    av.textContent = initialOf(contact ? safeName(contact) : 'گ');
   }
 
   const msgs = await getChatBetween(currentUser.phone, contactPhone);
   const container = document.getElementById('chat-messages');
   container.innerHTML = '';
-  if (msgs.length === 0) {
+  if (!msgs || msgs.length === 0) {
     container.innerHTML = '<div class="empty-state">هنوز پیامی رد و بدل نشده</div>';
     return;
   }
@@ -260,19 +267,12 @@ async function openChat(contactPhone) {
     const div = document.createElement('div');
     const mine = m.from === currentUser.phone;
     div.className = 'chat-msg ' + (mine ? 'mine' : 'theirs');
-
     let inner = '';
-    if (m.type === 'image') {
-      inner = `<img src="${m.content}">`;
-    } else if (m.type === 'audio') {
-      inner = `<audio controls src="${m.content}"></audio>`;
-    } else if (m.type === 'video') {
-      inner = `<video controls src="${m.content}"></video>`;
-    } else if (m.type === 'file') {
-      inner = `<a class="file-link" href="${m.content.data}" download="${m.content.name}">📄 ${m.content.name}</a>`;
-    } else {
-      inner = m.content;
-    }
+    if (m.type === 'image') inner = `<img src="${m.content}">`;
+    else if (m.type === 'audio') inner = `<audio controls src="${m.content}"></audio>`;
+    else if (m.type === 'video') inner = `<video controls src="${m.content}"></video>`;
+    else if (m.type === 'file') inner = `<a class="file-link" href="${m.content.data}" download="${m.content.name}">📄 ${m.content.name}</a>`;
+    else inner = m.content;
     inner += `<small>${new Date(m.ts).toLocaleTimeString('fa-IR')}</small>`;
     div.innerHTML = inner;
     container.appendChild(div);
@@ -284,6 +284,7 @@ async function sendChatText() {
   const input = document.getElementById('chat-input');
   const txt = input.value.trim();
   if (!txt) return;
+  if (!currentChatPhone) return;
   input.value = '';
   await sendMsg(currentUser.phone, currentChatPhone, 'text', txt);
   openChat(currentChatPhone);
@@ -293,7 +294,7 @@ async function sendChatFile(e) {
   const f = e.target.files[0];
   if (!f) return;
   e.target.value = '';
-  const maxSize = 800 * 1024; // 800KB limit for base64 demo
+  const maxSize = 800 * 1024;
   if (f.size > maxSize) { alert('حجم فایل زیاد است (حداکثر ۸۰۰ کیلوبایت)'); return; }
   const r = new FileReader();
   r.onload = async (ev) => {
@@ -302,7 +303,6 @@ async function sendChatFile(e) {
     if (f.type.startsWith('image/')) type = 'image';
     else if (f.type.startsWith('audio/')) type = 'audio';
     else if (f.type.startsWith('video/')) type = 'video';
-
     let content = dataUrl;
     if (type === 'file') content = { name: f.name, data: dataUrl };
     await sendMsg(currentUser.phone, currentChatPhone, type, content);
@@ -329,36 +329,26 @@ function loadPanel() {
   const isVice = u.isVice;
   const isTeacher = u.isTeacher;
 
-  // Teachers & managers
-  if (isCreator || isManager || isVice) {
+  if (isCreator || isManager || isVice || isTeacher) {
     items.push({ label: 'لیست معلم‌ها', action: () => openList('teacher') });
   }
-  // Vices & managers & creator
   if (isCreator || isManager) {
     items.push({ label: 'لیست معاون‌ها', action: () => openList('vice') });
   }
-  // Only creator
   if (isCreator) {
     items.push({ label: 'لیست مدیرها', action: () => openList('manager') });
   }
-  // Tools (users) — creator, manager, support
   if (isCreator || isManager || isSupport) {
     items.push({ label: 'لیست کاربران', action: () => openList('user') });
     items.push({ label: 'رفع بن‌ها', action: () => openList('banned') });
   }
-  // Attendance
   if (isCreator || isManager || isVice || isTeacher) {
     items.push({ label: 'حضور و غیاب', action: () => goPage('att-grades') });
-  }
-  // Weekly attendance
-  if (isCreator || isManager || isVice || isTeacher) {
     items.push({ label: 'حضور هفتگی', action: () => goPage('weekly-att') });
   }
-  // Manage class lists — creator, manager, support
   if (isCreator || isManager || isSupport) {
     items.push({ label: 'مدیریت لیست کلاس‌ها', action: () => goPage('creator-lists') });
   }
-  // Grades (soon)
   if (isTeacher) {
     items.push({ label: 'لیست نمرات', action: () => alert('به زودی') });
   }
@@ -372,10 +362,10 @@ function loadPanel() {
   });
 }
 
-// ============ LIST ============
-async function openList(type) {
+// ============ LIST (با silent برای بروزرسانی آنی بدون فلش) ============
+async function openList(type, silent) {
   currentListType = type;
-  goPage('list');
+  if (!silent) goPage('list');
 
   const titles = {
     teacher: 'لیست معلم‌ها',
@@ -388,7 +378,6 @@ async function openList(type) {
 
   const canAdd = (currentUser.role === 'creator' || currentUser.isManager || currentUser.isVice)
     && ['teacher', 'vice', 'manager'].includes(type);
-  // only creator can add managers
   if (type === 'manager' && currentUser.role !== 'creator') {
     document.getElementById('list-add-btn').style.display = 'none';
   } else {
@@ -399,7 +388,7 @@ async function openList(type) {
   }
 
   const container = document.getElementById('list-container');
-  container.innerHTML = '<div class="empty-state">بارگذاری...</div>';
+  if (!silent) container.innerHTML = '<div class="empty-state">بارگذاری...</div>';
 
   try {
     let users = await getAllUsers();
@@ -426,7 +415,8 @@ async function openList(type) {
       container.appendChild(div);
     });
   } catch (e) {
-    container.innerHTML = '<div class="empty-state">خطا</div>';
+    console.error('openList:', e);
+    if (!silent) container.innerHTML = '<div class="empty-state">خطا</div>';
   }
 }
 
@@ -441,7 +431,6 @@ async function openEditUser(phone) {
   document.getElementById('eu-school').value = u.school || '';
   document.getElementById('eu-error').style.display = 'none';
 
-  // Toggles based on current user role
   const togglesDiv = document.getElementById('eu-toggles');
   togglesDiv.innerHTML = '';
 
@@ -474,14 +463,14 @@ async function saveUserEdit() {
   if (p) u.password = p;
   u.school = document.getElementById('eu-school').value.trim();
 
-  // read toggles
   ['isTeacher', 'isVice', 'isManager'].forEach(k => {
     const el = document.getElementById('tog-' + k);
     if (el) u[k] = el.checked;
   });
 
   await saveUser(currentEditPhone, u);
-  openList(currentListType);
+  goPage('list');
+  await openList(currentListType, true);
 }
 
 async function banAction() {
@@ -490,7 +479,8 @@ async function banAction() {
   if (!u) return;
   u.bannedUntil = Date.now() + 7 * 86400000;
   await saveUser(currentEditPhone, u);
-  openList(currentListType);
+  goPage('list');
+  await openList(currentListType, true);
 }
 
 async function unbanAction() {
@@ -498,13 +488,15 @@ async function unbanAction() {
   if (!u) return;
   u.bannedUntil = null;
   await saveUser(currentEditPhone, u);
-  openList(currentListType);
+  goPage('list');
+  await openList(currentListType, true);
 }
 
 async function deleteAction() {
   if (!confirm('حذف دائمی؟')) return;
   await deleteUser(currentEditPhone);
-  openList(currentListType);
+  goPage('list');
+  await openList(currentListType, true);
 }
 
 function openAddPerson() {
@@ -543,7 +535,8 @@ async function submitAddPerson() {
     createdAt: Date.now()
   };
   await saveUser(ph, newU);
-  openList(currentListType);
+  goPage('list');
+  await openList(currentListType, true);
 }
 
 // ============ ATTENDANCE ============
@@ -580,25 +573,26 @@ async function openAttSheet(grade, className) {
 
 async function renderBellTabs() {
   const tabs = document.getElementById('bell-tabs');
-  tabs.innerHTML = '';
   const today = new Date().toISOString().slice(0, 10);
+  const items = [];
   for (let b = 1; b <= 4; b++) {
     const data = await getAttendance(currentAttGrade, currentAttClass, today, b);
-    const approved = data && data.teacherApproved;
-    const div = document.createElement('button');
-    div.className = 'bell-tab' + (b === currentBell ? ' active' : '') + (approved ? ' approved' : '');
-    div.textContent = 'زنگ ' + b;
-    div.onclick = () => { currentBell = b; renderBellTabs(); renderAttSheet(); };
-    tabs.appendChild(div);
+    items.push({ bell: b, approved: !!(data && data.teacherApproved) });
   }
+  tabs.innerHTML = '';
+  items.forEach(({ bell, approved }) => {
+    const div = document.createElement('button');
+    div.className = 'bell-tab' + (bell === currentBell ? ' active' : '') + (approved ? ' approved' : '');
+    div.textContent = 'زنگ ' + bell;
+    div.onclick = () => { currentBell = bell; renderBellTabs(); renderAttSheet(); };
+    tabs.appendChild(div);
+  });
 }
 
 async function renderAttSheet() {
   const container = document.getElementById('att-sheet-container');
-  container.innerHTML = '<div class="empty-state">بارگذاری...</div>';
-
   const students = await getClassStudents(currentAttGrade, currentAttClass);
-  if (students.length === 0) {
+  if (!students || students.length === 0) {
     container.innerHTML = '<div class="empty-state">دانش‌آموزی نیست</div>';
     return;
   }
@@ -618,7 +612,6 @@ async function renderAttSheet() {
 
   container.innerHTML = '';
 
-  // locked banner
   if (isLocked) {
     const lock = document.createElement('div');
     lock.style.cssText = 'padding:10px;background:#e8f5e9;color:#2e7d32;border-radius:10px;margin-bottom:10px;font-size:13px;text-align:center;';
@@ -683,7 +676,6 @@ async function submitAttendance(baseData) {
     approvedAt: Date.now()
   };
   await saveAttendance(currentAttGrade, currentAttClass, data.date, currentBell, data);
-  alert('✓ ثبت و ارسال شد');
   await renderBellTabs();
   await renderAttSheet();
 }
@@ -696,9 +688,9 @@ async function openGradeManage(grade) {
   await renderClassesList();
 }
 
-async function renderClassesList() {
+async function renderClassesList(silent) {
   const container = document.getElementById('gm-classes');
-  container.innerHTML = '<div class="empty-state">بارگذاری...</div>';
+  if (!silent) container.innerHTML = '<div class="empty-state">بارگذاری...</div>';
   const classes = await getClasses(currentGradeManage);
   container.innerHTML = '';
   if (classes.length === 0) {
@@ -717,7 +709,7 @@ async function renderClassesList() {
       e.stopPropagation();
       if (!confirm('حذف کلاس ' + cls + ' و همه دانش‌آموزانش؟')) return;
       await removeClass(currentGradeManage, cls);
-      renderClassesList();
+      renderClassesList(true);
     };
     div.appendChild(del);
     container.appendChild(div);
@@ -728,7 +720,7 @@ async function promptAddClass() {
   const name = prompt('نام کلاس (مثلاً A یا ۱):');
   if (!name || !name.trim()) return;
   await addClass(currentGradeManage, name.trim());
-  renderClassesList();
+  renderClassesList(true);
 }
 
 async function openClassStudents(className) {
@@ -738,12 +730,12 @@ async function openClassStudents(className) {
   await renderStudentsList();
 }
 
-async function renderStudentsList() {
+async function renderStudentsList(silent) {
   const container = document.getElementById('cs-list');
-  container.innerHTML = '<div class="empty-state">بارگذاری...</div>';
+  if (!silent) container.innerHTML = '<div class="empty-state">بارگذاری...</div>';
   const students = await getClassStudents(currentGradeManage, currentClassManage);
   container.innerHTML = '';
-  if (students.length === 0) {
+  if (!students || students.length === 0) {
     container.innerHTML = '<div class="empty-state">دانش‌آموزی نیست</div>';
     return;
   }
@@ -758,7 +750,7 @@ async function renderStudentsList() {
     del.onclick = async () => {
       if (!confirm('حذف ' + s.name + '؟')) return;
       await removeStudent(currentGradeManage, currentClassManage, s.phone || s.name);
-      renderStudentsList();
+      renderStudentsList(true);
     };
     div.appendChild(del);
     container.appendChild(div);
@@ -788,7 +780,7 @@ async function submitAddStudent() {
   }
   await addStudent(currentGradeManage, currentClassManage, { name, phone, school });
   goPage('class-students');
-  renderStudentsList();
+  await renderStudentsList(true);
 }
 
 // ============ WEEKLY ============
@@ -823,8 +815,7 @@ async function openWeeklyView(grade, className) {
   const keys = await getAllAttendanceKeys(grade, className);
   const weekAgo = Date.now() - 7 * 86400000;
 
-  // gather records per student
-  const studentsMap = {}; // name -> { name, records: { date_bell: status } }
+  const studentsMap = {};
   const datesSet = new Set();
 
   for (const k of keys) {
@@ -844,7 +835,7 @@ async function openWeeklyView(grade, className) {
 
   container.innerHTML = '';
   if (Object.keys(studentsMap).length === 0) {
-    container.innerHTML = '<div class="empty-state">دادهای در هفته اخیر نیست</div>';
+    container.innerHTML = '<div class="empty-state">داده‌ای در هفته اخیر نیست</div>';
     return;
   }
 
